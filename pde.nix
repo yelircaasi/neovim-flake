@@ -38,7 +38,8 @@ in
       cp -L ${files.init} $out/config/init.lua
       echo "#!${pkgs.runtimeShell}" > $out/bin/pde
       echo "LUA_PATH=\"\" ${pkgs.neovim}/bin/nvim -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
-      chmod +x $out/bin/pde
+      cp -L $out/bin/pde $out/bin/nvim
+      chmod +x $out/bin/pde $out/bin/nvim
     '';
 
     # Embed custom configuration and aliases
