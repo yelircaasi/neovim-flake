@@ -8,6 +8,7 @@
 
   files = import ./lua-writer.nix {inherit pkgs custom configDir treesitter;};
   configDir = "config";
+  argCatcher = ''"\$@"'';
 in
   pkgs.stdenv.mkDerivation rec {
     name = "pde";
@@ -27,21 +28,17 @@ in
       mkdir -p $out/bin
       mkdir -p $out/config/
       mkdir -p $out/config/lua/
-
+      export VIMINIT='let &swapfile = 0'
     '';
 
     # Add aliases and links for neovim
     installPhase = ''
-      cp ${files.colors} $out/config/lua/colors.lua
-      cp ${files.python} $out/config/lua/python.lua
-      cp ${files.init} $out/config/init.lua
-      echo ${pde} > $out/bin/pde
+      cp -L ${files.colors} $out/config/_colors.lua
+      cp -L ${files.python} $out/config/python.lua
+      cp -L ${files.init} $out/config/init.lua
+      echo "#!${pkgs.runtimeShell}" > $out/bin/pde
+      echo "LUA_PATH=\"\" ${pkgs.neovim}/bin/nvim -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
       chmod +x $out/bin/pde
-    '';
-
-    pde = ''
-      #!${pkgs.runtimeShell}
-      ${pkgs.neovim}/bin/nvim -u $out/config/init.lua "$@"
     '';
 
     # Embed custom configuration and aliases
