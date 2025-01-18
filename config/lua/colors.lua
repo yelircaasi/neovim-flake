@@ -4,6 +4,7 @@
 --vim.api.nvim_set_hl(0, 'Cursor', { reverse = true })
 
 --vim.cmd("highlight clear")
+
 print(vim.opt.rtp)
 vim.cmd("syntax reset")
 --vim.g.colors_name = 'melange'
