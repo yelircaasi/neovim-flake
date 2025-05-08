@@ -1,4 +1,5 @@
-{pkgs}: {
+{pkgs, ...}: {
+  /*
   xit-nvim = pkgs.vimUtils.buildVimPlugin {
     pname = "xit.nvim";
     version = "2024-03-21";
@@ -506,4 +507,5 @@
     };
     meta.homepage = "https://github.com/chrisgrieser/nvim-various-textobjs";
   };
+  */
 }

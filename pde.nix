@@ -1,10 +1,11 @@
 {
   pkgs,
-  neovim-nightly,
+  # neovim-nightly,
   nix-treesitter,
+  ...
 }: let
   custom = import ./self-packaged-plugins.nix {inherit pkgs;};
-  treesitter = pkgs.vimPlugins.nvim-treesitter.withAllGrammars; #withPlugins (p: [nix-treesitter.tree-sitter-xit]);
+  treesitter = pkgs.vimPlugins.nvim-treesitter.withPlugins (p: [nix-treesitter.tree-sitter-xit]);
 
   files = import ./lua-writer.nix {inherit pkgs custom configDir treesitter;};
   configDir = "config";
@@ -16,7 +17,8 @@ in
 
     # Use the neovim-nightly package and dependencies
     buildInputs = [
-      neovim-nightly
+      # neovim-nightly
+      pkgs.neovim
       pkgs.python3
       pkgs.nodejs
       pkgs.ruby

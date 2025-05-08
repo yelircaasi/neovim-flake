@@ -3,6 +3,7 @@
   custom,
   configDir,
   treesitter,
+  ...
 }: rec {
   init = pkgs.writeTextFile {
     name = "init.lua";
