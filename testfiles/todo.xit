@@ -1,0 +1,162 @@
+Morning Routine
+[x] Get up and drink water
+[ ] Get dressed for sports
+[ ] Stretch
+[ ] Workout
+[ ] Haircut, shower, shave, dress
+[ ] Meditation
+[ ] Breakfast prep
+[ ] Breakfast
+[ ] Mouthwash, floss, brush teeth
+[ ] Thorough clean-up and organizing
+[ ] Flashcards
+[ ] Review daily plan
+[ ] Study wisdom literature
+[ ] Miscellaneous prep for the day
+
+Midday Routine
+[x] Large glass of water
+[ ] Stretchgs
+[ ] Meditation
+[ ] Review day and adjust plan
+
+Evening
+[ ] Thorough clean-up and organizing
+[ ] Brush teeth and rinse
+[ ] Review day and write in journal
+[ ] Review and refine plan for the next day
+[ ] Complete tracking for the day
+[ ] Prepare things for the next day, especially clothes and food
+[ ] Evening stroll
+[ ] Stretch
+[ ] Meditation
+[ ] Reading without distractions
+
+Weekly Planning and Review
+[ ] Complete tracking for the past week
+[ ] Write weekly review
+[ ] Review and adjust plan for coming week
+[ ] Plan meals for the coming week
+
+consilium
+[x] add make_or_read method to all relevant type classes
+[x] add get_path(cfg: Config) staticmethod to each type class corresponding to a path
+[x] add get_triggers(cfg: Config) and get_triggers_inclusive(cfg: Config) (to include own path) staticmethods to all relevant type classes
+[x] add dependencies_unchanged(cfg) static method to abstract away boilerplate inside make_or_read(cfg) -> return first_is_newer(get_path(cfg), get_triggers(cfg))
+[x] create class Derived(BaseModel) with methods
+    - dependencies_unchanged(cfg: Config)
+    - get_path_and_dependencies(cfg: Config) 
+    and static abstractmethods
+    - get_path(cfg: Config)
+    - get_triggers(cfg: Config)
+[ ] add libraries (also make compatible neovim-nixcats-pde, copier template with nix flake):
+    hypothesis https://hypothesis.works/products/ https://github.com/HypothesisWorks/hypothesis
+    bandit https://bandit.readthedocs.io/en/latest/index.html
+    safety https://pypi.org/project/safety/
+    pylint extensions https://pylint.readthedocs.io/en/latest/user_guide/checkers/extensions.html
+        pyreverse
+        symilar
+    ruff + pre-commit and mdformat integrations
+    pytest-mock
+    https://pypi.org/project/lefthook/ to replace pre-commit (.lefthook.yaml): https://github.com/evilmartians/lefthook/blob/master/docs/configuration.md
+    radon https://radon.readthedocs.io/en/stable/
+    mccabe (use via ruff) https://pypi.org/project/mccabe/
+    just https://just.systems/man/en/introduction.html
+    
+
+[ ] add to tasks a projectOrder (int) field, together with dependsOnPreceding
+    sorting priority: dependency, priority, projectOrder
+[ ] add commands:
+    'tasks set priority|link|status|dateEarliest|dateLatest|normalTime|minTime|idealTime|maxTime <QUERY>',
+    'tasks edit <QUERY>',
+    'tasks add-category' <QUERY>,
+    'tasks add-blocks <QUERY>'
+    'tasks shift <N> <QUERY>':q
+
+[ ] annotate all functions with contracts
+[ ] make tasks and entries immutable
+[ ] fix inventory to include quantities of recipes as well as of elementary ingredients
+[ ] create test util functions to patch cfg object to different directory (tedious part: recompute all contained paths) -> allows different 
+[ ] create test util functions to create dummy objects or even dummy directories with corresponding configs, explicity specifying only attributes that matter
+[ ] add 'declared' and 'derived' properties to cfg.paths, in order to ensure that cli/tui editing commands behave properly
+[ ] move the logic hat isn't tightly coupled to the datamodels back to core.planning.scheduling/allocation (?)
+[ ] use poetry2nix https://github.com/nix-community/poetry2nix
+
+Other - Next Steps
+[x] type up notes from notebook
+[x] clean up FIXME notes
+[ ] re-write viewhm script in haskell
+[ ] add scripts to nix-config to back up nvim and other relevant dotfiles to separate nix directories (for already-instantiated dotfiles and config info)
+[ ] make colorcritic and keycritic idempotent wrt colors.json and keybinds.json; specify file schemata (perhaps using pydantic)
+[ ] extract neovim config as a flake: see README in neovim directory of nix-config
+[ ] consilium: fix command tree to remove declaration::declaration and move adding/editing to own command and just generally clean up structure
+[ ] consilium: add `add` and `edit` commands
+[ ] parametrize presets internally (no repetition, where it can be avoided)
+[ ] note linting
+[ ] define tasks type
+[ ] task linting
+[ ] task sorting
+[ ] note adding
+[ ] task adding
+[ ] use pydantic.BaseModel in types
+[ ] consilium: get calendar working and create instantiated calendar -> create missing presets
+[ ] consilium: write tests for each command function (including yet-unwritten ones)
+[ ] consilium: fully specify directory structure
+[ ] consilium: fully specify entity types
+[ ] consilium: write working IO layer; streamline IO
+[ ] consilium: write tests for IO layer
+[ ] consilium: refactor IO layer
+[x] create creation/editing commands for consilium, for creating and editing calendar, tasks, config, routines, journaling, fitness settings, etc.
+[ ] add single-file note references to notes
+[ ] add references to relevant READMEs to notes
+[x] first iteration of query parser
+[x] list all drive files and add to notes
+[x] add all relevant android apps for consilium to notes
+[x] move nebokrai-data into notes (rename?)
+[x] define wezterm keybindings enough to have a comfortable workflow
+[ ] make task and calendar editors
+[ ] rework notes directory structure and config.json to minimize complexity and maximize at-a-glance accessibility
+[ ] pull still-relevant tasks from old tasks files into new, current files
+[ ] get calendar satisfactory for the next 6 months (in detail)
+[ ] make MVP of end-to-end tracking for routines and habits
+[ ] make MVP of end-to-end tracking for food
+[ ] make MVP of end-to-end tracking for fitness
+[ ] make special extra keyboard layer, accessible via space bar, to include most frequent non-letter characters (numbers to his layer, special keys to numbers)
+[ ] distinguish between physical and semantic keys in global-defs/keybindings and in kanata config
+[ ] set up g.key
+[ ] set up g.color
+[ ] use ratson/nix-treesitter to add xit (and potentially other) grammar to neovim via nix
+[ ] add mdbook docs and justfile to consilium (installed via flake.nix)
+
+Work
+[ ] what should the InputReceiver be able to do, i.e. how to get the input into the right form?
+    Is it connected to any endpoints?
+[ ] Do we need different PromptFormatter subclasses (Llama vs OpenAI), or is one sufficient for our purposes for now?
+[ ] Input parameters for QueryExecutor
+[ ] PostProcessor subclasses: AnswerPostProcessor, ReasoningPostProcessor, DocumentGenerationPostProcessor
+[ ] How to have HistoryManager communicate with QueryExecutor and PromptFormatter? pass it as a parameter in their initializations?
+[ ] What does the response look like?
+
+Iuclid
+[ ] Fix all mypy errors
+[ ] What is text in search_iuclid?
+[ ] 
+
+[x] Update tickets
+[ ] (30) write simple IUCLID module for executing query
+[ ] (30) Write tests for basic IUCLID query
+[ ] (15) Write string fuzzy search using rapidfuzz
+[ ] (15) Test string fuzzy search
+[ ] (30) Find 30 good chemicals and add them to server
+[ ] (30) Extend functionality of IUCLID module
+[ ] (30) Test extended functionality of IUCLID
+[ ] () Background research: familiarized with all chemical sources
+[ ] () Refactor to separate general query logic from chemical logic
+[ ] () Integrate additional data sources
+[ ] () Pre-computed index of chemical availability with fuzzy search
+[ ] () integration with NER
+[ ] () Tests
+[ ] 
+[ ] get answer-question pipeline fully running with iuclid
+[ ] add exceptions to ignore to knutils.retry
+[ ] look at multi-modal (time-series, text) financial prediction models.

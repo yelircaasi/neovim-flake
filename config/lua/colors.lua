@@ -5,7 +5,7 @@
 
 --vim.cmd("highlight clear")
 
-print(vim.opt.rtp)
+print('colors.lua loaded')
 vim.cmd("syntax reset")
 --vim.g.colors_name = 'melange'
 

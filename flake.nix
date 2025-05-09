@@ -12,7 +12,7 @@
     flake-utils.lib.eachDefaultSystem (
       system: let
         # neovim-nightly = inputs.neovim-nightly-overlay.packages.${system}.neovim;
-        nix-treesitter = "PLACEHOLDER1"; #inputs.nix-treesitter.packages.${system}.default;
+        nix-treesitter = inputs.nix-treesitter.packages.${system};
         pkgs = import inputs.nixpkgs {
           inherit system;
           # overlays = [neovim-nightly nix-treesitter];
@@ -33,7 +33,12 @@
         devShells = rec {
           default = pde;
           pde = pkgs.mkShell {
-            buildInputs = [pdeDerivation];
+            name = "pde-dev-shell";
+            buildInputs = [
+              pdeDerivation
+              pkgs.python3
+              pkgs.luajit
+            ];
           };
         };
       }

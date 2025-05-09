@@ -1,16 +1,39 @@
 {pkgs, ...}: {
-  /*
   xit-nvim = pkgs.vimUtils.buildVimPlugin {
     pname = "xit.nvim";
-    version = "2024-03-21";
+    version = "2025-05-09";
+    dependencies = [
+      pkgs.vimPlugins.nvim-treesitter
+    ];
+    src = pkgs.fetchFromGitHub {
+      owner = "yelircaasi";
+      repo = "xit.nvim";
+      rev = "24ab4b043915103a36f42ea9451b70ef16bed061";
+      sha256 = "sha256-O08kZVDgpuqSxc8CY8D5yPq/Q1O0ZAr1AKx0qht/UQU=";
+    };
+    meta.homepage = "https://github.com/yelircaasi/xit.nvim";
+  };
+  tsgrammar-just = pkgs.tree-sitter.buildGrammar {
+    language = "just";
+    version = "8af0aab";
+    src = pkgs.fetchFromGitHub {
+      owner = "IndianBoy42";
+      repo = "tree-sitter-just";
+      rev = "8af0aab79854aaf25b620a52c39485849922f766";
+      sha256 = "sha256-hYKFidN3LHJg2NLM1EiJFki+0nqi1URnoLLPknUbFJY=";
+    };
+  };
+  tsgrammar-xit = pkgs.tree-sitter.buildGrammar {
+    language = "xit";
+    version = "0.2";
     src = pkgs.fetchFromGitHub {
       owner = "synaptiko";
-      repo = "xit.nvim";
-      rev = "8f724f76c595f02a5bed2904ae556f60c62510f6";
-      sha256 = "sha256-IHsF6YqpmvMGi1wqh6nAWeI1w3TTiGZKDGKVl01zC2o=";
+      repo = "tree-sitter-xit";
+      rev = "a4fad351bfa5efdcb379b40c36671413fbe9caac";
+      sha256 = "sha256-wTr7YyGnz/dWfA5oecRqxeR8Unoob6isGnQg4/iu+MI=";
     };
-    meta.homepage = "https://github.com/synaptiko/xit.nvim";
   };
+  /*
   hawtkeys-nvim = pkgs.vimUtils.buildVimPlugin {
     pname = "hawtkeys.nvim";
     version = "2024-01-15";

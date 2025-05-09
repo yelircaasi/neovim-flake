@@ -1,4 +1,4 @@
-vim.opt.rtp:prepend("TREESITTER")
+vim.opt.rtp:prepend("$TREESITTER")
 require('nvim-treesitter')
 require'nvim-treesitter.configs'.setup {
     -- ensure_installed = { "python", "lua", "javascript" },  -- Ensure installed parsers
@@ -22,13 +22,21 @@ end
 
 addRelPath()
 require("_colors")
--- require("commands")
+require("options")
+require("mappings")
+require("commands")
+
+require("features.status_line")
+require("features.file_browser_tree")
+
+require('languages.python')
+require('languages.xit')
 -- require("mappings")
 -- require("options")
 
 -- require("features.file_browser_tree")
 -- require("features.status_line")
 
-require("python")
+
 -- require("languages.xit")
 
