@@ -1,6 +1,6 @@
 {
   pkgs,
-  # neovim-nightly,
+  neovim-nightly,
   nix-treesitter,
   ...
 }: let
@@ -26,7 +26,7 @@ in
     # Use the neovim-nightly package and dependencies
     buildInputs =
       [
-        pkgs.neovim
+        neovim-nightly
         treesitter
         custom.xit-nvim
         pkgs.ruff
@@ -88,7 +88,7 @@ in
       cp -L ${pkgs.ruff}/bin/ruff $out/bin/ruff
 
       echo "#!${pkgs.runtimeShell}" > $out/bin/pde
-      echo "LUA_PATH=\"\" ${pkgs.neovim}/bin/nvim -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
+      echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
       cp -L $out/bin/pde $out/bin/nvim
       chmod +x $out/bin/pde $out/bin/nvim
 

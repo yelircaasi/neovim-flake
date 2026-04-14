@@ -1,21 +1,21 @@
 print('python.lua loaded')
 
-vim.opt.rtp:prepend("$LSPCONFIG")
-local lspconf = require("lspconfig")
+-- vim.opt.rtp:prepend("$LSPCONFIG")
+local lspconf = vim.lsp.config
 
-vim.lsp.set_log_level('debug')
-lspconf.ruff.setup({
-    init_options = {
-      settings = {
-        args = {
-          "--line-length=100",
-          "--extend-ignore=E501",
-          "--select=I",
-          "--ignore=C90",
-          "--target-version=py311",
-        },
-}
-  }})
+vim.lsp.log.set_level('debug')
+-- lspconf.ruff.setup({
+--     init_options = {
+--       settings = {
+--         args = {
+--           "--line-length=100",
+--           "--extend-ignore=E501",
+--           "--select=I",
+--           "--ignore=C90",
+--           "--target-version=py311",
+--         },
+-- }
+--   }})
 vim.lsp.enable("ruff")
 
 -- lspconf.pylsp.setup({

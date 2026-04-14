@@ -1,6 +1,6 @@
 vim.opt.rtp:prepend("$TREESITTER")
 require('nvim-treesitter')
-require'nvim-treesitter.configs'.setup {
+require'nvim-treesitter'.setup {
     -- ensure_installed = { "python", "lua", "javascript" },  -- Ensure installed parsers
     highlight = { enable = true },
     fold = { enable = false }  -- Disable folding if necessary

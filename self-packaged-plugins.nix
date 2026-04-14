@@ -5,6 +5,7 @@
     dependencies = [
       pkgs.vimPlugins.nvim-treesitter
     ];
+    doCheck = false;
     src = pkgs.fetchFromGitHub {
       owner = "yelircaasi";
       repo = "xit.nvim";
