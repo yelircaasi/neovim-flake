@@ -89,7 +89,8 @@ in
 
       echo "#!${pkgs.runtimeShell}" > $out/bin/pde
       echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
-      cp -L $out/bin/pde $out/bin/nvim
+      echo "#!${pkgs.runtimeShell}" > $out/bin/nvim
+      echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u \$HOME/.config/nvim/init.lua ${argCatcher}" >> $out/bin/nvim
       chmod +x $out/bin/pde $out/bin/nvim
 
       # cp -L ${pkgs.python3}/bin/python $out/bin/python
