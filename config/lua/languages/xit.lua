@@ -28,7 +28,7 @@ vim.api.nvim_create_autocmd('FileType', {
     vim.opt.rtp:prepend("$XIT")
     vim.opt.rtp:prepend("$TSXIT")
     
-    parser_configs = require("nvim-treesitter.parsers").get_parser_configs()
+    parser_configs = require("nvim-treesitter.parsers") --.get_parser_configs()
     parser_configs.xit = {
       install_info = {
         url = "$TSXIT",
@@ -39,7 +39,7 @@ vim.api.nvim_create_autocmd('FileType', {
       },
       filetype = "xit",
     }
-    require('nvim-treesitter.configs').setup({
+    require('nvim-treesitter').setup({
       highlight = {enable = true,},
       -- ensure_installed = { "xit", "python", "lua", "javascript" },
       auto_install = false,
@@ -51,6 +51,8 @@ vim.api.nvim_create_autocmd('FileType', {
       default_jump_group = "all", -- possible values: all, open_and_ongoing
       wrap_jumps = true,
     })
+    
+    print("set up xit")
 
     vim.api.nvim_set_hl(0, '@XitHeadline', {
       fg = '#FFD700',
