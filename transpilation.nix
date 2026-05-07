@@ -5,10 +5,10 @@ pkgs.stdenv.mkDerivation {
 
   dontInstall = true;
 
-#   nativeBuildInputs = with pkgs; [
-#     lua51Packages.cyan
-#     stylua
-#   ];
+  nativeBuildInputs = with pkgs; [
+    lua51Packages.cyan
+    stylua
+  ];
 
   buildPhase = ''
     set -euo pipefail
@@ -16,7 +16,7 @@ pkgs.stdenv.mkDerivation {
     mkdir -p $out
     mkdir -p $out/config
 
-    ${pkgs.lua51Packages.cyan}/bin/cyan build \
+    cyan build \
         --gen-target 5.1 \
         --global-env-def vim \
         --global-env-def cfg \
@@ -24,6 +24,6 @@ pkgs.stdenv.mkDerivation {
         -b $out/config/ \
         --prune
 
-    ${pkgs.stylua}/bin/stylua $out/config
+    stylua $out/config
   '';
 }
