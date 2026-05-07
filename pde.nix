@@ -67,17 +67,14 @@ in
           ])
       );
 
-    # Set up configuration during build
     buildPhase = ''
       mkdir -p $out
       mkdir -p $out/bin
-      mkdir -p $out/
       export VIMINIT='let &swapfile = 0'
     '';
 
     # Add aliases and links for neovim
     installPhase = ''
-
 
       cp -rL ${transpiled}/config/ $out/
 

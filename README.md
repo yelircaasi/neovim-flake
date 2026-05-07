@@ -2,6 +2,11 @@
 
 ## Roadmap
 
+- [ ] move last bits of plugin-set.nix into plugins-derivation.nix,
+      make each into own derivation? -> pass through as output packages
+- [ ] go through, clean up and pare down notes
+- [ ] get Python LSP running properly
+
 https://ayats.org/blog/neovim-wrapper
 https://github.com/calops/nix/tree/main/modules/home/programs/neovim
 
