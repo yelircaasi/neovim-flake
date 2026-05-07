@@ -4,13 +4,6 @@
   nix-treesitter,
   ...
 }: let
-  /*
-
-  
-
-  files = import ./lua-writer.nix {inherit pkgs custom configDir treesitter nix-treesitter;};
-  */
-
   custom = import ./self-packaged-plugins.nix {inherit pkgs;};
 
   treesitter = pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins:
@@ -22,17 +15,15 @@
     ]
     ++ plugins);
 
+  files = import ./lua-writer.nix {inherit pkgs custom configDir treesitter nix-treesitter;};
   configDir = "config";
   argCatcher = ''"\$@"'';
-
-  transpiled = import ./transpilation.nix {inherit pkgs;};
 in
   pkgs.stdenv.mkDerivation rec {
     name = "pde";
     src = ./.;
 
-    propagatedBuildInputs = import ./tools.nix {inherit pkgs;};
-
+    # Use the neovim-nightly package and dependencies
     buildInputs =
       [
         neovim-nightly
@@ -81,7 +72,17 @@ in
     installPhase = ''
 
 
-      cp -rL ${transpiled} $out/config/
+      cp -L ${files.init} $out/config/init.lua
+      cp -L ${files.colors} $out/config/_colors.lua
+      cp -L ${files.options} $out/config/options.lua
+      cp -L ${files.mappings} $out/config/mappings.lua
+      cp -L ${files.commands} $out/config/commands.lua
+
+      cp -L ${files.python} $out/config/languages/python.lua
+      cp -L ${files.xit} $out/config/languages/xit.lua
+
+      cp -L ${files.statusLine} $out/config/features/status_line.lua
+      cp -L ${files.fileBrowserTree} $out/config/features/file_browser_tree.lua
 
       cp -L ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
       cp -L ${pkgs.ruff}/bin/ruff $out/bin/ruff

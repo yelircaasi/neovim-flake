@@ -18,3 +18,17 @@ https://github.com/calops/nix/tree/main/modules/home/programs/neovim
 [ ] https://github.com/wiltaylor/neovim-flake
 [ ] https://github.com/cwfryer/neovim-flake/
 [ ] 
+
+## Data Flow
+
+`plugin-set.nix` gets plugins from `nixpkgs` and `self-packaged-plugins.nix`.
+
+`plugins-derivation.nix` packages the plugins together in the standard directory structure.
+
+`transpilation.nix` transforms the `.tl` code into Lua and writes it as a derivation.
+
+`treesitter.nix` takes care of 
+
+`tools.nix` handles the external tools.
+
+`pde.nix` wires all of these parts together and exposes the executables.
