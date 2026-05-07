@@ -1,35 +1,31 @@
 {pkgs}:
-pkgs.stdenv.mkDerivation rec {
-  name = "pde";
-  src = ./.;
+pkgs.stdenv.mkDerivation {
+  name = "tl-transpiled";
+  src = ./teal;
 
-  propagatedBuildInputs = tools;
+  dontInstall = true;
 
-  buildInputs = with pkgs; [
+  nativeBuildInputs = with pkgs; [
     lua5_1
     lua51Packages.tl
     lua51Packages.cyan
     stylua
   ];
 
-  # Set up configuration during build
   buildPhase = ''
-    cd ${./teal}
-    cyan \
+    set -euo pipefail
+
+    mkdir -p $out
+    mkdir -p $out/config
+
+    ${pkgs.lua51Packages.cyan}/bin/cyan build \
         --gen-target 5.1 \
         --global-env-def vim \
         --global-env-def cfg \
-        -s ${./teal} \
-        -b $out build \
+        -s src \
+        -b $out/config/ \
         --prune
   '';
-
-  # Add aliases and links for neovim
-  # installPhase = ''
-
-  # '';
-
-  # Embed custom configuration and aliases
 }
 /*
 

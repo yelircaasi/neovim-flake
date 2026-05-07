@@ -69,11 +69,9 @@ in
 
     # Set up configuration during build
     buildPhase = ''
+      mkdir -p $out
       mkdir -p $out/bin
-      mkdir -p $out/config/
-      mkdir -p $out/config/lua/
-      mkdir -p $out/config/languages/
-      mkdir -p $out/config/features/
+      mkdir -p $out/
       export VIMINIT='let &swapfile = 0'
     '';
 
@@ -81,7 +79,7 @@ in
     installPhase = ''
 
 
-      cp -rL ${transpiled} $out/config/
+      cp -rL ${transpiled}/config/ $out/
 
       cp -L ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
       cp -L ${pkgs.ruff}/bin/ruff $out/bin/ruff
