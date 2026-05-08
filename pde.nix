@@ -4,14 +4,8 @@
   nix-treesitter,
   ...
 }: let
-  /*
-
-  
-
-  files = import ./lua-writer.nix {inherit pkgs custom configDir treesitter nix-treesitter;};
-  */
-
   custom = import ./self-packaged-plugins.nix {inherit pkgs;};
+  pluginDerivation = (import ./plugins-derivation.nix {inherit pkgs;}).nvimPlugins;
 
   treesitter = pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins:
     pkgs.vimPlugins.nvim-treesitter.allGrammars
@@ -26,6 +20,9 @@
   argCatcher = ''"\$@"'';
 
   transpiled = import ./transpilation.nix {inherit pkgs;};
+
+  derefCopy = "cp -L";
+  derefCopyDir = "cp -rL";
 in
   pkgs.stdenv.mkDerivation rec {
     name = "pde";
@@ -73,13 +70,13 @@ in
       export VIMINIT='let &swapfile = 0'
     '';
 
-    # Add aliases and links for neovim
     installPhase = ''
+      ${derefCopyDir} ${transpiled}/config/ $out/
+      ${derefCopyDir} ${pluginDerivation}/plugins/ $out/
+      ${derefCopyDir} ${pluginDerivation}/meta/ $out/
 
-      cp -rL ${transpiled}/config/ $out/
-
-      cp -L ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
-      cp -L ${pkgs.ruff}/bin/ruff $out/bin/ruff
+      ${derefCopy} ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
+      ${derefCopy} ${pkgs.ruff}/bin/ruff $out/bin/ruff
 
       echo "#!${pkgs.runtimeShell}" > $out/bin/pde
       echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
@@ -87,9 +84,9 @@ in
       echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u \$HOME/.config/nvim/init.lua ${argCatcher}" >> $out/bin/nvim
       chmod +x $out/bin/pde $out/bin/nvim
 
-      # cp -L ${pkgs.python3}/bin/python $out/bin/python
-      # cp -L ${pkgs.python3}/bin/python3 $out/bin/python3
-      # cp -L ${pkgs.luajit}/bin/lua $out/bin/lua
+      # ${derefCopy} ${pkgs.python3}/bin/python $out/bin/python
+      # ${derefCopy} ${pkgs.python3}/bin/python3 $out/bin/python3
+      # ${derefCopy} ${pkgs.luajit}/bin/lua $out/bin/lua
     '';
 
     # Embed custom configuration and aliases
