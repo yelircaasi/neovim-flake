@@ -30,6 +30,10 @@ global record Utils
 	get_plugin: function(string): Plugin
 	packadd: function(string, ? function())
 	setup_plugin: SetupFunction
+	packadd_default: function(string, ? function())
+	setup_plugin_default: SetupFunction
+	packadd_safe: function(string, ? function())
+	setup_plugin_safe: SetupFunction
 	map: MapFunction
 end
 

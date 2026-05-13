@@ -87,7 +87,7 @@ local function setup(config: UtilsConfig): Utils
 	    return required
 	end
 
-	local function packadd_default(plugin_name: string, custom_func?: function())
+	M.packadd_default = function(plugin_name: string, custom_func?: function())
 	    if not M.is_included(plugin_name) then return end
 	    local path = PLUGIN_PATHS[plugin_name]
 	    prepend_safe(path)
@@ -96,15 +96,15 @@ local function setup(config: UtilsConfig): Utils
 		custom_func()
 	end
 
-	local function packadd_safe(plugin_name: string, custom_func?: function())
-		local result, plugin = pcall(packadd_default, plugin_name, custom_func) as (boolean, Plugin)
+	M.packadd_safe = function(plugin_name: string, custom_func?: function())
+		local result, plugin = pcall(M.packadd_default, plugin_name, custom_func) as (boolean, Plugin)
 	    if not result then
 		   M.printv("ERROR: vimscript plugin require unsuccessful: " .. plugin_name)
 		   return
 	    end
 	end
 
-	local function setup_plugin_safe(plugin_name: string, config_or_function?: PluginConfig | function(Plugin)): nil
+	M.setup_plugin_safe = function(plugin_name: string, config_or_function?: PluginConfig | function(Plugin)): nil
 	    if not M.is_included(plugin_name) then return end
 	    local result, plugin = pcall(M.get_plugin, plugin_name) as (boolean, Plugin)
 	    if not result then
@@ -121,7 +121,7 @@ local function setup(config: UtilsConfig): Utils
 	    end
 	end
 
-	local function setup_plugin_default(plugin_name: string, config_or_function?: PluginConfig | function(Plugin)): nil
+	M.setup_plugin_default = function(plugin_name: string, config_or_function?: PluginConfig | function(Plugin)): nil
 	    if not M.is_included(plugin_name) then return end
 	    local plugin = M.get_plugin(plugin_name)
 	    if not config_or_function then return end
@@ -136,11 +136,11 @@ local function setup(config: UtilsConfig): Utils
 	end
 
 	if config.safe then
-	    M.setup_plugin = setup_plugin_safe
-		M.packadd = packadd_safe
+	    M.setup_plugin = M.setup_plugin_safe
+		M.packadd = M.packadd_safe
 	else
-	    M.setup_plugin = setup_plugin_default
-	    M.packadd = packadd_default
+	    M.setup_plugin = M.setup_plugin_default
+	    M.packadd = M.packadd_default
 	end
 
 	M.map = function(mode: string | {string}, lhs: string, rhs: string | function(), opts?: vim.keymap.SetOpts): nil

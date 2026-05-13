@@ -88,8 +88,6 @@ in
       # ${derefCopy} ${pkgs.python3}/bin/python3 $out/bin/python3
       # ${derefCopy} ${pkgs.luajit}/bin/lua $out/bin/lua
     '';
-
-    # Embed custom configuration and aliases
   }
 # {
 #   enable = true;

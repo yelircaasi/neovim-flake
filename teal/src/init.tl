@@ -1,3 +1,6 @@
+local NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string
+print(NVIM_HOME .. "/before_init.lua")
+dofile(NVIM_HOME .. "/before_init.lua")
 -- GLOBAL OPTIONS ======================================================================================================
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
@@ -36,13 +39,16 @@ local NVIM_DIR: string = (vim.fn.expand("<sfile>:p:h") as string)
 
 -- vim.opt.runtimepath:prepend(NVIM_DIR) TODO: not working (maybe not in time?)
 package.path = package.path .. ";" .. NVIM_DIR .. "/?.lua"
+local plugin_paths: {string:string}
+local result, plugin_paths = pcall(dofile, NVIM_HOME .. "/plugin_paths.lua") as (boolean, {string:string})
+plugin_paths = result and plugin_paths or {}
 
 local utils = require("lua.utils").setup({
-	verbose = false,
+	verbose = true,
 	safe = true,
 	prepend_safe = prepend_safe,
 	layers = {0, 1,},
-	plugin_paths = dofile(NVIM_DIR .. "/meta/plugin_paths.lua") as {string:string},
+	plugin_paths = plugin_paths,
 	dependencies = dofile(NVIM_DIR .. "/meta/dependencies.lua") as {string:{string}},
 	plugins_by_layer = dofile(NVIM_DIR .. "/meta/plugin_layers.lua") as {number:{number:{string}}},
 })
@@ -324,3 +330,4 @@ setup_plugin("markdown-preview")
 ------ Lua / self-referential
 setup_plugin("structlog")
 setup_plugin("neorepl")
+dofile(NVIM_HOME .. "/after_init.lua")
