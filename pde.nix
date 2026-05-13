@@ -72,6 +72,36 @@ in
 
     installPhase = ''
       ${derefCopyDir} ${transpiled}/config/ $out/
+      ${derefCopyDir} ${pluginDerivation}/meta/ $out/
+
+      # Copy the entire pack tree — one directory, native pack layout
+      mkdir -p $out/pack
+      cp -rL ${pluginDerivation}/pack/. $out/pack
+
+      ${derefCopy} ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
+      ${derefCopy} ${pkgs.ruff}/bin/ruff $out/bin/ruff
+
+      chmod -R u+w $out/config
+      cat > $out/config/prepend.lua << EOF
+      vim.opt.runtimepath:prepend("${pluginDerivation}/pack/bundle/opt")
+      vim.opt.packpath:prepend("${pluginDerivation}")
+      EOF
+
+      echo "#!${pkgs.runtimeShell}" > $out/bin/pde
+      echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim \
+        --cmd 'set packpath^=$out' \
+        -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
+
+      echo "#!${pkgs.runtimeShell}" > $out/bin/nvim
+      echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim \
+        --cmd 'set packpath^=$out' \
+        -u \$HOME/.config/nvim/init.lua ${argCatcher}" >> $out/bin/nvim
+
+      chmod +x $out/bin/pde $out/bin/nvim
+    '';
+
+    OLD_installPhase = ''
+      ${derefCopyDir} ${transpiled}/config/ $out/
       ${derefCopyDir} ${pluginDerivation}/plugins/ $out/
       ${derefCopyDir} ${pluginDerivation}/meta/ $out/
 

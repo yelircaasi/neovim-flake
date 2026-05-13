@@ -55,7 +55,7 @@ let
       }
     '';
 in {
-  nvimPlugins = pkgs.runCommand "nvim-plugins" {} ''
+  OLD_nvimPlugins = pkgs.runCommand "nvim-plugins" {} ''
     mkdir -p $out
     mkdir -p $out/plugins
     cp -rL ${pkgs.linkFarm "nvim-plugins" fullList}/. $out/plugins
@@ -75,6 +75,26 @@ in {
     EOF
 
     ${pkgs.python3}/bin/python3 -m json.tool --indent 4 $out/meta/plugin_paths.json > $out/meta/tmp.json
+    mv $out/meta/tmp.json $out/meta/plugin_paths.json
+  '';
+
+  nvimPlugins = pkgs.runCommand "nvim-plugins" {} ''
+    mkdir -p $out/pack/bundle/opt
+    cp -rL ${pkgs.linkFarm "nvim-plugins" fullList}/. $out/pack/bundle/opt
+    chmod -R u+w $out
+
+    mkdir -p $out/meta
+
+    cat > $out/meta/plugin_paths.lua << 'EOF'
+    ${luaFile}
+    EOF
+    ${pkgs.stylua}/bin/stylua $out/meta/plugin_paths.lua
+
+    cat > $out/meta/plugin_paths.json << 'EOF'
+    ${jsonFile}
+    EOF
+    ${pkgs.python3}/bin/python3 -m json.tool --indent 4 $out/meta/plugin_paths.json \
+      > $out/meta/tmp.json
     mv $out/meta/tmp.json $out/meta/plugin_paths.json
   '';
 

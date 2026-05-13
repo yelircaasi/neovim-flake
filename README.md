@@ -2,6 +2,9 @@
 
 ## Roadmap
 
+- [ ] fork dial, fix structure, write nix expression
+- [ ] take care of compiling fzf-lua-native
+- [ ] find what has  sqlite.lua as a dependency
 - [ ] move last bits of plugin-set.nix into plugins-derivation.nix,
       make each into own derivation? -> pass through as output packages
 - [ ] go through, clean up and pare down notes

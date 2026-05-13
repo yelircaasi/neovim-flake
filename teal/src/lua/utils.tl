@@ -76,13 +76,14 @@ local function setup(config: UtilsConfig): Utils
 	    if not M.is_included(plugin_name) then return nil end
 	    local path = PLUGIN_PATHS[plugin_name]
 	    local deps = DEPENDENCIES[plugin_name]
-	    prepend_safe(path)
 	    if deps then
 		   for _, dep_name in ipairs(deps) do
 			  local dep_path = PLUGIN_PATHS[dep_name]
-			  prepend_safe(dep_path)
+			  if dep_path then prepend_safe(dep_path) end
 		   end
 	    end
+	    if path then prepend_safe(path) end
+		vim.cmd("packadd " .. plugin_name)
 	    local required = require(plugin_name) as Plugin
 	    return required
 	end
@@ -90,7 +91,14 @@ local function setup(config: UtilsConfig): Utils
 	M.packadd_default = function(plugin_name: string, custom_func?: function())
 	    if not M.is_included(plugin_name) then return end
 	    local path = PLUGIN_PATHS[plugin_name]
-	    prepend_safe(path)
+	    local deps = DEPENDENCIES[plugin_name]
+	    if path then prepend_safe(path) end
+	    if deps then
+		   for _, dep_name in ipairs(deps) do
+			  local dep_path = PLUGIN_PATHS[dep_name]
+			  if dep_path then prepend_safe(dep_path) end
+		   end
+	    end
 	    vim.cmd("packadd " .. plugin_name)
 	    if custom_func is nil then return end
 		custom_func()
@@ -100,6 +108,7 @@ local function setup(config: UtilsConfig): Utils
 		local result, plugin = pcall(M.packadd_default, plugin_name, custom_func) as (boolean, Plugin)
 	    if not result then
 		   M.printv("ERROR: vimscript plugin require unsuccessful: " .. plugin_name)
+		   M.printv(plugin as string)
 		   return
 	    end
 	end
@@ -109,6 +118,7 @@ local function setup(config: UtilsConfig): Utils
 	    local result, plugin = pcall(M.get_plugin, plugin_name) as (boolean, Plugin)
 	    if not result then
 		   M.printv("ERROR: plugin require unsuccessful: " .. plugin_name)
+		   M.printv(plugin as string)
 		   return
 	    end
 	    if not config_or_function then return end

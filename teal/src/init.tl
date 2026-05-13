@@ -1,3 +1,11 @@
+-- RTP =================================================================================================================
+local CONFIG_DIR: string = (vim.fn.expand("<sfile>:p:h") as string)
+local paths_file: string = CONFIG_DIR .. "/prepend.lua"
+print(paths_file)
+print(vim.inspect(vim.opt.runtimepath))
+print(vim.inspect(vim.opt.packpath))
+dofile(paths_file)
+-- PRE HOOKS ===========================================================================================================
 local NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string
 print(NVIM_HOME .. "/before_init.lua")
 dofile(NVIM_HOME .. "/before_init.lua")
@@ -34,14 +42,12 @@ local prepend_safe = function(path: string, create?: boolean): nil
 end
 
 local HAS_NIX: boolean = vim.fn.isdirectory("/nix/store") ~= 0
-local NVIM_DIR: string = (vim.fn.expand("<sfile>:p:h") as string)
 -- debug.getinfo(2, "S").source:sub(2):match("(.*/)") or "./"
 
--- vim.opt.runtimepath:prepend(NVIM_DIR) TODO: not working (maybe not in time?)
-package.path = package.path .. ";" .. NVIM_DIR .. "/?.lua"
-local plugin_paths: {string:string}
-local result, plugin_paths = pcall(dofile, NVIM_HOME .. "/plugin_paths.lua") as (boolean, {string:string})
-plugin_paths = result and plugin_paths or {}
+-- vim.opt.runtimepath:prepend(CONFIG_DIR) TODO: not working (maybe not in time?)
+package.path = package.path .. ";" .. CONFIG_DIR .. "/?.lua"
+local result, explicit_paths = pcall(dofile, NVIM_HOME .. "/plugin_paths.lua") as (boolean, {string:string})
+local plugin_paths: {string:string} = result and explicit_paths or {}
 
 local utils = require("lua.utils").setup({
 	verbose = true,
@@ -49,13 +55,13 @@ local utils = require("lua.utils").setup({
 	prepend_safe = prepend_safe,
 	layers = {0, 1,},
 	plugin_paths = plugin_paths,
-	dependencies = dofile(NVIM_DIR .. "/meta/dependencies.lua") as {string:{string}},
-	plugins_by_layer = dofile(NVIM_DIR .. "/meta/plugin_layers.lua") as {number:{number:{string}}},
+	dependencies = dofile(CONFIG_DIR .. "/meta/dependencies.lua") as {string:{string}},
+	plugins_by_layer = dofile(CONFIG_DIR .. "/meta/plugin_layers.lua") as {number:{number:{string}}},
 })
 local setup_plugin: SetupFunction = utils.setup_plugin
 local map: MapFunction = utils.map
 
-utils.printv("NVIM_DIR: " .. NVIM_DIR)
+utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
 utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
 utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
 
@@ -126,7 +132,7 @@ setup_plugin("nvim-treesitter", function(treesitter: Plugin)
 end as CustomSetupFunction)
 setup_plugin("treesitter-modules")
 setup_plugin("dropbar")
-setup_plugin("nvim-navbuddy")
+utils.packadd("nvim-navbuddy")
 setup_plugin("aerial")
 ------ file explorer (as central focus)
 setup_plugin("oil")
@@ -136,11 +142,14 @@ setup_plugin("nvim-tree")
 ------ picker / search
 setup_plugin("pickme")
 setup_plugin("telescope")
-setup_plugin("telescope-fzf-native")
+-- setup_plugin("telescope-fzf-native") TODO!
 setup_plugin("fzf-lua")
 setup_plugin("deck")
 ------ suites
-setup_plugin("mini")
+setup_plugin("mini.indent")
+setup_plugin("mini.keymap")
+setup_plugin("mini.sessions")
+-- TODO: further mini.* plugins
 setup_plugin("snacks")
 setup_plugin("blink")
 ------ search
@@ -174,7 +183,7 @@ setup_plugin("nvim-macros", {
 setup_plugin("recorder")
 
 ------ multi-cursor
-setup_plugin("vim-visual-multi")
+utils.packadd("vim-visual-multi")
 ------ motion
 setup_plugin("leap")
 setup_plugin("flash")
@@ -196,21 +205,22 @@ setup_plugin("insx")
 setup_plugin("which-key")
 ------ alignment / indentation
 setup_plugin("indentmini")
-setup_plugin("indent-blankline")
+utils.packadd("indent-blankline")
 setup_plugin("nvim-anydent")
 setup_plugin("mini.align")
-setup_plugin("tabular")
+utils.packadd("tabular")
 ------ textobjects
 setup_plugin("nvim-treesitter-textobjects")
-setup_plugin("nvim-various-textobjs")
+utils.packadd("nvim-various-textobjs")
 ------ comments
 setup_plugin("Comment")
 setup_plugin("todo-comments")
-setup_plugin("vim-commentary")
+utils.packadd("vim-commentary")
 ------ split / join
 setup_plugin("treesj")
 ------ value manipulation
-setup_plugin("dial")
+-- this one has a flawed structure; need to fork it and fix that
+-- setup_plugin("dial") TODO!
 ------ marks
 setup_plugin("harpoon-core")
 setup_plugin("marks")
@@ -330,4 +340,5 @@ setup_plugin("markdown-preview")
 ------ Lua / self-referential
 setup_plugin("structlog")
 setup_plugin("neorepl")
+-- POST HOOKS =========================================================================================================
 dofile(NVIM_HOME .. "/after_init.lua")
