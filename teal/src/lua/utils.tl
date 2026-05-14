@@ -23,8 +23,8 @@ local function setup(config: UtilsConfig): Utils
 		-- M.printv("layer" .. layer)
 	    local layer_table: {number: {string}} = PLUGINS_BY_LAYER[layer]
 	    if VERBOSE then
-			-- print("--- layer " .. tostring(layer) .. ": " .. #layer_table .. " plugins")
-			-- print(vim.inspect(layer_table))
+			print("--- layer " .. tostring(layer) .. ": " .. #layer_table .. " plugins")
+			print(vim.inspect(layer_table))
 		end
         
 	    for _, names in pairs(layer_table) do
@@ -57,6 +57,7 @@ local function setup(config: UtilsConfig): Utils
 	    local result, return_value = pcall(func, single_arg) as boolean, T
 	    if not result then
 		   M.printb(err_msg)
+		   print(return_value)
 		   return false, nil
 	    else
 		   return true, return_value
@@ -74,16 +75,15 @@ local function setup(config: UtilsConfig): Utils
 
 	M.get_plugin = function(plugin_name: string): Plugin
 	    if not M.is_included(plugin_name) then return nil end
-	    local path = PLUGIN_PATHS[plugin_name]
+	    -- local path = PLUGIN_PATHS[plugin_name]
 	    local deps = DEPENDENCIES[plugin_name]
 	    if deps then
 		   for _, dep_name in ipairs(deps) do
-			  local dep_path = PLUGIN_PATHS[dep_name]
-			  if dep_path then prepend_safe(dep_path) end
+			  vim.cmd.packadd(dep_name)
 		   end
 	    end
-	    if path then prepend_safe(path) end
-		vim.cmd("packadd " .. plugin_name)
+	    -- if path then prepend_safe(path) end
+		vim.cmd.packadd(plugin_name)
 	    local required = require(plugin_name) as Plugin
 	    return required
 	end
@@ -99,7 +99,7 @@ local function setup(config: UtilsConfig): Utils
 			  if dep_path then prepend_safe(dep_path) end
 		   end
 	    end
-	    vim.cmd("packadd " .. plugin_name)
+	    vim.cmd.packadd(plugin_name)
 	    if custom_func is nil then return end
 		custom_func()
 	end
@@ -107,8 +107,8 @@ local function setup(config: UtilsConfig): Utils
 	M.packadd_safe = function(plugin_name: string, custom_func?: function())
 		local result, plugin = pcall(M.packadd_default, plugin_name, custom_func) as (boolean, Plugin)
 	    if not result then
-		   M.printv("ERROR: vimscript plugin require unsuccessful: " .. plugin_name)
-		   M.printv(plugin as string)
+		   print("ERROR: vimscript plugin require unsuccessful: " .. plugin_name)
+		   print(plugin as string)
 		   return
 	    end
 	end
@@ -117,8 +117,8 @@ local function setup(config: UtilsConfig): Utils
 	    if not M.is_included(plugin_name) then return end
 	    local result, plugin = pcall(M.get_plugin, plugin_name) as (boolean, Plugin)
 	    if not result then
-		   M.printv("ERROR: plugin require unsuccessful: " .. plugin_name)
-		   M.printv(plugin as string)
+		   print("ERROR: plugin require unsuccessful: " .. plugin_name)
+		   print(plugin as string)
 		   return
 	    end
 	    if not config_or_function then return end

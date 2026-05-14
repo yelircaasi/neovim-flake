@@ -8,6 +8,7 @@ global CONFIG_DIR: string = join_paths(DERIVATION_DIR, "config")
 global PARSER_DIR: string = join_paths(DERIVATION_DIR, "parser")
 vim.opt.runtimepath:prepend(DERIVATION_DIR)
 vim.opt.runtimepath:prepend(PARSER_DIR)
+vim.opt.packpath:prepend(DERIVATION_DIR)
 
 -- PRE HOOKS ===========================================================================================================
 local NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string

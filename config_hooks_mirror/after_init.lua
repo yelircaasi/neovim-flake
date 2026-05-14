@@ -14,6 +14,37 @@ local map = utils.map
 
 -- utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
 
+
+local setup_telescope = function(telescope)
+    -- vim.cmd.packadd("telescope-fzf-native")
+    -- vim.cmd.packadd("plenary")
+    telescope.setup({
+        extensions = {
+            fzf = {
+            fuzzy = true,                    -- false will only do exact matching
+            override_generic_sorter = true,  -- override the generic sorter
+            override_file_sorter = true,     -- override the file sorter
+            case_mode = "smart_case",        -- or "ignore_case" or "respect_case"
+                                            -- the default case_mode is "smart_case"
+            }
+        }
+    })
+    -- utils.setup_plugin("telescope-fzf-native")
+
+    -- To get fzf loaded and working with telescope, you need to call
+    -- load_extension, somewhere after setup function:
+    telescope.load_extension('fzf')
+    print("loaded telescope with fzf-native")
+end
+
+-- vim.cmd.packadd("plenary")
+-- vim.cmd.packadd("telescope")
+-- vim.cmd.packadd("telescope-fzf-native")
+-- setup_telescope(require "telescope")
+
+-- lua require("telescope").load_extension('fzf')
+utils.setup_plugin_default("telescope", setup_telescope)
+
 if false then  --=============
 
 setup_plugin("plenary")
@@ -47,7 +78,7 @@ setup_plugin("neo-tree")
 setup_plugin("nvim-tree")
 
 setup_plugin("pickme")
-setup_plugin("telescope")
+-- setup_plugin("telescope") MOVED
 
 setup_plugin("fzf-lua")
 setup_plugin("deck")

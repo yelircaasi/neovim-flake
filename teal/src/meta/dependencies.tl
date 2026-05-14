@@ -1,5 +1,6 @@
 local M: {string: {string}} = {
 	["nvim-navbuddy"] = { "nui" },
-	yazi              = { "plenary" },
+	["yazi"]          = { "plenary" },
+	["telescope"]     = { "plenary", "telescope-fzf-native" },    
 }
 return M
