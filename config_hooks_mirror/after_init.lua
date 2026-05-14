@@ -1487,3 +1487,831 @@ The script:
 You can run it with `:luafile path/to/script.lua` in Neovim or just require it in your config.
 
 --]]
+
+
+if false then
+
+print('options.lua loaded')
+
+-- MAPPINGS
+
+print('mappings.lua loaded')
+
+vim.g.mapleader = " "
+vim.keymap.set("n", "<leader>alf", function()
+	print("A lua func")
+end, { noremap = true })
+
+-- COMMANDS
+
+print('commands.lua loaded')
+
+-- vim.api.nvim_create_user_command("LoadPython", function()
+--     require("languages.python")
+--   end, {})
+
+
+-- COLORS
+
+--vim.api.nvim_set_hl(0, "Comment", { bg = "Purple" })
+--vim.api.nvim_set_hl(0, 'Normal', { fg = "Green", bg = "Red" })
+--vim.api.nvim_set_hl(0, 'Error', { fg = "<white>", undercurl = true })
+--vim.api.nvim_set_hl(0, 'Cursor', { reverse = true })
+
+--vim.cmd("highlight clear")
+
+print('colors.lua loaded')
+vim.cmd("syntax reset")
+--vim.g.colors_name = 'melange'
+
+-- local bg = vim.opt.background:get()
+
+-- package.loaded['melange/palettes/' .. bg] = nil -- Only needed for development
+--local palette = require('melange/palettes/' .. bg)
+
+--local a = palette.a -- Grays
+--local b = palette.b -- Bright foreground colors
+--local c = palette.c -- Foreground colors
+--local d = palette.d -- Background colors
+
+-- See https://github.com/neovim/neovim/pull/7406
+--[[
+vim.g.terminal_color_0 = "$color.terminalColor00$"
+vim.g.terminal_color_1 = "$color.terminalColor01$"
+vim.g.terminal_color_2 = "$color.terminalColor02$"
+vim.g.terminal_color_3 = "$color.terminalColor03$"
+vim.g.terminal_color_4 = "$color.terminalColor04$"
+vim.g.terminal_color_5 = "$color.terminalColor05$"
+vim.g.terminal_color_6 = "$color.terminalColor06$"
+vim.g.terminal_color_7 = "$color.terminalColor07$"
+vim.g.terminal_color_8 = "$color.terminalColor08$"
+vim.g.terminal_color_9 = "$color.terminalColor09$"
+vim.g.terminal_color_10 = "$color.terminalColor0A$"
+vim.g.terminal_color_11 = "$color.terminalColor0B$"
+vim.g.terminal_color_12 = "$color.terminalColor0C$"
+vim.g.terminal_color_13 = "$color.terminalColor0D$"
+vim.g.terminal_color_14 = "$color.terminalColor0E$"
+vim.g.terminal_color_15 = "$color.terminalColor0F$"
+--]]
+local enable_font_variants = true
+--vim.g.melange_enable_font_variants == nil or vim.g.melange_enable_font_variants
+
+local bold = enable_font_variants
+local italic = enable_font_variants
+local underline = enable_font_variants
+local undercurl = enable_font_variants
+local strikethrough = enable_font_variants
+
+for name, attrs in pairs({
+        ---- :help highlight-default -------------------------------
+
+        Normal = { bg = "#000800", fg = "#808080" },
+        NormalFloat = { bg = "#000800", fg = "#808080" },
+        NormalNC = "Normal",
+
+        -- Cursor: ...
+
+        WinSeparator = { bg = "#000800", fg = "#111211" },
+        -- VertSplit = { bg = "<|color.nvim.VertSplit.bg |>", fg = "<|color.nvim.VertSplit.fg |>" },
+        -- Special = { fg = "<|%color.nvim.Special |>" },
+        -- CursorLine = { bg = "<|%color.nvim.CursorLine.bg |>" },
+
+        Identifier = { fg = "#426989" }, --$color.nvim.Identifier.fg$" },
+        ["@variable"] = { fg = "#13446c" },
+        Function = { fg = "#246b44" },
+        Statement = { fg = "#3f0d08" },
+        Directory = { fg = "#13446c" },
+        String = { fg = "#808080" },
+        Comment = { fg = "#333933" },
+        PreProc = { fg = "#123622" },
+        Operator = { fg = "#246b44" },
+        Delimiter = { fg = "#123622" },
+        NeotreeFileName = { fg = "#9a9a9a" },
+
+        -- inheriting background from default Nvim* colors
+        Search = { fg = "#8AA88A", bg = "#003600" },
+        CurSearch = { fg = "#809880", bg = "#002600" },
+
+        StatusLine = { fg = "#455684", bg = "#111211" },
+        StatusLineNC = { fg = "#455684", bg = "#111211" },
+        Visual = { fg = "#061815", bg = "#0d8f77" },
+        Folded = { fg = "#808080", bg = "#001300" },
+        DiffAdd = { fg = "#668366", bg = "#002200" },
+        DiffChange = { fg = "#7f86f3", bg = "#050a58" },
+        DiffDelete = { fg = "#d5776f" },
+        DiffText = { fg = "#050a58", bg = "#7f86f3" },
+        Pmenu = { fg = "#505ad6", bg = "#000800" },
+        PmenuSel = { fg = "#737df1", bg = "#002600" },
+        PmenuThumb = { bg = "#777777" },
+        CursorColumn = { bg = "#000e00" },
+        CursorLine = { bg = "#000e00" },
+        ColorColumn = { bg = "#9b73f1" },
+        WinBar = { fg = "#dddddd", bg = "#000800" },
+        WinBarNC = { fg = "#dddddd", bg = "#000800" },
+        FloatShadow = { bg = "#002600" },
+        FloatShadowThrough = {
+                bg = "#118811",
+        },
+        MatchParen = { bg = "#51136e" },
+        RedrawDebugClear = { bg = "#dddddd" },
+        RedrawDebugComposed = {
+                bg = "#dddddd",
+        },
+        RedrawDebugRecompose = {
+                bg = "#dddddd",
+        },
+        Error = { fg = "#bd1dc5", bg = "#000800" },
+
+        -- inheriting foreground from default Nvim* colors
+        SpecialKey = { fg = "#491d5e" },
+        NonText = { fg = "#111211" },
+        Directory = { fg = "#13446c" },
+        ErrorMsg = { fg = "#bd1dc5" },
+        MoreMsg = { fg = "#1db6c5" },
+        ModeMsg = { fg = "#376808" },
+        LineNr = { fg = "#333833" },
+        Question = { fg = "#402967" },
+        WarningMsg = { fg = "#CBC383" },
+        SignColumn = { fg = "#1b8984" },
+        Conceal = { fg = "#808080", bg = "#000800" },
+        QuickFixLine = { fg = "#A30101" },
+        Special = { fg = "#49125e" },
+
+        DiagnosticError = { fg = "#bd1dc5" },
+        DiagnosticFloatingWarn = { fg = "#CBC383" },
+        DiagnosticWarn = { fg = "#CBC383" },
+        DiagnosticFloatingInfo = { fg = "#555555" },
+        DiagnosticInfo = { fg = "#555555" },
+        DiagnosticFloatingHint = { fg = "#9b73f1" },
+        DiagnosticHint = { fg = "#9b73f1" },
+        DiagnosticFloatingOk = { fg = "#555555" },
+        DiagnosticOk = { fg = "#555555" },
+        Added = { fg = "#368366" },
+        ["@diff.minus"] = { fg = "#d5776f" },
+        Removed = { fg = "#d5776f" },
+        Changed = { fg = "#7f86f3" },
+        CmpItemAbbrDeprecatedDefault = { fg = "#ffffff" },
+        CmpItemKindDefault = { fg = "#eeeeee" },
+        RainbowDelimiter1 = { fg = "#2b1400" },
+        RainbowDelimiter2 = { fg = "#4f473b" },
+        RainbowDelimiter3 = { fg = "#381900" },
+        RainbowDelimiter4 = { fg = "#726c62" },
+        RainbowDelimiter5 = { fg = "#51331a" },
+        RainbowDelimiter6 = { fg = "#959189" },
+        RainbowDelimiter7 = { fg = "#78604d" },
+}) do
+        if type(attrs) == "table" then
+                vim.api.nvim_set_hl(0, name, attrs)
+        else
+                vim.api.nvim_set_hl(0, name, { link = attrs })
+        end
+end
+
+-- PYTHON
+
+print('python.lua loaded')
+
+-- vim.opt.rtp:prepend("$LSPCONFIG")
+local lspconf = vim.lsp.config
+
+vim.lsp.log.set_level('debug')
+-- lspconf.ruff.setup({
+--     init_options = {
+--       settings = {
+--         args = {
+--           "--line-length=100",
+--           "--extend-ignore=E501",
+--           "--select=I",
+--           "--ignore=C90",
+--           "--target-version=py311",
+--         },
+-- }
+--   }})
+vim.lsp.enable("ruff")
+
+-- lspconf.pylsp.setup({
+-- 	on_attach = custom_attach,
+-- 	settings = {
+
+-- 		pylsp = {
+--             auto_source = true,
+    
+-- 			plugins = {
+-- 				-- autopep8 = { enabled = false },
+-- 				-- yapf = { enabled = false },
+
+				
+-- 				-- pylsp_mypy = {
+-- 				-- 	enabled = true,
+-- 				-- 	strict = true,
+-- 				-- },
+-- 				-- rope = {
+-- 				-- 	enabled = true,
+-- 				-- },
+-- 				-- ruff = {
+-- 				-- 	enabled = true,
+-- 				-- },
+-- 				-- jedi_completion = {
+-- 				-- 	fuzzy = true,
+-- 				-- },
+-- 				-- pylint = {
+-- 				-- 	enabled = true,
+-- 				-- 	executable = "pylint",
+-- 				-- },
+--                 ruff = {
+--                     enabled = true,  -- Enable the plugin
+--                     formatEnabled = true,  -- Enable formatting using ruffs formatter
+--                     executable = "<path-to-ruff-bin>",  -- Custom path to ruff
+--                     config = "<path_to_custom_ruff_toml>",  -- Custom config for ruff to use
+--                     extendSelect = { "I" },  -- Rules that are additionally used by ruff
+--                     extendIgnore = { "C90" },  -- Rules that are additionally ignored by ruff
+--                     format = { "I" },  -- Rules that are marked as fixable by ruff that should be fixed when running textDocument/formatting
+--                     severities = { ["D212"] = "I" },  -- Optional table of rules where a custom severity is desired
+--                     unsafeFixes = false,  -- Whether or not to offer unsafe fixes as code actions. Ignored with the "Fix All" action
+              
+--                     -- Rules that are ignored when a pyproject.toml or ruff.toml is present:
+--                     lineLength = 120,  -- Line length to pass to ruff checking and formatting
+--                     exclude = { "__about__.py" },  -- Files to be excluded by ruff checking
+--                     select = { "F" },  -- Rules to be enabled by ruff
+--                     ignore = { "D210" },  -- Rules to be ignored by ruff
+--                     perFileIgnores = { ["__init__.py"] = "CPY001" },  -- Rules that should be ignored for specific files
+--                     preview = false,  -- Whether to enable the preview style linting and formatting.
+--                     targetVersion = "py310",  -- The minimum python version to target (applies for both linting and formatting).
+--                   },
+-- 			},
+-- 		},
+-- 		flags = {
+-- 			debounce_text_changes = 200,
+-- 		},
+-- 		capabilities = capabilities,
+-- 		formatCommand = { "ruff", "format" },
+-- 	},
+-- })
+
+-- LUA
+
+
+
+-- XIT
+
+vim.api.nvim_create_autocmd({ "BufRead", "BufNewFile" }, {
+  pattern = "*.xit",
+  callback = function()
+    vim.bo.filetype = "xit"
+  end,
+})
+
+-- 
+
+vim.cmd [[
+  syntax clear
+  syntax on
+  highlight TSVariable guifg=Green
+  highlight link Identifier TSVariable
+]]
+
+--
+
+vim.api.nvim_create_augroup('XitFiletypeGroup', { clear = true })
+
+vim.api.nvim_create_autocmd('FileType', {
+
+  group = 'XitFiletypeGroup',
+  pattern = 'xit',
+  callback = function()
+    vim.opt.rtp:prepend("$TREESITTER")
+    print(".xit filetype detected")
+    vim.opt.rtp:prepend("$XIT")
+    vim.opt.rtp:prepend("$TSXIT")
+    
+    parser_configs = require("nvim-treesitter.parsers") --.get_parser_configs()
+    parser_configs.xit = {
+      install_info = {
+        url = "$TSXIT",
+        files = {"parser"},
+        install_dir = "$TSXIT",
+        generate_requires_npm = false,
+        requires_generate_from_grammar = false,
+      },
+      filetype = "xit",
+    }
+    require('nvim-treesitter').setup({
+      highlight = {enable = true,},
+      -- ensure_installed = { "xit", "python", "lua", "javascript" },
+      auto_install = false,
+    })
+
+    require('xit').setup({
+      disable_default_highlights = false,
+      disable_default_mappings = false,
+      default_jump_group = "all", -- possible values: all, open_and_ongoing
+      wrap_jumps = true,
+    })
+    
+    print("set up xit")
+
+    vim.api.nvim_set_hl(0, '@XitHeadline', {
+      fg = '#FFD700',
+      bg = 'NONE',
+      bold = true,
+      underline = true,
+    })
+  end,
+})
+
+-- vim.api.nvim_create_augroup('XitFiletypeGroup', { clear = true })
+
+-- vim.api.nvim_create_autocmd('FileType', {
+
+--   group = 'XitFiletypeGroup',
+--   pattern = 'xit',
+--   callback = function()
+--     vim.opt.rtp:prepend("$TREESITTER")
+--     vim.opt.rtp:prepend("$XIT")
+--     require('nvim-treesitter.configs').setup({highlight = {enable = true,}})
+--     -- require('xit').setup({
+--     --   disable_default_highlights = false,
+--     --   disable_default_mappings = false,
+--     --   default_jump_group = "all", -- possible values: all, open_and_ongoing
+--     --   wrap_jumps = true,
+--     -- })
+--     vim.api.nvim_set_hl(0, '@XitHeadline', {
+--       fg = '#FFD700',
+--       bg = 'NONE',
+--       bold = true,
+--       underline = true,
+--     })
+--   end,
+-- })
+
+-- STATUSLINE
+
+print('status_line.lua loaded')
+
+vim.keymap.set("n", "<leader>s", function()
+	
+    vim.opt.rtp:prepend("$LUALINE")
+	local lualine = require("lualine")
+
+	vim.opt.rtp:prepend("$NAVIC")
+	local navic = require("nvim-navic")
+
+	local colors = {
+		-- bg = "<| color.nvim.statusLine.bg |>",
+		-- fg = "<| color.nvim.statusLine.fg |>",
+		-- yellow = "<| color.nvim.statusLine.yellow |>",
+		-- cyan = "<| color.nvim.statusLine.cyan |>",
+		-- darkblue = "<| color.nvim.statusLine.darkblue |>",
+		-- green = "<| color.nvim.statusLine.green |>",
+		-- orange = "<| color.nvim.statusLine.orange |>",
+		-- violet = "<| color.nvim.statusLine.violet |>",
+		-- magenta = "<| color.nvim.statusLine.magenta |>",
+		-- blue = "<| color.nvim.statusLine.blue |>",
+		-- red = "<| color.nvim.statusLine.red |>",
+
+        bg        = "#1e1e2e",  -- Dark background
+        fg        = "#cdd6f4",  -- Light foreground text
+        yellow    = "#f9e2af",  -- Soft yellow
+        cyan      = "#89dceb",  -- Bright cyan
+        darkblue  = "#1e66f5",  -- Saturated blue
+        green     = "#a6e3a1",  -- Pleasant green
+        orange    = "#fab387",  -- Soft orange
+        violet    = "#cba6f7",  -- Light violet
+        magenta   = "#f5c2e7",  -- Pink/magenta
+        blue      = "#89b4fa",  -- Soft blue
+        red       = "#f38ba8",  -- Warm red
+	}
+
+	local conditions = {
+		buffer_not_empty = function()
+			return vim.fn.empty(vim.fn.expand("%:t")) ~= 1
+		end,
+		hide_in_width = function()
+			return vim.fn.winwidth(0) > 80
+		end,
+		check_git_workspace = function()
+			local filepath = vim.fn.expand("%:p:h")
+			local gitdir = vim.fn.finddir(".git", filepath .. ";")
+			return gitdir and #gitdir > 0 and #gitdir < #filepath
+		end,
+	}
+
+	local config = {
+		options = {
+			component_separators = "",
+			section_separators = "",
+			theme = {
+				normal = { c = { fg = colors.fg, bg = colors.bg } },
+				inactive = { c = { fg = colors.fg, bg = colors.bg } },
+			},
+		},
+		sections = {
+			lualine_a = {},
+			lualine_b = {},
+			lualine_y = {},
+			lualine_z = {},
+			lualine_c = {},
+			lualine_x = {},
+		},
+		inactive_sections = {
+			lualine_a = {},
+			lualine_b = {},
+			lualine_y = {},
+			lualine_z = {},
+			lualine_c = {},
+			lualine_x = {},
+		},
+	}
+
+	local function ins_left(component)
+		table.insert(config.sections.lualine_c, component)
+	end
+
+	local function ins_right(component)
+		table.insert(config.sections.lualine_x, component)
+	end
+
+	ins_left({
+		function()
+			return " "
+		end,
+		color = function()
+			local mode_color = {
+				n = colors.red,
+				i = colors.green,
+				v = colors.blue,
+				[""] = colors.blue,
+				V = colors.blue,
+				c = colors.magenta,
+				no = colors.red,
+				s = colors.orange,
+				S = colors.orange,
+				[""] = colors.orange,
+				ic = colors.yellow,
+				R = colors.violet,
+				Rv = colors.violet,
+				cv = colors.red,
+				ce = colors.red,
+				r = colors.cyan,
+				rm = colors.cyan,
+				["r?"] = colors.cyan,
+				["!"] = colors.red,
+				t = colors.red,
+			}
+			return { fg = mode_color[vim.fn.mode()] }
+		end,
+		padding = { right = 1 },
+	})
+
+	ins_left({
+		"filesize",
+		cond = conditions.buffer_not_empty,
+	})
+
+	ins_left({
+		"filename",
+		cond = conditions.buffer_not_empty,
+		color = { fg = colors.magenta, gui = "bold" },
+	})
+
+	ins_left({ "location" })
+
+	ins_left({ "progress", color = { fg = colors.fg, gui = "bold" } })
+
+	ins_left({
+		"diagnostics",
+		sources = { "nvim_diagnostic" },
+		symbols = { error = " ", warn = " ", info = " " },
+		diagnostics_color = {
+			color_error = { fg = colors.red },
+			color_warn = { fg = colors.yellow },
+			color_info = { fg = colors.cyan },
+		},
+	})
+
+	ins_left({
+		function()
+			return "%="
+		end,
+	})
+
+	ins_left({
+		function()
+			local msg = "No Active Lsp"
+			local buf_ft = vim.api.nvim_buf_get_option(0, "filetype")
+			local clients = vim.lsp.get_clients()
+			if next(clients) == nil then
+				return msg
+			end
+			for _, client in ipairs(clients) do
+				local filetypes = client.config.filetypes
+				if filetypes and vim.fn.index(filetypes, buf_ft) ~= -1 then
+					return client.name
+				end
+			end
+			return msg
+		end,
+		icon = " LSP:",
+		color = { fg = colors.cyan, gui = "bold" },
+	})
+
+	ins_right({
+		"o:encoding",
+		fmt = string.upper,
+		cond = conditions.hide_in_width,
+		color = { fg = colors.green, gui = "bold" },
+	})
+
+	ins_right({
+		"fileformat",
+		fmt = string.upper,
+		icons_enabled = false,
+		color = { fg = colors.green, gui = "bold" },
+	})
+
+	ins_right({
+		"branch",
+		icon = "",
+		color = { fg = colors.violet, gui = "bold" },
+	})
+
+	ins_right({
+		"diff",
+		symbols = { added = " ", modified = "󰝤 ", removed = " " },
+		diff_color = {
+			added = { fg = colors.green },
+			modified = { fg = colors.orange },
+			removed = { fg = colors.red },
+		},
+		cond = conditions.hide_in_width,
+	})
+
+	lualine.setup(config)
+end, { noremap = true, silent = true })
+
+-- FILE TREE BROWSER
+
+print('file_browser_tree.lua loaded')
+
+vim.keymap.set("n", "<leader>t", function()
+    vim.g.loaded_netrw = 1
+    vim.g.loaded_netrwPlugin = 1
+
+    vim.opt.rtp:prepend("$NVIMTREE")
+    
+    local nvimtree = require("nvim-tree")
+    nvimtree.setup(
+        {
+            sort = {
+              sorter = "case_sensitive",
+            },
+            view = {
+              width = 30,
+            },
+            renderer = {
+              group_empty = true,
+            },
+            filters = {
+              dotfiles = false,
+            },
+        }
+    )
+    -- require("nvim-web-devicons").setup()
+    -- -- require("nui")
+    -- require("plenary")
+    print('nvim-tree requires successful')
+	-- local oil = require("oil")
+	-- local genghis = require("genghis")
+end)
+
+-- vim.keymap.set("n", "<leader>l", function()
+--     vim.g.loaded_netrw = 1
+--     vim.g.loaded_netrwPlugin = 1
+
+--     vim.opt.rtp:prepend("$NEOTREE")
+--     vim.opt.rtp:prepend("$WEBDEVICONS")
+--     vim.opt.rtp:prepend("$PLENARY")
+--     vim.opt.rtp:prepend("$NUI")
+--     local neotree = require("neo-tree")
+--     require("nvim-web-devicons").setup()
+--     -- require("nui")
+--     require("plenary")
+--     print('neotree requires successful')
+-- 	-- local oil = require("oil")
+-- 	-- local genghis = require("genghis")
+
+-- 	neotree.setup({
+-- 		close_if_last_window = true,
+-- 		-- popup_border_style = "rounded",
+-- 		-- enable_git_status = true,
+-- 		-- enable_diagnostics = true,
+-- 		-- open_files_do_not_replace_types = { "terminal", "trouble", "qf" },
+-- 		-- sort_case_insensitive = false,
+-- 		-- sort_function = nil,
+-- 		-- default_component_configs = {
+-- 		-- 	container = {
+-- 		-- 		enable_character_fade = true,
+-- 		-- 		right_padding = 0,
+-- 		-- 	},
+-- 		-- 	indent = {
+-- 		-- 		indent_size = 2,
+-- 		-- 		padding = 1,
+-- 		-- 		with_markers = true,
+-- 		-- 		indent_marker = "│",
+-- 		-- 		last_indent_marker = "└",
+-- 		-- 		highlight = "NeoTreeIndentMarker",
+-- 		-- 		with_expanders = nil,
+-- 		-- 		expander_collapsed = "",
+-- 		-- 		expander_expanded = "",
+-- 		-- 		expander_highlight = "NeoTreeExpander",
+-- 		-- 	},
+-- 		-- 	icon = {
+-- 		-- 		folder_closed = "",
+-- 		-- 		folder_open = "",
+-- 		-- 		folder_empty = "",
+-- 		-- 		default = "",
+-- 		-- 		highlight = "NeoTreeFileIcon",
+-- 		-- 	},
+-- 		-- 	modified = {
+-- 		-- 		symbol = "[+]",
+-- 		-- 		highlight = "NeoTreeModified",
+-- 		-- 	},
+-- 		-- 	name = {
+-- 		-- 		trailing_slash = false,
+-- 		-- 		use_git_status_colors = true,
+-- 		-- 		highlight = "NeoTreeFileName",
+-- 		-- 	},
+-- 		-- 	git_status = {
+-- 		-- 		symbols = {
+-- 		-- 			added = "✚",
+-- 		-- 			modified = "",
+-- 		-- 			deleted = "✖",
+-- 		-- 			renamed = "",
+-- 		-- 			untracked = "",
+-- 		-- 			ignored = "",
+-- 		-- 			unstaged = "",
+-- 		-- 			staged = "",
+-- 		-- 			conflict = "",
+-- 		-- 		},
+-- 		-- 	},
+-- 		-- },
+-- 		-- commands = {},
+-- 		-- window = {
+-- 		-- 	position = "left",
+-- 		-- 	width = 40,
+-- 		-- 	mapping_options = {
+-- 		-- 		noremap = true,
+-- 		-- 		nowait = true,
+-- 		-- 	},
+-- 		-- 	mappings = {
+-- 		-- 		["<space>"] = {
+-- 		-- 			"toggle_node",
+-- 		-- 			nowait = false,
+-- 		-- 		},
+-- 		-- 		["<2-LeftMouse>"] = "open",
+-- 		-- 		["<cr>"] = "open",
+-- 		-- 		["<esc>"] = "revert_preview",
+-- 		-- 		["P"] = { "toggle_preview", config = { use_float = true } },
+-- 		-- 		["l"] = "focus_preview",
+-- 		-- 		["S"] = "open_split",
+-- 		-- 		["s"] = "open_vsplit",
+-- 		-- 		["t"] = "open_tabnew",
+-- 		-- 		["w"] = "open_with_window_picker",
+-- 		-- 		["C"] = "close_node",
+-- 		-- 		["z"] = "close_all_nodes",
+-- 		-- 		["a"] = {
+-- 		-- 			"add",
+-- 		-- 			config = {
+-- 		-- 				show_path = "none",
+-- 		-- 			},
+-- 		-- 		},
+-- 		-- 		["A"] = "add_directory",
+-- 		-- 		["d"] = "delete",
+-- 		-- 		["r"] = "rename",
+-- 		-- 		["y"] = "copy_to_clipboard",
+-- 		-- 		["x"] = "cut_to_clipboard",
+-- 		-- 		["p"] = "paste_from_clipboard",
+-- 		-- 		["c"] = "copy",
+-- 		-- 		["m"] = "move",
+-- 		-- 		["q"] = "close_window",
+-- 		-- 		["R"] = "refresh",
+-- 		-- 		["?"] = "show_help",
+-- 		-- 		["<"] = "prev_source",
+-- 		-- 		[">"] = "next_source",
+-- 		-- 	},
+-- 		-- },
+-- 		-- nesting_rules = {},
+-- 		-- filesystem = {
+-- 		-- 	filtered_items = {
+-- 		-- 		visible = false,
+-- 		-- 		hide_dotfiles = true,
+-- 		-- 		hide_gitignored = true,
+-- 		-- 		hide_hidden = true,
+-- 		-- 		hide_by_name = {},
+-- 		-- 		hide_by_pattern = {},
+-- 		-- 		always_show = {},
+-- 		-- 		never_show = {},
+-- 		-- 		never_show_by_pattern = {},
+-- 		-- 	},
+-- 		-- 	follow_current_file = { enabled = true },
+-- 		-- 	group_empty_dirs = false,
+-- 		-- 	hijack_netrw_behavior = "open_default",
+-- 		-- 	use_libuv_file_watcher = true,
+-- 		-- 	window = {
+-- 		-- 		mappings = {
+-- 		-- 			["<bs>"] = "navigate_up",
+-- 		-- 			["."] = "set_root",
+-- 		-- 			["H"] = "toggle_hidden",
+-- 		-- 			["/"] = "fuzzy_finder",
+-- 		-- 			["D"] = "fuzzy_finder_directory",
+-- 		-- 			["#"] = "fuzzy_sorter",
+-- 		-- 			["f"] = "filter_on_submit",
+-- 		-- 			["<c-x>"] = "clear_filter",
+-- 		-- 			["[g"] = "prev_git_modified",
+-- 		-- 			["]g"] = "next_git_modified",
+-- 		-- 		},
+-- 		-- 		fuzzy_finder_mappings = {
+-- 		-- 			["<down>"] = "move_cursor_down",
+-- 		-- 			["<C-n>"] = "move_cursor_down",
+-- 		-- 			["<up>"] = "move_cursor_up",
+-- 		-- 			["<C-p>"] = "move_cursor_up",
+-- 		-- 		},
+-- 		-- 	},
+-- 		-- 	commands = {},
+-- 		-- },
+-- 		-- buffers = {
+-- 		-- 	follow_current_file = { enabled = true },
+-- 		-- 	group_empty_dirs = true,
+-- 		-- 	show_unloaded = true,
+-- 		-- 	window = {
+-- 		-- 		mappings = {
+-- 		-- 			["bd"] = "buffer_delete",
+-- 		-- 			["<bs>"] = "navigate_up",
+-- 		-- 			["."] = "set_root",
+-- 		-- 		},
+-- 		-- 	},
+-- 		-- },
+-- 		-- git_status = {
+-- 		-- 	window = {
+-- 		-- 		position = "float",
+-- 		-- 		mappings = {
+-- 		-- 			["A"] = "git_add_all",
+-- 		-- 			["gu"] = "git_unstage_file",
+-- 		-- 			["ga"] = "git_add_file",
+-- 		-- 			["gr"] = "git_revert_file",
+-- 		-- 			["gc"] = "git_commit",
+-- 		-- 			["gp"] = "git_push",
+-- 		-- 			["gg"] = "git_commit_and_push",
+-- 		-- 		},
+-- 		-- 	},
+-- 		-- },
+-- 	})
+-- end, { noremap = true, silent = true })
+
+-- vim.keymap.set('n', '<leader>t', ':Neotree<CR>')
+
+vim.opt.rtp:prepend("$TREESITTER")
+require('nvim-treesitter')
+require'nvim-treesitter'.setup {
+    -- ensure_installed = { "python", "lua", "javascript" },  -- Ensure installed parsers
+    highlight = { enable = true },
+    fold = { enable = false }  -- Disable folding if necessary
+  }
+
+function addRelPath(dir)
+    local spath =
+        debug.getinfo(1,'S').source
+          :sub(2)
+          :gsub("^([^/])","./%1")
+          :gsub("[^/]*$","")
+    dir=dir and (dir.."/") or ""
+    spath = spath..dir
+    package.path = spath.."?.lua;"
+                 ..spath.."?/init.lua"
+                --  ..package.path
+end
+
+
+addRelPath()
+require("_colors")
+require("options")
+require("mappings")
+require("commands")
+
+require("features.status_line")
+require("features.file_browser_tree")
+
+require('languages.python')
+require('languages.xit')
+-- require("mappings")
+-- require("options")
+
+-- require("features.file_browser_tree")
+-- require("features.status_line")
+
+
+-- require("languages.xit")
+
+
+
+end
