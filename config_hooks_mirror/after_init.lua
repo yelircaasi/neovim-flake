@@ -116,7 +116,7 @@ setup_plugin("todo-comments")
 utils.packadd("vim-commentary")
 
 setup_plugin("treesj")
-
+setup_plugin("dial")
 setup_plugin("harpoon-core")
 setup_plugin("marks")
 setup_plugin("markit")
@@ -323,3 +323,9 @@ vim.opt.runtimepath:prepend(PARSER_DIR)
 vim.opt.runtimepath:prepend("/nix/store/ydlwparyk4mxl6wzhlp3x54zl3nk82c5-pde")
 
 vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
+
+
+setup_plugin("dial")
+
+
+-- debug.getinfo(2, "S").source:sub(2):match("(.*/)") or "./"

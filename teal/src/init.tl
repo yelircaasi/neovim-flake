@@ -8,15 +8,8 @@ vim.opt.runtimepath:prepend(DERIVATION_DIR)
 vim.opt.runtimepath:prepend(OPT_DIR)
 vim.opt.runtimepath:prepend(PARSER_DIR)
 vim.opt.packpath:prepend(PACK_DIR)
--- print(CONFIG_DIR)
--- print(OPT_DIR)
--- print(PACK_DIR)
--- print(PARSER_DIR)
--- print(vim.inspect(vim.opt.runtimepath))
--- print(vim.inspect(vim.opt.packpath))
 -- PRE HOOKS ===========================================================================================================
 local NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string
--- print(NVIM_HOME .. "/before_init.lua")
 global VERBOSE: boolean = false
 global SAFE: boolean = true
 dofile(NVIM_HOME .. "/before_init.lua")
@@ -26,7 +19,6 @@ vim.g.maplocalleader = " "
 vim.g.loaded_matchparen = 1
 vim.g.loaded_matchit = 1
 vim.g.loaded_netrw = 1
-
 -- UTILS ===============================================================================================================
 local path_helpers: {string: (function(string):string)} = {}
 
@@ -55,9 +47,7 @@ end
 prepend_safe(vim.env.VIMRUNTIME as string)
 
 global HAS_NIX: boolean = vim.fn.isdirectory("/nix/store") ~= 0
--- debug.getinfo(2, "S").source:sub(2):match("(.*/)") or "./"
 
--- vim.opt.runtimepath:prepend(CONFIG_DIR) TODO: not working (maybe not in time?)
 package.path = package.path .. ";" .. CONFIG_DIR .. "/?.lua"
 local result, explicit_paths = pcall(dofile, NVIM_HOME .. "/plugin_paths.lua") as (boolean, {string:string})
 local plugin_paths: {string:string} = result and explicit_paths or {}
@@ -71,10 +61,6 @@ global utils = require("lua.utils").setup({
 	dependencies = dofile(CONFIG_DIR .. "/meta/dependencies.lua") as {string:{string}},
 	plugins_by_layer = dofile(CONFIG_DIR .. "/meta/plugin_layers.lua") as {number:{number:{string}}},
 })
-
--- utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
--- utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
--- utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
 
 -- =====================================================================================================================
 -- PLUGIN SETUP ========================================================================================================
@@ -359,6 +345,4 @@ setup_plugin("neorepl")
 --]]
 -- POST HOOKS =========================================================================================================
 
--- utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
--- utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
 dofile(NVIM_HOME .. "/after_init.lua")

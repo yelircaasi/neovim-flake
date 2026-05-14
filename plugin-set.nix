@@ -798,7 +798,7 @@ in rec {
       };
     };
     todo-comments = pkgs.vimUtils.buildVimPlugin {
-      pname = "TODO-comments-nvim";
+      pname = "todo-comments-nvim";
       version = "2025-11-10";
       src = pkgs.fetchFromGitHub {
         owner = "folke";
