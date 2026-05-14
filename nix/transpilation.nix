@@ -1,7 +1,7 @@
 {pkgs}:
 pkgs.stdenv.mkDerivation {
   name = "tl-transpiled";
-  src = ./teal;
+  src = ../teal;
 
   dontInstall = true;
 
