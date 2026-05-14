@@ -1,10 +1,15 @@
 -- RTP =================================================================================================================
-local CONFIG_DIR: string = (vim.fn.expand("<sfile>:p:h") as string)
-local paths_file: string = CONFIG_DIR .. "/prepend.lua"
-print(paths_file)
+local DERIVATION_DIR: string = (vim.fn.resolve(vim.fn.expand("<sfile>:p:h:h") as string) as string)
+local CONFIG_DIR: string = DERIVATION_DIR .. "/config"
+local OPT_DIR = (vim.fn.resolve(DERIVATION_DIR .. "/pack/bundle/opt") as string)
+local PACK_DIR = (vim.fn.fnamemodify(OPT_DIR, ":h:h:h") as string)
+vim.opt.runtimepath:prepend(OPT_DIR)
+vim.opt.packpath:prepend(PACK_DIR)
+print(CONFIG_DIR)
+print(OPT_DIR)
+print(PACK_DIR)
 print(vim.inspect(vim.opt.runtimepath))
 print(vim.inspect(vim.opt.packpath))
-dofile(paths_file)
 -- PRE HOOKS ===========================================================================================================
 local NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string
 print(NVIM_HOME .. "/before_init.lua")
@@ -41,7 +46,7 @@ local prepend_safe = function(path: string, create?: boolean): nil
 	end
 end
 
-local HAS_NIX: boolean = vim.fn.isdirectory("/nix/store") ~= 0
+global HAS_NIX: boolean = vim.fn.isdirectory("/nix/store") ~= 0
 -- debug.getinfo(2, "S").source:sub(2):match("(.*/)") or "./"
 
 -- vim.opt.runtimepath:prepend(CONFIG_DIR) TODO: not working (maybe not in time?)
@@ -49,7 +54,7 @@ package.path = package.path .. ";" .. CONFIG_DIR .. "/?.lua"
 local result, explicit_paths = pcall(dofile, NVIM_HOME .. "/plugin_paths.lua") as (boolean, {string:string})
 local plugin_paths: {string:string} = result and explicit_paths or {}
 
-local utils = require("lua.utils").setup({
+global utils = require("lua.utils").setup({
 	verbose = true,
 	safe = true,
 	prepend_safe = prepend_safe,
@@ -69,6 +74,7 @@ utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
 -- PLUGIN SETUP ========================================================================================================
 -- =====================================================================================================================
 
+--[[
 -- LAYER 0: foundation, colors, search, core navigation ============================================================== 0
 ------ core dependencies
 setup_plugin("plenary")
@@ -340,5 +346,9 @@ setup_plugin("markdown-preview")
 ------ Lua / self-referential
 setup_plugin("structlog")
 setup_plugin("neorepl")
+--]]
 -- POST HOOKS =========================================================================================================
+
+utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
+utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
 dofile(NVIM_HOME .. "/after_init.lua")
