@@ -20,11 +20,11 @@ local function setup(config: UtilsConfig): Utils
 
 	M.PLUGINS_INCLUDED = {}
 	for _, layer in ipairs(LAYERS) do
-		M.printv("layer" .. layer)
+		-- M.printv("layer" .. layer)
 	    local layer_table: {number: {string}} = PLUGINS_BY_LAYER[layer]
 	    if VERBOSE then
-			print("--- layer " .. tostring(layer) .. ": " .. #layer_table .. " plugins")
-			print(vim.inspect(layer_table))
+			-- print("--- layer " .. tostring(layer) .. ": " .. #layer_table .. " plugins")
+			-- print(vim.inspect(layer_table))
 		end
         
 	    for _, names in pairs(layer_table) do

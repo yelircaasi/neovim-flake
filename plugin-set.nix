@@ -2,6 +2,21 @@
   custom = import ./self-packaged-plugins.nix;
 in rec {
   customPlugins = {
+    xit = pkgs.vimUtils.buildVimPlugin {
+      pname = "xit.nvim";
+      version = "2025-05-09";
+      dependencies = [
+        pkgs.vimPlugins.nvim-treesitter
+      ];
+      doCheck = false;
+      src = pkgs.fetchFromGitHub {
+        owner = "yelircaasi";
+        repo = "xit.nvim";
+        rev = "24ab4b043915103a36f42ea9451b70ef16bed061";
+        sha256 = "sha256-O08kZVDgpuqSxc8CY8D5yPq/Q1O0ZAr1AKx0qht/UQU=";
+      };
+      meta.homepage = "https://github.com/yelircaasi/xit.nvim";
+    };
     cosmic-ui = pkgs.vimUtils.buildVimPlugin {
       pname = "cosmic-ui";
       version = "2026-03-23";

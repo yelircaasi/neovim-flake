@@ -1,18 +1,24 @@
 -- RTP =================================================================================================================
-local DERIVATION_DIR: string = (vim.fn.resolve(vim.fn.expand("<sfile>:p:h:h") as string) as string)
+global DERIVATION_DIR: string = (vim.fn.resolve(vim.fn.expand("<sfile>:p:h:h") as string) as string)
 local CONFIG_DIR: string = DERIVATION_DIR .. "/config"
 local OPT_DIR = (vim.fn.resolve(DERIVATION_DIR .. "/pack/bundle/opt") as string)
 local PACK_DIR = (vim.fn.fnamemodify(OPT_DIR, ":h:h:h") as string)
+global PARSER_DIR: string = DERIVATION_DIR .. "/parser"
+vim.opt.runtimepath:prepend(DERIVATION_DIR)
 vim.opt.runtimepath:prepend(OPT_DIR)
+vim.opt.runtimepath:prepend(PARSER_DIR)
 vim.opt.packpath:prepend(PACK_DIR)
-print(CONFIG_DIR)
-print(OPT_DIR)
-print(PACK_DIR)
-print(vim.inspect(vim.opt.runtimepath))
-print(vim.inspect(vim.opt.packpath))
+-- print(CONFIG_DIR)
+-- print(OPT_DIR)
+-- print(PACK_DIR)
+-- print(PARSER_DIR)
+-- print(vim.inspect(vim.opt.runtimepath))
+-- print(vim.inspect(vim.opt.packpath))
 -- PRE HOOKS ===========================================================================================================
 local NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string
-print(NVIM_HOME .. "/before_init.lua")
+-- print(NVIM_HOME .. "/before_init.lua")
+global VERBOSE: boolean = false
+global SAFE: boolean = true
 dofile(NVIM_HOME .. "/before_init.lua")
 -- GLOBAL OPTIONS ======================================================================================================
 vim.g.mapleader = " "
@@ -46,6 +52,8 @@ local prepend_safe = function(path: string, create?: boolean): nil
 	end
 end
 
+prepend_safe(vim.env.VIMRUNTIME as string)
+
 global HAS_NIX: boolean = vim.fn.isdirectory("/nix/store") ~= 0
 -- debug.getinfo(2, "S").source:sub(2):match("(.*/)") or "./"
 
@@ -55,26 +63,28 @@ local result, explicit_paths = pcall(dofile, NVIM_HOME .. "/plugin_paths.lua") a
 local plugin_paths: {string:string} = result and explicit_paths or {}
 
 global utils = require("lua.utils").setup({
-	verbose = true,
-	safe = true,
+	verbose = VERBOSE,
+	safe = SAFE,
 	prepend_safe = prepend_safe,
 	layers = {0, 1,},
 	plugin_paths = plugin_paths,
 	dependencies = dofile(CONFIG_DIR .. "/meta/dependencies.lua") as {string:{string}},
 	plugins_by_layer = dofile(CONFIG_DIR .. "/meta/plugin_layers.lua") as {number:{number:{string}}},
 })
-local setup_plugin: SetupFunction = utils.setup_plugin
-local map: MapFunction = utils.map
 
-utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
-utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
-utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
+-- utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
+-- utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
+-- utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
 
 -- =====================================================================================================================
 -- PLUGIN SETUP ========================================================================================================
 -- =====================================================================================================================
 
 --[[
+
+local setup_plugin: SetupFunction = utils.setup_plugin
+local map: MapFunction = utils.map
+
 -- LAYER 0: foundation, colors, search, core navigation ============================================================== 0
 ------ core dependencies
 setup_plugin("plenary")
@@ -349,6 +359,6 @@ setup_plugin("neorepl")
 --]]
 -- POST HOOKS =========================================================================================================
 
-utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
-utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
+-- utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
+-- utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
 dofile(NVIM_HOME .. "/after_init.lua")

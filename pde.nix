@@ -7,14 +7,7 @@
   custom = import ./self-packaged-plugins.nix {inherit pkgs;};
   pluginDerivation = (import ./plugins-derivation.nix {inherit pkgs;}).nvimPlugins;
 
-  treesitter = pkgs.vimPlugins.nvim-treesitter.withPlugins (plugins:
-    pkgs.vimPlugins.nvim-treesitter.allGrammars
-    ++ [
-      custom.tsgrammar-just
-      custom.tsgrammar-xit
-      nix-treesitter.tree-sitter-xit
-    ]
-    ++ plugins);
+  treesitterDerivation = (import ./treesitter.nix {inherit pkgs;}).allParsers;
 
   configDir = "config";
   argCatcher = ''"\$@"'';
@@ -33,8 +26,6 @@ in
     buildInputs =
       [
         neovim-nightly
-        treesitter
-        custom.xit-nvim
         pkgs.ruff
 
         pkgs.python3
@@ -73,51 +64,45 @@ in
     installPhase = ''
       ${derefCopyDir} ${transpiled}/config/ $out/
       ${derefCopyDir} ${pluginDerivation}/meta/ $out/
+      ${derefCopyDir} ${treesitterDerivation}/parser/ $out/
 
-      # Copy the entire pack tree — one directory, native pack layout
       mkdir -p $out/pack
-      cp -rL ${pluginDerivation}/pack/. $out/pack
+      ${derefCopyDir} ${pluginDerivation}/pack/. $out/pack
 
       ${derefCopy} ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
       ${derefCopy} ${pkgs.ruff}/bin/ruff $out/bin/ruff
 
       chmod -R u+w $out/config
-      cat > $out/config/prepend.lua << EOF
-      vim.opt.runtimepath:prepend("${pluginDerivation}/pack/bundle/opt")
-      vim.opt.packpath:prepend("${pluginDerivation}")
-      EOF
-
       echo "#!${pkgs.runtimeShell}" > $out/bin/pde
-      echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim \
-        --cmd 'set packpath^=$out' \
+      # REMOVED: --cmd 'set packpath^=$out' \
+      echo "${neovim-nightly}/bin/nvim \
         -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
 
       echo "#!${pkgs.runtimeShell}" > $out/bin/nvim
-      echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim \
-        --cmd 'set packpath^=$out' \
+      echo "${neovim-nightly}/bin/nvim \
         -u \$HOME/.config/nvim/init.lua ${argCatcher}" >> $out/bin/nvim
 
       chmod +x $out/bin/pde $out/bin/nvim
     '';
 
-    OLD_installPhase = ''
-      ${derefCopyDir} ${transpiled}/config/ $out/
-      ${derefCopyDir} ${pluginDerivation}/plugins/ $out/
-      ${derefCopyDir} ${pluginDerivation}/meta/ $out/
+    # OLD_installPhase = ''
+    #   ${derefCopyDir} ${transpiled}/config/ $out/
+    #   ${derefCopyDir} ${pluginDerivation}/plugins/ $out/
+    #   ${derefCopyDir} ${pluginDerivation}/meta/ $out/
 
-      ${derefCopy} ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
-      ${derefCopy} ${pkgs.ruff}/bin/ruff $out/bin/ruff
+    #   ${derefCopy} ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
+    #   ${derefCopy} ${pkgs.ruff}/bin/ruff $out/bin/ruff
 
-      echo "#!${pkgs.runtimeShell}" > $out/bin/pde
-      echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
-      echo "#!${pkgs.runtimeShell}" > $out/bin/nvim
-      echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u \$HOME/.config/nvim/init.lua ${argCatcher}" >> $out/bin/nvim
-      chmod +x $out/bin/pde $out/bin/nvim
+    #   echo "#!${pkgs.runtimeShell}" > $out/bin/pde
+    #   echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
+    #   echo "#!${pkgs.runtimeShell}" > $out/bin/nvim
+    #   echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u \$HOME/.config/nvim/init.lua ${argCatcher}" >> $out/bin/nvim
+    #   chmod +x $out/bin/pde $out/bin/nvim
 
-      # ${derefCopy} ${pkgs.python3}/bin/python $out/bin/python
-      # ${derefCopy} ${pkgs.python3}/bin/python3 $out/bin/python3
-      # ${derefCopy} ${pkgs.luajit}/bin/lua $out/bin/lua
-    '';
+    #   # ${derefCopy} ${pkgs.python3}/bin/python $out/bin/python
+    #   # ${derefCopy} ${pkgs.python3}/bin/python3 $out/bin/python3
+    #   # ${derefCopy} ${pkgs.luajit}/bin/lua $out/bin/lua
+    # '';
   }
 # {
 #   enable = true;
