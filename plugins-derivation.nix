@@ -96,6 +96,9 @@ in {
     ${pkgs.python3}/bin/python3 -m json.tool --indent 4 $out/meta/plugin_paths.json \
       > $out/meta/tmp.json
     mv $out/meta/tmp.json $out/meta/plugin_paths.json
+
+    # fix dial path so nvim can find it
+    cp $out/pack/bundle/opt/dial/plugin/dial.lua $out/pack/bundle/opt/dial/lua/dial/init.lua
   '';
 
   standardPathsDerivation = stdenvNoCC.mkDerivation {
