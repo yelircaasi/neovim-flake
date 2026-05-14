@@ -2,7 +2,7 @@
 local type luv = require("luv")
 
 global record vim
-   -- TODO: Either find a way to generate these or at least find a comprehensive list to put a bunch of 'TODO' stub definitions here
+   -- Either find a way to generate these or at least find a comprehensive list to put a bunch of 'todo' stub definitions here
    --    Sadly, there doesn't seem to be a nice way to serialize all of these
    --    since they're lazily brought in as you call them
    --    this might be the only way since user defined functions are also called here
@@ -13,8 +13,7 @@ global record vim
    --    ...
    -- end
 
-   -- TODO:
-   -- vim.treesitter
+   -- still need: vim.treesitter
 
    loop: luv
    uv: luv
@@ -462,7 +461,7 @@ global record vim
       del: function(modes: string|{string}, lhs: string, opts: DelOpts)
    end
 
-   record EventData --TODO: this is a vim thing, so types aren't really documented
+   record EventData  -- this is a vim thing, so types aren't really documented
       abort: any
       chan: integer
       cmdlevel: any

@@ -127,7 +127,6 @@ poetry:
 
 profile:
     python3 -m scalene.set_nvidia_gpu_modes
-    # TODO
 
 @view-cov:
     echo "Recency: `sed 's/.\{7\}$//' <<< cat {{ PROJECTCACHE }}/last_test`"

@@ -197,7 +197,7 @@ setup_plugin("hop")
 
 setup_plugin("rainbow-delimiters")
 setup_plugin("nvim-autopairs")
---TODO setup_plugin("blink.pairs")
+-- TODO setup_plugin("blink.pairs")
 utils.packadd("vim-sandwich")
 -- setup_plugin("vim-sandwich")
 setup_plugin("nvim-surround")
@@ -225,7 +225,7 @@ utils.packadd("vim-commentary")
 setup_plugin("treesj")
 ------ value manipulation
 -- this one has a flawed structure; need to fork it and fix that
--- setup_plugin("dial") TODO!
+-- setup_plugin("dial")
 ------ marks
 setup_plugin("harpoon-core")
 setup_plugin("marks")

@@ -288,7 +288,7 @@ in rec {
       };
     };
     blink = pkgs.vimUtils.buildVimPlugin {
-      pname = "TODO: separate packages";
+      pname = "blink";  # TODO: need to separate packages?
       version = "2025-10-21";
       src = pkgs.fetchFromGitHub {
         owner = "saghen";

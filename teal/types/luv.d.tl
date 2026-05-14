@@ -1,4 +1,4 @@
--- TODO: see https://github.com/teal-language/tl/issues/812
+-- see https://github.com/teal-language/tl/issues/812
 
 -- See full docs here
 -- https://github.com/luvit/luv/blob/master/docs.md

@@ -54,7 +54,7 @@ for name, attrs in pairs({
         NormalFloat = { bg = "#000800", fg = "#808080" },
         NormalNC = "Normal",
 
-        -- Cursor: TODO...
+        -- Cursor: ...
 
         WinSeparator = { bg = "#000800", fg = "#111211" },
         -- VertSplit = { bg = "<|color.nvim.VertSplit.bg |>", fg = "<|color.nvim.VertSplit.fg |>" },

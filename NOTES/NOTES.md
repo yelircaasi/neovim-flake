@@ -216,7 +216,7 @@ Final touches for a seamless experience
 - UI Enhancements:
   - `folke/noice.nvim` (improved UI for messages, cmdline)
   - `rcarriga/nvim-notify` (better notifications)
-  - `folke/todo-comments.nvim` (highlight TODOs/FIXMEs)
+  - `folke/todo-comments.nvim` (highlight TO_DOs/FIXMEs)
   - `kevinhwang91/nvim-ufo` (better code folding)
 
 - Wezterm Integration:
