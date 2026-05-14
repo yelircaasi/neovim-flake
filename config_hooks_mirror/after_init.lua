@@ -1,5 +1,9 @@
 print("Entering after_init.lua.")
 
+utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
+utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
+utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
+
 if HAS_NIX then 
   vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
 end

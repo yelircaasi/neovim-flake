@@ -1,24 +1,27 @@
+global function join_paths(base: string, child: string): string
+	return base .. "/" .. child
+end
+
 -- RTP =================================================================================================================
 global DERIVATION_DIR: string = (vim.fn.resolve(vim.fn.expand("<sfile>:p:h:h") as string) as string)
-local CONFIG_DIR: string = DERIVATION_DIR .. "/config"
-local OPT_DIR = (vim.fn.resolve(DERIVATION_DIR .. "/pack/bundle/opt") as string)
-local PACK_DIR = (vim.fn.fnamemodify(OPT_DIR, ":h:h:h") as string)
-global PARSER_DIR: string = DERIVATION_DIR .. "/parser"
+global CONFIG_DIR: string = join_paths(DERIVATION_DIR, "config")
+global PARSER_DIR: string = join_paths(DERIVATION_DIR, "parser")
 vim.opt.runtimepath:prepend(DERIVATION_DIR)
-vim.opt.runtimepath:prepend(OPT_DIR)
 vim.opt.runtimepath:prepend(PARSER_DIR)
-vim.opt.packpath:prepend(PACK_DIR)
+
 -- PRE HOOKS ===========================================================================================================
 local NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string
 global VERBOSE: boolean = false
 global SAFE: boolean = true
 dofile(NVIM_HOME .. "/before_init.lua")
+
 -- GLOBAL OPTIONS ======================================================================================================
 vim.g.mapleader = " "
 vim.g.maplocalleader = " "
 vim.g.loaded_matchparen = 1
 vim.g.loaded_matchit = 1
 vim.g.loaded_netrw = 1
+
 -- UTILS ===============================================================================================================
 local path_helpers: {string: (function(string):string)} = {}
 
