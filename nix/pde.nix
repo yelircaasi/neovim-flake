@@ -84,47 +84,4 @@ in
 
       chmod +x $out/bin/pde $out/bin/nvim
     '';
-
-    # OLD_installPhase = ''
-    #   ${derefCopyDir} ${transpiled}/config/ $out/
-    #   ${derefCopyDir} ${pluginDerivation}/plugins/ $out/
-    #   ${derefCopyDir} ${pluginDerivation}/meta/ $out/
-
-    #   ${derefCopy} ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
-    #   ${derefCopy} ${pkgs.ruff}/bin/ruff $out/bin/ruff
-
-    #   echo "#!${pkgs.runtimeShell}" > $out/bin/pde
-    #   echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
-    #   echo "#!${pkgs.runtimeShell}" > $out/bin/nvim
-    #   echo "LUA_PATH=\"\" ${neovim-nightly}/bin/nvim -u \$HOME/.config/nvim/init.lua ${argCatcher}" >> $out/bin/nvim
-    #   chmod +x $out/bin/pde $out/bin/nvim
-
-    #   # ${derefCopy} ${pkgs.python3}/bin/python $out/bin/python
-    #   # ${derefCopy} ${pkgs.python3}/bin/python3 $out/bin/python3
-    #   # ${derefCopy} ${pkgs.luajit}/bin/lua $out/bin/lua
-    # '';
   }
-# {
-#   enable = true;
-#   defaultEditor = true;
-#   withPython3 = true;
-#   withNodeJs = true;
-#   withRuby = true;
-#   package = neovim-nightly;
-#   viAlias = false;
-#   vimAlias = false;
-#   vimdiffAlias = true;
-#   inherit plugins;
-#   configure = {
-#     customRC = ''
-#       set number
-#       set cc=80
-#       set list
-#       set listchars=tab:→\ ,space:·,nbsp:␣,trail:•,eol:¶,precedes:«,extends:»
-#       if &diff
-#         colorscheme blue
-#       endif
-#     '';
-#   };
-# }
-
