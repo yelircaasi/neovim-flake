@@ -1,21 +1,9 @@
 {pkgs}:
-# usage: pkgs.callPackage ./neovim-plugin-pack.nix {} pluginSet;
 let
   lib = pkgs.lib;
   stdenvNoCC = pkgs.stdenvNoCC;
 
   inherit (import ./plugin-set.nix {inherit pkgs;}) nixpkgsList customList;
-
-  # getPluginName = p: let
-  #   raw =
-  #     p.pname or (
-  #       let
-  #         m = builtins.match "(.+)-[0-9][^-]*" p.name;
-  #       in
-  #         if m != null
-  #         then builtins.head m
-  #         else p.name
-  #     );
 
   fullList = customList ++ nixpkgsList;
 

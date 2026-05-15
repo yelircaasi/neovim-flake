@@ -5,6 +5,7 @@
 
 For runtime tools that a *wrapped executable* needs on its `PATH`, the idiomatic pattern is `makeWrapper`:
 
+see https://phip1611.de/blog/nix-how-to-package-a-shell-script/
 ```nix
 pkgs.stdenv.mkDerivation {
   name = "my-neovim";
@@ -12,7 +13,7 @@ pkgs.stdenv.mkDerivation {
 
   installPhase = ''
     mkdir -p $out/bin
-    makeWrapper ${pkgs.neovim}/bin/nvim $out/bin/nvim \
+    pkgs.makeWrapper ${pkgs.neovim}/bin/nvim $out/bin/nvim \
       --prefix PATH : ${lib.makeBinPath [
         pkgs.rust-analyzer
         pkgs.lua-language-server

@@ -55,12 +55,3 @@ in {
       grammarList}
   '';
 }
-# allParsers = pkgs.runCommand "nvim-ts-all-parsers" {} ''
-#   mkdir -p $out/parser
-#   find ${tsGrammars} -name "*.so" -exec ln -s {} $out/parser/ \;
-#   ${pkgs.lib.concatMapStrings (g: ''
-#       find ${g} -name "*.so" -exec ln -s {} $out/parser/ \;
-#     '')
-#     customGrammars}
-# '';
-
