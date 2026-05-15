@@ -2,7 +2,9 @@
 
 ## Roadmap
 
-- [ ] fork dial, fix structure, write nix expression
+- [ ] gather all nvim configs I have written, glean what
+      is still usable, combine them here
+- [x] fork dial, fix structure, write nix expression
 - [ ] take care of compiling fzf-lua-native
 - [ ] find what has  sqlite.lua as a dependency
 - [ ] move last bits of plugin-set.nix into plugins-derivation.nix,
