@@ -118,6 +118,692 @@ if WEZTERM then
 	end
 end
 
+
+if willothy_wezterm then
+	local fmt = string.format
+
+	local wezterm = {
+		switch_tab = {},
+		switch_pane = {},
+		split_pane = {},
+	}
+
+	---@private
+	local did_setup = false
+
+	---@private
+	local wezterm_executable
+
+	---@private
+	local function err(e)
+		vim.notify("Wezterm failed to " .. e, vim.log.levels.ERROR, {
+			title = "Wezterm",
+		})
+	end
+
+	---@private
+	local function exit_handler(msg)
+		---@param obj vim.SystemCompleted
+		return function(obj)
+			if obj.code ~= 0 then
+				err(msg)
+			end
+		end
+	end
+
+	---@private
+	local function find_wezterm()
+		if vim.fn.executable("wezterm") ~= 0 then
+			return "wezterm"
+		end
+		if vim.fn.executable("wezterm.exe") ~= 0 then
+			return "wezterm.exe"
+		end
+
+		err("find 'wezterm' executable")
+		return nil
+	end
+
+	---@private
+	local function count_non_nil(...)
+		local n = 0
+		for i = 1, select("#", ...) do
+			if select(i, ...) ~= nil then
+				n = n + 1
+			end
+		end
+		return n
+	end
+
+	---@class wezterm.SplitOpts
+	---@field cwd string|nil
+	---@field pane number|nil The pane to split (default current)
+	---@field top boolean|nil (default false)
+	---@field left boolean|nil (default false)
+	---@field bottom boolean|nil (default false)
+	---@field right boolean|nil (default false)
+	---@field move_pane number|nil Move a pane instead of spawning a command in it (default nil/disabled)
+	---@field percent number|nil The percentage of the pane to split (default nil)
+	---@field program string[]|nil The program to spawn in the new pane (default nil/Wezterm default)
+	---@field top_level boolean|nil Split the window instead of the pane (default false)-
+
+	---@class wezterm.SpawnOpts
+	---@field pane number|nil Set the current pane
+	---@field new_window boolean|nil Open in a new window
+	---@field workspace string|nil Set the workspace for the new window (requires new window)
+	---@field cwd string|nil Set the cwd for the spawned program
+	---@field args string[]|nil Additional args to pass to the spawned program
+
+	---@class wezterm.GetTextOpts
+	---@field pane_id number|nil
+	---@field start_line number|nil
+	---@field end_line number|nil
+	---@field escapes boolean|nil Include escape sequences in the output
+
+	---Exec an arbitrary command in wezterm (does not return result)
+	---@param args string[]
+	---@param handler fun(res: vim.SystemObj)
+	---@param stdin string|string[]|boolean If `true`, then a pipe to stdin is opened and can be written to via the `write()` method to SystemObj. If string or string[] then will be written to stdin
+	function wezterm.exec(args, handler, stdin)
+		if not wezterm.setup({}) then
+			return
+		end
+		vim.system({ wezterm_executable, unpack(args) }, {
+			stdin = stdin,
+			text = true,
+		}, vim.schedule_wrap(handler))
+	end
+
+	---Synchronously exec an arbitrary command in wezterm
+	---@param args string[]
+	---@return boolean success
+	---@return string stdout
+	---@return string stderr
+	function wezterm.exec_sync(args)
+		if not wezterm.setup({}) then
+			return false, "", ""
+		end
+		local rv = vim.system({ wezterm_executable, unpack(args) }, {
+			text = true,
+		}):wait()
+
+		return rv.code == 0, rv.stdout, rv.stderr
+	end
+
+	---Set a user var in the current wezterm pane
+	---@param name string
+	---@param value string | number | boolean | table | nil
+	function wezterm.set_user_var(name, value)
+		local ty = type(value)
+
+		if ty == "table" then
+			value = vim.json.encode(value)
+		elseif ty == "function" or ty == "thread" then
+			error("cannot serialize " .. ty)
+		elseif ty == "boolean" then
+			value = value and "true" or "false"
+		elseif ty == "nil" then
+			value = ""
+		end
+
+		local template = "\x1b]1337;SetUserVar=%s=%s\a"
+		local command = template:format(name, vim.base64.encode(tostring(value)))
+		vim.api.nvim_chan_send(vim.v.stderr, command)
+	end
+
+	---Show a desktop notification from wezterm
+	---@param title string
+	---@param body string
+	function wezterm.notify(title, body)
+		local template = "\x1b]777;notify;%s;%s\x1b\\"
+		local command = template:format(title or "", body or "")
+		vim.api.nvim_chan_send(vim.v.stderr, command)
+	end
+
+	---Spawn a program in wezterm
+	---@param program string
+	---@param opts wezterm.SpawnOpts
+	function wezterm.spawn(program, opts)
+		opts = opts or {}
+		local args = { "cli", "spawn" }
+		args.insert = table.insert
+		if opts.pane then
+			args:insert("--pane-id")
+			args:insert(fmt("%d", opts.pane))
+		end
+		if opts.new_window then
+			args:insert("--new-window")
+		end
+		if opts.workspace then
+			if not opts.new_window then
+				err("workspace option requires new_window")
+				return
+			end
+			args:insert("--workspace")
+			args:insert(opts.workspace)
+		end
+		if opts.cwd then
+			args:insert("--cwd")
+			args:insert(opts.cwd)
+		end
+		if program then
+			args:insert(program)
+			if opts.args then
+				for _, arg in ipairs(opts.args) do
+					args:insert(arg)
+				end
+			end
+		end
+
+		local emsg = "spawn " .. program .. " " .. table.concat(args, " ")
+		wezterm.exec(args, exit_handler(emsg))
+	end
+
+	---@param args string[]
+	---@param opts wezterm.SplitOpts
+	local function split_pane_args(args, opts)
+		if opts.cwd then
+			table.insert(args, "--cwd")
+			table.insert(args, opts.cwd)
+		end
+		if opts.percent then
+			table.insert(args, "--percent")
+			table.insert(args, fmt("%d", opts.percent))
+		end
+		if opts.pane then
+			table.insert(args, "--pane-id")
+			table.insert(args, fmt("%d", opts.pane))
+		end
+		if opts.top_level then
+			table.insert(args, "--top-level")
+		end
+		if opts.move_pane then
+			if opts.program then
+				err("split: move_pane and program are mutually exclusive")
+				return
+			end
+		elseif opts.program then
+			for _, arg in ipairs(opts.program) do
+				table.insert(args, arg)
+			end
+		end
+	end
+
+	---Split a pane vertically
+	---@param opts wezterm.SplitOpts
+	function wezterm.split_pane.vertical(opts)
+		opts = opts or {}
+		local args = { "cli", "split-pane" }
+		split_pane_args(args, opts)
+		if opts.top then
+			table.insert(args, "--top")
+		elseif opts.bottom then
+			table.insert(args, "--bottom")
+		end
+		wezterm.exec(args, exit_handler("split pane"))
+	end
+
+	---Split a pane horizontally
+	---@param opts wezterm.SplitOpts
+	function wezterm.split_pane.horizontal(opts)
+		opts = opts or {}
+		local args = { "cli", "split-pane" }
+		split_pane_args(args, opts)
+		if opts.left then
+			table.insert(args, "--left")
+		elseif opts.right then
+			table.insert(args, "--right")
+		else
+			table.insert(args, "--horizontal")
+		end
+		wezterm.exec(args, exit_handler("split pane"))
+	end
+
+	---Set the title of a Wezterm tab
+	---@param title string
+	---@param id number | nil Tab id
+	function wezterm.set_tab_title(title, id)
+		if not title then
+			return
+		end
+		local args = { "cli", "set-tab-title" }
+		if id then
+			table.insert(args, "--tab-id")
+			table.insert(args, fmt("%d", id))
+			table.insert(args, title)
+		else
+			table.insert(args, title)
+		end
+		wezterm.exec(args, exit_handler("set tab title to '" .. title .. (id == nil and "'" or "' for tab " .. id)))
+	end
+
+	---Set the the title of a Wezterm window
+	---@param title string
+	---@param id number | nil Window id
+	function wezterm.set_win_title(title, id)
+		if not title then
+			return
+		end
+		local args = { "cli", "set-window-title" }
+		if id then
+			table.insert(args, "--window-id")
+			table.insert(args, fmt("%d", id))
+			table.insert(args, title)
+		else
+			table.insert(args, title)
+		end
+		wezterm.exec(
+			args,
+			exit_handler("set window title to '" .. title .. (id == nil and "'" or ("' for window " .. id)))
+		)
+	end
+
+	---Switch to the tab relative to the current tab
+	---@param relno number The relative number of tabs to switch
+	function wezterm.switch_tab.relative(relno)
+		if not relno then
+			relno = vim.v.count or 0
+		end
+		wezterm.exec(
+			{ "cli", "activate-tab", "--tab-relative", fmt("%d", relno) },
+			exit_handler("activate tab relative " .. relno)
+		)
+	end
+
+	---Switch to the tab with the given index
+	---@param index number The absolute index of the tab to switch to
+	function wezterm.switch_tab.index(index)
+		if not index then
+			index = vim.v.count or 0
+		end
+		wezterm.exec(
+			{ "cli", "activate-tab", "--tab-index", fmt("%d", index) },
+			exit_handler("activate tab by index " .. index)
+		)
+	end
+
+	---Switch to the tab with the given id
+	---@param id number The id of the tab to switch to
+	function wezterm.switch_tab.id(id)
+		if not id then
+			id = vim.v.count or 0
+		end
+		wezterm.exec({ "cli", "activate-tab", "--tab-id", fmt("%d", id) }, exit_handler("activate tab by id " .. id))
+	end
+
+	---Switch to the given pane
+	---@param id number The id of the pane to switch to
+	function wezterm.switch_pane.id(id)
+		if not id then
+			id = vim.v.count or 0
+		end
+		wezterm.exec({ "cli", "activate-pane", "--pane-id", fmt("%d", id) }, exit_handler("activate pane by id " .. id))
+	end
+
+	---Used for validating directions
+	local directions = {
+		Up = true,
+		Down = true,
+		Left = true,
+		Right = true,
+		Next = true,
+		Prev = true,
+	}
+
+	---@param dir 'Up' | 'Down' | 'Left' | 'Right' | 'Next' | 'Prev'
+	---@param pane integer | nil Specify the current pane
+	function wezterm.get_pane_direction(dir, pane)
+		if not dir then
+			err("dir is required for get-pane-direction")
+		end
+		local first_char = dir:sub(1, 1)
+		dir = first_char:upper() .. dir:sub(2, -1)
+
+		if not directions[dir] then
+			err("get pane: invalid direction " .. vim.inspect(dir))
+		end
+
+		local args = { "cli", "get-pane-direction" }
+
+		if pane then
+			table.insert(args, "--pane-id")
+			table.insert(args, pane)
+		end
+
+		table.insert(args, dir)
+
+		local ok, pane_id, errmsg = wezterm.exec_sync(args)
+
+		if not ok then
+			errmsg("get pane direction: " .. errmsg)
+			return
+		end
+
+		pane_id = pane_id:gsub("^%s+", ""):gsub("%s+$", "")
+
+		return tonumber(pane_id)
+	end
+
+	---Get the id of the current pane
+	---@return number | nil
+	function wezterm.get_current_pane()
+		local id = vim.env.WEZTERM_PANE
+		if id then
+			id = id:gsub("^%s+", ""):gsub("%s+$", "")
+			return tonumber(id)
+		end
+	end
+
+	---Zoom or unzoom a pane.
+	---
+	---If no options are provided, toggles zoom for the provided (or current) pane.
+	---@param pane number | nil The pane to zoom (default current)
+	---@param opts { zoom: boolean, unzoom: boolean, toggle: boolean } # Default: { toggle = true }
+	function wezterm.zoom_pane(pane, opts)
+		opts = opts or {}
+		local args = { "cli", "zoom-pane" }
+
+		if count_non_nil(opts.zoom, opts.unzoom, opts.toggle) > 1 then
+			err("zoom pane: 'zoom', 'unzoom', and 'toggle' are mutually exclusive")
+			return
+		end
+
+		if pane then
+			table.insert(args, "--pane-id")
+			table.insert(args, pane)
+		end
+
+		if opts.zoom then
+			table.insert(args, "--zoom")
+		elseif opts.unzoom then
+			table.insert(args, "--unzoom")
+		else
+			table.insert(args, "--toggle")
+		end
+		wezterm.exec(args, exit_handler("zoom pane"))
+	end
+
+	---@param opts wezterm.GetTextOpts
+	function wezterm.get_text(opts)
+		local args = {}
+
+		if opts.pane_id then
+			table.insert(args, "--pane-id")
+			table.insert(args, opts.pane_id)
+		end
+
+		if opts.start_line then
+			table.insert(args, "--start-line")
+			table.insert(args, opts.start_line)
+		end
+
+		if opts.end_line then
+			table.insert(args, "--end-line")
+			table.insert(args, opts.end_line)
+		end
+
+		if opts.escapes then
+			table.insert(args, "--escapes")
+		end
+
+		local ok, stdout, stderr = wezterm.exec_sync(args)
+
+		if not ok then
+			err("get text: " .. stderr)
+			return
+		end
+
+		return stdout
+	end
+
+	---Switch pane in the given direction
+	---@param dir 'Up' | 'Down' | 'Left' | 'Right' | 'Next' | 'Prev' The direction to switch to
+	---@param pane integer | nil Specify the current pane
+	function wezterm.switch_pane.direction(dir, pane)
+		if not dir then
+			err("dir is required for split-pane")
+		end
+
+		local first_char = dir:sub(1, 1)
+		dir = first_char:upper() .. dir:sub(2, -1)
+
+		if not directions[dir] then
+			err("switch pane: invalid direction " .. vim.inspect(dir))
+			return
+		end
+
+		local args = { "cli", "activate-pane-direction" }
+
+		if pane then
+			table.insert(args, "--pane-id")
+			table.insert(args, pane)
+		end
+
+		table.insert(args, dir)
+
+		wezterm.exec(args, exit_handler("activate pane by direction " .. dir))
+	end
+
+	---Send text to a pane
+	---@param text string Text to send
+	---@param pane integer | nil Specify thecurrent pane
+	---@param no_paste boolean|nil (default false)
+	function wezterm.send_text(text, pane, no_paste)
+		if not text then
+			err("text is required for send-text")
+		end
+
+		local args = { "cli", "send-text" }
+
+		if pane then
+			table.insert(args, "--pane-id")
+			table.insert(args, pane)
+		end
+
+		if no_paste then
+			table.insert(args, "--no-paste")
+		end
+
+		wezterm.exec(args, exit_handler("send text to pane"), text)
+	end
+
+	local function trim(str)
+		return str:gsub("^%s+", ""):gsub("%s+$", "")
+	end
+
+	---@text The size of a Wezterm pane
+	---@class Wezterm.PaneSize
+	---@field cols integer
+	---@field rows integer
+	---@field pixel_width integer
+	---@field pixel_height integer
+	---@field dpi integer
+
+	---@text Information about a Wezterm pane
+	---@class Wezterm.Pane
+	---@field cursor_shape string
+	---@field cursor_visibility string
+	---@field cursor_x integer
+	---@field cursor_y integer
+	---@field cwd string
+	---@field is_active boolean
+	---@field is_zoomed boolean
+	---@field left_col integer
+	---@field pane_id integer
+	---@field size Wezterm.PaneSize
+	---@field tab_id integer
+	---@field tab_title string
+	---@field title string
+	---@field top_row integer
+	---@field tty_name string
+	---@field window_id integer
+	---@field window_title string
+	---@field workspace string
+
+	---@text Information about a Wezterm tab
+	---@class Wezterm.Tab
+	---@field tab_id integer
+	---@field tab_title string
+	---@field window_id integer
+	---@field window_title string
+	---@field panes Wezterm.Pane[]
+
+	---@text Information about a Wezterm GUI window
+	---@class Wezterm.Window
+	---@field window_id integer
+	---@field window_title string
+	---@field tabs Wezterm.Tab[]
+
+	---@text Wrapper around `wezterm cli list`
+	---
+	---@return Wezterm.Pane[]?
+	function wezterm.list_panes()
+		local ok, stdout, stderr = wezterm.exec_sync({ "cli", "list", "--format", "json" })
+		if not ok then
+			err("list panes: " .. stderr)
+			return
+		end
+		local decoded, obj = pcall(vim.json.decode, trim(stdout), {
+			luanil = {
+				object = true,
+				array = true,
+			},
+		})
+		if not decoded then
+			err("list panes: " .. obj)
+			return
+		end
+		return obj
+	end
+
+	---@text Wrapper around `wezterm cli list`
+	---
+	---@return Wezterm.Tab[]?
+	function wezterm.list_tabs()
+		local tabs = {}
+		local by_id = {}
+		local panes = wezterm.list_panes()
+		if not panes then
+			return
+		end
+		for _, pane in ipairs(panes) do
+			local tab_id = pane.tab_id
+			if not by_id[tab_id] then
+				by_id[tab_id] = {
+					tab_id = tab_id,
+					tab_title = pane.tab_title,
+					window_id = pane.window_id,
+					window_title = pane.window_title,
+					panes = {},
+				}
+				table.insert(tabs, by_id[tab_id])
+			end
+			table.insert(by_id[tab_id].panes, pane)
+		end
+		return tabs
+	end
+
+	---@text Wrapper around `wezterm cli list`
+	---
+	---@return Wezterm.Window[]?
+	function wezterm.list_windows()
+		local windows = {}
+		local by_id = {}
+
+		local tabs = wezterm.list_tabs()
+		if not tabs then
+			return
+		end
+
+		for _, tab in ipairs(tabs) do
+			local window_id = tab.window_id
+			if not by_id[window_id] then
+				by_id[window_id] = {
+					window_id = window_id,
+					window_title = tab.window_title,
+					tabs = {},
+				}
+				table.insert(windows, by_id[window_id])
+			end
+			table.insert(by_id[window_id].tabs, tab)
+		end
+
+		return windows
+	end
+
+	---Wrapper around `wezterm cli list-clients`
+	---
+	---@return table[]?
+	function wezterm.list_clients()
+		local ok, stdout, stderr = wezterm.exec_sync({ "cli", "list-clients", "--format", "json" })
+		if not ok then
+			err("list panes: " .. stderr)
+			return
+		end
+		local decoded, obj = pcall(vim.json.decode, trim(stdout), {
+			luanil = {
+				object = true,
+				array = true,
+			},
+		})
+		if not decoded then
+			err("list panes: " .. obj)
+			return
+		end
+		return obj
+	end
+
+	---@private
+	function wezterm.create_commands()
+		vim.api.nvim_create_user_command("WeztermSpawn", "lua require('wezterm').spawn(<f-args>)", {
+			nargs = "*",
+			complete = "shellcmd",
+		})
+	end
+
+	---@private
+	---@class wezterm.Config
+	---@field create_commands boolean | nil
+	local config = {
+		create_commands = true,
+	}
+
+	---@param opts wezterm.Config
+	function wezterm.setup(opts)
+		if did_setup then
+			return wezterm_executable ~= nil
+		end
+		did_setup = true
+
+		opts = vim.tbl_deep_extend("force", config, opts or {})
+
+		if vim.system == nil or vim.base64 == nil then
+			vim.notify_once(
+				"Wezterm.nvim requires Neovim >= 0.10. If you are using an older version, consider upgrading or pinning v0.4.0 of this plugin.",
+				vim.log.levels.ERROR,
+				{
+					title = "Wezterm",
+				}
+			)
+		end
+
+		local exe = find_wezterm()
+		if not exe then
+			err("find 'wezterm' executable")
+			return false
+		end
+		wezterm_executable = exe
+
+		if opts.create_commands == true then
+			wezterm.create_commands()
+		end
+
+		return true
+	end
+
+	return wezterm
+end
+
 -- DAP ========================================================================================
 
 setup_plugin("dap-python", function()
@@ -173,6 +859,534 @@ vim.opt.termguicolors = true
 vim.filetype.add({
 	extension = { xit = "xit" },
 })
+
+-- MAPPINGS ========================================================================================
+
+if mappings_lua then
+	--[[
+	DESIRED MAPPINGS/ACTIONS
+
+	- open quickfix window
+	- open floating terminal
+	- copy selection to new file
+	- jump to reference (next, previous)
+	- jump to definition
+	- open search and replace (with preview)
+	- fold block
+	- fold/unfold all of given level
+	- toggle value under cursor
+	- rename everywhere (optionally with preview)
+	- search pattern/regex in given files -> save results list & use it to navigate
+	- show keybinds available
+	- add/view/edit comment/annotation pointing to given location
+	- view/navigate TODOs and comments
+	- insert snippet
+	- format code (optionally only under selection)
+	- edit selection in new buffer
+	- dull colors outside of selection
+	- edit filesystem as a buffer (oil.nvim?)
+	- get autocomplete suggestion
+	- check spelling in file (ONLY on command!)
+	- view diff (with saved, last commit, etc.)
+	- file tree view
+	- navigate between search results
+	- toggle to light colors (or even lighten/darken colors, increase contrast -> write plugin?)
+	- jump to next syntactic object ( 
+	- command to run changed tests (use testmon or analogous)
+	- get LLM feedback
+	- unified preview_+accept/reject framework
+	- multi-line / multi-location edits
+
+	AUTOMATIC/TOGGLABLE FUNCTIONALITIES
+	--> dull colors everywhere except in active block (via treesitter?)
+	--> custom syntax highlighting for my special formats (from consilium-notes: jn, ...)
+
+	--]]
+
+	-- Set up a local map function for convenience
+	local map = vim.keymap.set
+
+	-- telescope ----------------------------------------------------------------------------------------------------------
+	map("n", "<leader>ff", function()
+		require("telescope.builtin").find_files()
+	end, { desc = "Find Files" })
+	map("n", "<leader>gf", function()
+		require("telescope.builtin").git_files()
+	end, { desc = "Find Git Files" })
+	map("n", "<leader>fg", function()
+		require("telescope.builtin").live_grep()
+	end, { desc = "Live Grep" })
+	map("n", "<leader>fb", function()
+		require("telescope.builtin").buffers()
+	end, { desc = "Find Buffers" })
+	map("n", "<leader>fh", function()
+		require("telescope.builtin").help_tags()
+	end, { desc = "Find Help Tags" })
+
+	-- floaterm -----------------------------------------------------------------------------------------------------------
+	vim.keymap.set("n", "<leader>ft", "<Cmd>FloatermToggle<CR>", { desc = "Toggle floaterm" })
+	vim.keymap.set("t", "<leader>ft", "<C-\\><C-n><Cmd>FloatermToggle<CR>", { desc = "Toggle floaterm" })
+
+	-- LSP ----------------------------------------------------------------------------------------------------------------
+	-- We will create an autocommand group to attach keymaps only to buffers with an active LSP client.
+	local lsp_keymaps_group = vim.api.nvim_create_augroup("LspKeymaps", { clear = true })
+
+	vim.api.nvim_create_autocmd("LspAttach", {
+		group = lsp_keymaps_group,
+		callback = function(ev)
+			local lsp_map = function(keys, func, desc)
+				vim.keymap.set("n", keys, func, { buffer = ev.buf, desc = "LSP: " .. desc })
+			end
+
+			-- Navigation and Information
+			lsp_map("gd", vim.lsp.buf.definition, "Go to Definition")
+			lsp_map("gD", vim.lsp.buf.declaration, "Go to Declaration")
+			lsp_map("gr", vim.lsp.buf.references, "Go to References")
+			lsp_map("gI", vim.lsp.buf.implementation, "Go to Implementation")
+			lsp_map("K", vim.lsp.buf.hover, "Hover Documentation")
+			lsp_map("<C-k>", vim.lsp.buf.signature_help, "Signature Help")
+
+			-- Actions
+			lsp_map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
+			lsp_map("<leader>rn", vim.lsp.buf.rename, "Rename")
+
+			-- Diagnostics
+			lsp_map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic")
+			lsp_map("]d", vim.diagnostic.goto_next, "Next Diagnostic")
+			lsp_map("<leader>dl", vim.diagnostic.open_float, "Show Line Diagnostics")
+
+			-- format on save (to use LSP formatter instead of conform)
+			-- vim.api.nvim_buf_create_autocmd("BufWritePre", {
+			--   buffer = ev.buf,
+			--   callback = function() vim.lsp.buf.format { async = false } end
+			-- })
+			--
+			local bufopts = { noremap = true, silent = true, buffer = bufnr }
+		end,
+	})
+
+	-- quickfix -----------------------------------------------------------------------------------------------------------
+	vim.keymap.set("i", "kj", "<escape>")
+	vim.keymap.set("n", "<leader>wq", function()
+		vim.cmd("wq")
+	end)
+	vim.keymap.set("n", "<leader>ww", function()
+		vim.cmd("w")
+	end)
+	vim.keymap.set("n", "<leader>q", function()
+		-- Populates the Quickfix list with all diagnostics from the current buffer
+		vim.diagnostic.setqflist({ bufnr = 0 })
+		vim.cmd("copen")
+	end, { desc = "Open Quickfix with diagnostics" })
+
+	--- dial---------------------------------------------------------------------------------------------------------------
+	vim.keymap.set("n", "<C-a>", function()
+		require("dial.map").manipulate("increment", "normal")
+	end)
+	vim.keymap.set("n", "<C-x>", function()
+		require("dial.map").manipulate("decrement", "normal")
+	end)
+	vim.keymap.set("n", "g<C-a>", function()
+		require("dial.map").manipulate("increment", "gnormal")
+	end)
+	vim.keymap.set("n", "g<C-x>", function()
+		require("dial.map").manipulate("decrement", "gnormal")
+	end)
+	vim.keymap.set("x", "<C-a>", function()
+		require("dial.map").manipulate("increment", "visual")
+	end)
+	vim.keymap.set("x", "<C-x>", function()
+		require("dial.map").manipulate("decrement", "visual")
+	end)
+	vim.keymap.set("x", "g<C-a>", function()
+		require("dial.map").manipulate("increment", "gvisual")
+	end)
+	vim.keymap.set("x", "g<C-x>", function()
+		require("dial.map").manipulate("decrement", "gvisual")
+	end)
+
+	--- zen-mode ----------------------------------------------------------------------------------------------------------
+
+	vim.keymap.set("n", "<leader>zm", function()
+		require("zen-mode").toggle({
+			window = {
+				width = 0.85, -- width will be 85% of the editor width
+			},
+		})
+	end)
+end
+
+if other_mappings then
+	---------------------------------------------------------------------------------------------------------------- KEYMAPS
+	local nvx = { "n", "v", "x" }
+	map({
+		mode = "n",
+		sequence = "<leader>o",
+		action = ":update<CR> :source<CR>",
+		opts = {},
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>ww",
+		action = ":write<CR>",
+		opts = {},
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>qq",
+		action = ":quit<CR>",
+		opts = {},
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>wq",
+		action = ":wq<CR>",
+		opts = {},
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>f",
+		action = ":Pick files<CR>",
+		opts = {},
+	})
+	map({
+		mode = "t",
+		sequence = "<Esc>",
+		action = [[<C-\><C-n>]],
+		opts = { desc = "Exit terminal mode" },
+	})
+	map({
+		mode = "t",
+		sequence = "kj",
+		action = [[<C-\><C-n>]],
+		opts = { desc = "Exit terminal mode" },
+	})
+	map({
+		mode = "t",
+		sequence = "<C-o>",
+		action = [[<C-\><C-o>]],
+		opts = { desc = "Temporary normal mode" },
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>lf",
+		action = vim.lsp.buf.format,
+		opts = { desc = "" },
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>h",
+		action = ":Pick help",
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>e",
+		action = ":Oil<CR>",
+	})
+	map({
+		mode = nvx,
+		sequence = "<leader>y",
+		action = "+y<CR>",
+		opts = { desc = "Yank to system clipboard" },
+	})
+	map({
+		mode = nvx,
+		sequence = "<leader>d",
+		action = "+d<CR>",
+		opts = { desc = "Paste from system clipboard" },
+	})
+	-- map({
+	--     mode = "",
+	--     sequence = "",\
+	--     action = [[]],
+	--     opts = { desc = "" }
+	-- })
+	-- map({
+	--     mode = "",
+	--     sequence = "",
+	--     action = [[]],
+	--     opts = { desc = "" }
+	-- })
+	-- map('t', '^[', "^\^N")
+	-- map('t', '^O', '^\^O')
+	map({
+		mode = "x",
+		sequence = "<leader>mf",
+		action = ":'<,'>lua move_selection_to_new_file()<CR>",
+		opts = { desc = "Move selection to new file (split)" },
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>lu",
+		action = function()
+			-- Create a new empty floating window or split
+			vim.cmd("vsplit | enew")
+			vim.bo.filetype = "lua"
+			vim.bo.bufhidden = "hide"
+
+			-- Map <CR> to execute the current line or selection
+			vim.keymap.set("n", "<CR>", ":.lua<CR>", { buffer = true })
+			vim.keymap.set("v", "<CR>", ":lua<CR>", { buffer = true })
+		end,
+		opts = { desc = "Open Lua Scratchpad" },
+	})
+	map({
+		mode = "v",
+		sequence = "<leader>ms",
+		action = move_selection_to_new_file,
+	})
+	map({ ------------------------------------------------------------------------------------------------------ diagnostics
+		mode = "n",
+		sequence = "<leader>dt",
+		action = function()
+			diagnostics_active = not diagnostics_active
+			set_diagnostics_mode()
+		end,
+		opts = { desc = "Toggle LSP Diagnostics" },
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>dm",
+		action = function()
+			-- only cycle if active; otherwise turn on and reset to 1
+			if not diagnostics_active then
+				diagnostics_active = true
+				current_mode_index = 1
+			else
+				current_mode_index = current_mode_index + 1
+				if current_mode_index > #diagnostic_modes then
+					current_mode_index = 1
+				end
+			end
+			set_diagnostics_mode()
+		end,
+		opts = { desc = "Cycle LSP Diagnostic Modes" },
+	})
+	map({ -------------------------------------------------------------------------------------------------------- telescope
+		mode = "n",
+		sequence = "<leader>ff",
+		action = make_setup_function(function()
+			require("telescope.builtin").find_files()
+		end),
+		opts = { desc = "Find Files" },
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>gf",
+		action = function()
+			require("telescope.builtin").git_files()
+		end,
+		opts = { desc = "Find Git Files" },
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>fg",
+		action = function()
+			require("telescope.builtin").live_grep()
+		end,
+		opts = { desc = "Live Grep" },
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>fb",
+		action = function()
+			require("telescope.builtin").buffers()
+		end,
+		opts = { desc = "Find Buffers" },
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>fh",
+		action = function()
+			require("telescope.builtin").help_tags()
+		end,
+		opts = { desc = "Find Help Tags" },
+	})
+	map({ --------------------------------------------------------------------------------------------------------- floaterm
+		mode = "n",
+		sequence = "<leader>ft",
+		action = "<Cmd>FloatermToggle<CR>",
+		opts = { desc = "Toggle floaterm" },
+	})
+	map({
+		mode = "t",
+		sequence = "<leader>ft",
+		action = "<C-\\><C-n><Cmd>FloatermToggle<CR>",
+		opts = { desc = "Toggle floaterm" },
+	})
+	-------------------------------------------------------------------------------------------------------------------- LSP
+	-- autocommand group to attach keymaps only to buffers with an active LSP client.
+	local lsp_keymaps_group = vim.api.nvim_create_augroup("LspKeymaps", { clear = true })
+
+	vim.api.nvim_create_autocmd("LspAttach", {
+		group = lsp_keymaps_group,
+		callback = function(ev)
+			local lsp_map = function(keys, func, desc)
+				map({
+					mode = "n",
+					sequence = keys,
+					action = func,
+					opts = { buffer = ev.buf, desc = "LSP: " .. desc },
+				})
+			end
+
+			-- Navigation and Information
+			lsp_map("gd", vim.lsp.buf.definition, "Go to Definition")
+			lsp_map("gD", vim.lsp.buf.declaration, "Go to Declaration")
+			lsp_map("gr", vim.lsp.buf.references, "Go to References")
+			lsp_map("gI", vim.lsp.buf.implementation, "Go to Implementation")
+			lsp_map("K", vim.lsp.buf.hover, "Hover Documentation")
+			lsp_map("<C-k>", vim.lsp.buf.signature_help, "Signature Help")
+
+			-- Actions
+			lsp_map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
+			lsp_map("<leader>rn", vim.lsp.buf.rename, "Rename")
+
+			-- Diagnostics
+			lsp_map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic")
+			lsp_map("]d", vim.diagnostic.goto_next, "Next Diagnostic")
+			lsp_map("<leader>dl", vim.diagnostic.open_float, "Show Line Diagnostics")
+
+			-- format on save (to use LSP formatter instead of conform)
+			-- vim.api.nvim_buf_create_autocmd("BufWritePre", {
+			--   buffer = ev.buf,
+			--   callback = function() vim.lsp.buf.format { async = false } end
+			-- })
+			--
+			local bufopts = { noremap = true, silent = true, buffer = bufnr }
+		end,
+	})
+	map({ --------------------------------------------------------------------------------------------------------- quickfix
+		mode = { "i" },
+		sequence = "kj",
+		action = "<escape>",
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>wq",
+		action = function()
+			vim.cmd("wq")
+		end,
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>ww",
+		action = function()
+			vim.cmd("w")
+		end,
+	})
+	map({
+		mode = "n",
+		sequence = "<leader>q",
+		action = function()
+			-- Populates the Quickfix list with all diagnostics from the current buffer
+			vim.diagnostic.setqflist({ bufnr = 0 })
+			vim.cmd("copen")
+		end,
+		opts = { desc = "Open Quickfix with diagnostics" },
+	})
+	map({ ------------------------------------------------------------------------------------------------------------- dial
+		mode = "n",
+		sequence = "<C-a>",
+		action = function()
+			require("dial.map").manipulate("increment", "normal")
+		end,
+		opts = { desc = "" },
+	})
+	map({
+		mode = "n",
+		sequence = "<C-x>",
+		action = function()
+			require("dial.map").manipulate("decrement", "normal")
+		end,
+		opts = { desc = "" },
+	})
+	map({
+		mode = "n",
+		sequence = "g<C-a>",
+		action = function()
+			require("dial.map").manipulate("increment", "gnormal")
+		end,
+		opts = { desc = "" },
+	})
+	map({
+		mode = "n",
+		sequence = "g<C-x>",
+		action = function()
+			require("dial.map").manipulate("decrement", "gnormal")
+		end,
+		opts = { desc = "" },
+	})
+	map({
+		mode = "x",
+		sequence = "<C-a>",
+		action = function()
+			require("dial.map").manipulate("increment", "visual")
+		end,
+		opts = { desc = "" },
+	})
+	map({
+		mode = "x",
+		sequence = "<C-x>",
+		action = function()
+			require("dial.map").manipulate("decrement", "visual")
+		end,
+		opts = { desc = "" },
+	})
+	map({
+		mode = "x",
+		sequence = "g<C-a>",
+		action = function()
+			require("dial.map").manipulate("increment", "gvisual")
+		end,
+		opts = { desc = "" },
+	})
+	map({
+		mode = "x",
+		sequence = "g<C-x>",
+		action = function()
+			require("dial.map").manipulate("decrement", "gvisual")
+		end,
+		opts = { desc = "" },
+	})
+	map({ --------------------------------------------------------------------------------------------------------- zen-mode
+		mode = "n",
+		sequence = "<leader>zm",
+		action = function()
+			-- width will be 85% of the editor width
+			require("zen-mode").toggle({ window = { width = 0.85 } })
+		end,
+		opts = { desc = "" },
+	})
+
+	map({
+		mode = { "n", "v" },
+		sequence = "<leader>-",
+		action = function()
+			load_yazi()
+			vim.cmd("Yazi")
+		end,
+		opts = { desc = "Open yazi at the current file." },
+	})
+	map({
+		mode = { "n", "v" },
+		sequence = "<leader>cw",
+		action = function()
+			load_yazi()
+			vim.cmd("Yazi cwd")
+		end,
+		opts = { desc = "Open the file manager in nvim's working directory." },
+	})
+	map({
+		mode = { "n", "v" },
+		sequence = "<c-up>",
+		action = function()
+			load_yazi()
+			vim.cmd("Yazi toggle")
+		end,
+		opts = { desc = "Resume the last yazi session." },
+	})
+end
 
 -- AUTOCOMMANDS =================================================================================================
 
@@ -362,13 +1576,177 @@ setup_plugin("bamboo", function(bamboo)
 	utils.printbv("Set up bamboo")
 end)
 
+if other_colors then
+
+	--vim.api.nvim_set_hl(0, "Comment", { bg = "Purple" })
+	--vim.api.nvim_set_hl(0, 'Normal', { fg = "Green", bg = "Red" })
+	--vim.api.nvim_set_hl(0, 'Error', { fg = "<white>", undercurl = true })
+	--vim.api.nvim_set_hl(0, 'Cursor', { reverse = true })
+
+	--vim.cmd("highlight clear")
+
+	-- print(vim.opt.rtp)
+	vim.cmd("syntax reset")
+	--vim.g.colors_name = 'melange'
+
+	-- local bg = vim.opt.background:get(n)
+
+	-- package.loaded['melange/palettes/' .. bg] = nil -- Only needed for development
+	--local palette = require('melange/palettes/' .. bg)
+
+	--local a = palette.a -- Grays
+	--local b = palette.b -- Bright foreground colors
+	--local c = palette.c -- Foreground colors
+	--local d = palette.d -- Background colors
+
+	-- See https://github.com/neovim/neovim/pull/7406
+	--[[
+	vim.g.terminal_color_0 = "$color.terminalColor00$"
+	vim.g.terminal_color_1 = "$color.terminalColor01$"
+	vim.g.terminal_color_2 = "$color.terminalColor02$"
+	vim.g.terminal_color_3 = "$color.terminalColor03$"
+	vim.g.terminal_color_4 = "$color.terminalColor04$"
+	vim.g.terminal_color_5 = "$color.terminalColor05$"
+	vim.g.terminal_color_6 = "$color.terminalColor06$"
+	vim.g.terminal_color_7 = "$color.terminalColor07$"
+	vim.g.terminal_color_8 = "$color.terminalColor08$"
+	vim.g.terminal_color_9 = "$color.terminalColor09$"
+	vim.g.terminal_color_10 = "$color.terminalColor0A$"
+	vim.g.terminal_color_11 = "$color.terminalColor0B$"
+	vim.g.terminal_color_12 = "$color.terminalColor0C$"
+	vim.g.terminal_color_13 = "$color.terminalColor0D$"
+	vim.g.terminal_color_14 = "$color.terminalColor0E$"
+	vim.g.terminal_color_15 = "$color.terminalColor0F$"
+	--]]
+	local enable_font_variants = true
+	--vim.g.melange_enable_font_variants == nil or vim.g.melange_enable_font_variants
+
+	local bold = enable_font_variants
+	local italic = enable_font_variants
+	local underline = enable_font_variants
+	local undercurl = enable_font_variants
+	local strikethrough = enable_font_variants
+
+	-- local aliases = {
+	--     DARK_PINK = "#913d55",
+	--
+	--
+	-- }
+	vim.api.nvim_set_hl(0, "Normal", { bg = "#020802" })
+	for name, attrs in pairs({
+		---- :help highlight-default -------------------------------
+
+		Normal = { bg = "#000800", fg = "#808080" },
+		NormalFloat = { bg = "#000800", fg = "#808080" },
+		NormalNC = "Normal",
+
+		-- Cursor: TODO...
+
+		WinSeparator = { bg = "#000800", fg = "#111211" },
+		-- VertSplit = { bg = "<|color.nvim.VertSplit.bg |>", fg = "<|color.nvim.VertSplit.fg |>" },
+		-- Special = { fg = "<|%color.nvim.Special |>" },
+		-- CursorLine = { bg = "<|%color.nvim.CursorLine.bg |>" },
+
+		Identifier = { fg = "#426989" }, --$color.nvim.Identifier.fg$" },
+		["@variable"] = { fg = "#13446c" },
+		Function = { fg = "#246b44" },
+		Statement = { fg = "#913d55" },
+		Constant = { fg = "#7080a8" },
+		Type = { fg = "#8888dd" },
+		["@module"] = { fg = "#aaaacc" },
+		String = { fg = "#434f6f" }, --"#3e4966" }, -- 808080 55668f 1c2e8b
+		Comment = { fg = "#625c3f" }, -- 333933
+		PreProc = { fg = "#123622" },
+		Operator = { fg = "#246b44" },
+		Delimiter = { fg = "#123622" },
+		NeotreeFileName = { fg = "#9a9a9a" },
+
+		-- inheriting background from default Nvim* colors
+		Search = { fg = "#8AA88A", bg = "#003600" },
+		CurSearch = { fg = "#809880", bg = "#002600" },
+
+		StatusLine = { fg = "#455684", bg = "#111211" },
+		StatusLineNC = { fg = "#455684", bg = "#111211" },
+		Visual = { fg = "#061815", bg = "#0d8f77" },
+		Folded = { fg = "#808080", bg = "#001300" },
+		DiffAdd = { fg = "#668366", bg = "#002200" },
+		DiffChange = { fg = "#7f86f3", bg = "#050a58" },
+		DiffDelete = { fg = "#d5776f" },
+		DiffText = { fg = "#050a58", bg = "#7f86f3" },
+		Pmenu = { fg = "#505ad6", bg = "#000800" },
+		PmenuSel = { fg = "#737df1", bg = "#002600" },
+		PmenuThumb = { bg = "#777777" },
+		CursorColumn = { bg = "#000e00" },
+		CursorLine = { bg = "#000e00" },
+		ColorColumn = { bg = "#9b73f1" },
+		WinBar = { fg = "#dddddd", bg = "#000800" },
+		WinBarNC = { fg = "#dddddd", bg = "#000800" },
+		FloatShadow = { bg = "#002600" },
+		FloatShadowThrough = {
+			bg = "#118811",
+		},
+		MatchParen = { bg = "#51136e" },
+		RedrawDebugClear = { bg = "#dddddd" },
+		RedrawDebugComposed = {
+			bg = "#dddddd",
+		},
+		RedrawDebugRecompose = {
+			bg = "#dddddd",
+		},
+		Error = { fg = "#bd1dc5", bg = "#000800" },
+
+		-- inheriting foreground from default Nvim* colors
+		SpecialKey = { fg = "#491d5e" },
+		NonText = { fg = "#111211" },
+		Directory = { fg = "#13446c" },
+		ErrorMsg = { fg = "#bd1dc5" },
+		MoreMsg = { fg = "#1db6c5" },
+		ModeMsg = { fg = "#376808" },
+		LineNr = { fg = "#333833" },
+		Question = { fg = "#402967" },
+		WarningMsg = { fg = "#CBC383" },
+		SignColumn = { fg = "#1b8984" },
+		Conceal = { fg = "#808080", bg = "#000800" },
+		QuickFixLine = { fg = "#A30101" },
+		Special = { fg = "#741d96" }, --"#49125e" },
+
+		DiagnosticError = { fg = "#bd1dc5" },
+		DiagnosticFloatingWarn = { fg = "#CBC383" },
+		DiagnosticWarn = { fg = "#CBC383" },
+		DiagnosticFloatingInfo = { fg = "#555555" },
+		DiagnosticInfo = { fg = "#555555" },
+		DiagnosticFloatingHint = { fg = "#9b73f1" },
+		DiagnosticHint = { fg = "#9b73f1" },
+		DiagnosticFloatingOk = { fg = "#555555" },
+		DiagnosticOk = { fg = "#555555" },
+		Added = { fg = "#368366" },
+		["@diff.minus"] = { fg = "#d5776f" },
+		Removed = { fg = "#d5776f" },
+		Changed = { fg = "#7f86f3" },
+		CmpItemAbbrDeprecatedDefault = { fg = "#ffffff" },
+		CmpItemKindDefault = { fg = "#eeeeee" },
+		RainbowDelimiter1 = { fg = "#2b1400" },
+		RainbowDelimiter2 = { fg = "#4f473b" },
+		RainbowDelimiter3 = { fg = "#381900" },
+		RainbowDelimiter4 = { fg = "#726c62" },
+		RainbowDelimiter5 = { fg = "#51331a" },
+		RainbowDelimiter6 = { fg = "#959189" },
+		RainbowDelimiter7 = { fg = "#78604d" },
+	}) do
+		if type(attrs) == "table" then
+			vim.api.nvim_set_hl(0, name, attrs)
+		else
+			vim.api.nvim_set_hl(0, name, { link = attrs })
+		end
+	end
+end
+
 -- MISC ========================================================================================
 
-
+utils.setup_plugin("xit")
 
 -- ADDED: Initialize which-key
 utils.setup_plugin("which-key")
-
 
 -- debug.getinfo(2, "S").source:sub(2):match("(.*/)") or "./"
 
@@ -439,6 +1817,219 @@ if false then
 end
 
 -- LSP ========================================================================================
+
+lsp = true
+if lsp then
+
+	vim.lsp.enable("lua_ls")
+	vim.lsp.enable("ruff")
+	vim.lsp.enable("tinymist")
+	vim.lsp.config("lua_ls", {
+		settings = {
+			Lua = {
+				workspace = { library = vim.api.nvim_get_runtime_file("", true) },
+			},
+		},
+	})
+	vim.lsp.config("ruff", {}) -- TODO
+	vim.lsp.config("tinymist", {}) -- TODO
+	vim.lsp.config("rust-analyzer", {}) -- TODO
+	vim.lsp.config("haskell-ls", {}) -- TODO
+
+	vim.api.nvim_create_autocmd("LspAttach", {
+		callback = function(ev)
+			local client = vim.lsp.get_client_by_id(ev.data.client_id)
+			if client:supports_method("textDocument/completion") then
+				vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+			end
+		end,
+	})
+	vim.cmd("set completeopt+=noselect")
+	printv("CHECKPOINT A")
+	setup_plugin({ -------------------------------------------------------------------------------------------- conform.nvim
+		name = "conform",
+		setup_fn = function()
+			require("conform").setup({
+				formatters_by_ft = {
+					python = {
+						-- To fix auto-fixable lint errors.
+						"ruff_fix",
+						-- To run the Ruff formatter.
+						"ruff_format",
+						-- To organize the imports.
+						"ruff_organize_imports",
+					},
+					nix = {
+						"alejandra",
+					},
+					lua = {
+						"stylua",
+					},
+					haskell = {
+						"fourmolu",
+					},
+					rust = {
+						"rustfmt",
+					},
+					go = {
+						"gofmt",
+					},
+				},
+			})
+
+			-- Optional: format on save
+			vim.api.nvim_create_autocmd("BufWritePre", {
+				callback = function(args)
+					require("conform").format({ bufnr = args.buf })
+				end,
+			})
+		end,
+	})
+end
+
+lsp_with_diagnostics = false
+if lsp_with_diagnostics then
+	local diagnostic_modes = {
+		{
+			name = "End of Line (Virtual Text)",
+			config = {
+				virtual_text = {
+					prefix = "●", -- Could be '■', '▎', 'x'
+					spacing = 4,
+					source = "if_many",
+				},
+				virtual_lines = false,
+				signs = true,
+				underline = true,
+				update_in_insert = false,
+			},
+		},
+		{
+			name = "Under Line (Virtual Lines)",
+			config = {
+				virtual_text = false,
+				-- 'virtual_lines' is now a built-in handler in Nvim 0.10/0.11+
+				virtual_lines = {
+					only_current_line = true, -- Only show for current line to reduce clutter
+					highlight_whole_line = false,
+				},
+				signs = true,
+				underline = true,
+				update_in_insert = false,
+			},
+		},
+		{
+			name = "Gutter Only (Signs)",
+			config = {
+				virtual_text = false,
+				virtual_lines = false,
+				signs = {
+					-- Custom mapping for signs if you want specific characters
+					text = {
+						[vim.diagnostic.severity.ERROR] = "E",
+						[vim.diagnostic.severity.WARN] = "W",
+						[vim.diagnostic.severity.HINT] = "H",
+						[vim.diagnostic.severity.INFO] = "I",
+					},
+				},
+				underline = false, -- Often cleaner to disable underline in "minimal" mode
+				update_in_insert = false,
+			},
+		},
+	}
+
+	local function set_diagnostics_mode()
+		if not diagnostics_active then
+			vim.diagnostic.enable(false)
+			printv("LSP Diagnostics: OFF")
+			return
+		end
+
+		vim.diagnostic.enable(true)
+		local mode = diagnostic_modes[current_mode_index]
+		vim.diagnostic.config(mode.config)
+		printv("LSP Mode: " .. mode.name)
+	end
+
+	set_diagnostics_mode()
+
+	vim.lsp.config["haskell-language-server"] =
+		{ ------------------------------------------------------------------ HASKELL
+			cmd = { "haskell-language-server" },
+			filetypes = { "haskell" },
+			root_markers = { { "*.cabal" }, ".git" },
+			settings = {},
+		}
+	vim.lsp.config["luals"] =
+		{ ---------------------------------------------------------------------------------------- LUA
+			-- Command and arguments to start the server.
+			cmd = { "lua-language-server" },
+			-- Filetypes to automatically attach to.
+			filetypes = { "lua" },
+			-- Sets the "workspace" to the directory where any of these files is found.
+			-- Files that share a root directory will reuse the LSP server connection.
+			-- Nested lists indicate equal priority, see |vim.lsp.Config|.
+			root_markers = { { ".luarc.json", ".luarc.jsonc" }, ".git" },
+			-- Specific settings to send to the server. The schema is server-defined.
+			-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
+			settings = {
+				Lua = {
+					runtime = {
+						version = "LuaJIT",
+					},
+					workspace = {
+						library = vim.api.nvim_get_runtime_file("", true),
+					},
+					diagnostics = {
+						globals = {
+							"vim",
+						},
+					},
+				},
+			},
+		}
+	vim.lsp.config["ruff"] =
+		{ -------------------------------------------------------------------------------------- PYTHON
+			cmd = { "ruff", "server" },
+			filetypes = { "python" },
+			-- Sets the "workspace" to the directory where any of these files is found.
+			-- Files that share a root directory will reuse the LSP server connection.
+			-- Nested lists indicate equal priority, see |vim.lsp.Config|.
+			root_markers = { { ".ruff_cache", "pyproject.toml" }, ".git" },
+			settings = {},
+		}
+	vim.lsp.config["pyright"] = {
+		cmd = { "pyright-langserver", "--stdio" },
+		filetypes = { "python" },
+		root_markers = {
+			{ "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile" },
+			".git",
+		},
+		settings = {
+			python = {
+				analysis = {
+					autoSearchPaths = true,
+					useLibraryCodeForTypes = true,
+					typeCheckingMode = "basic", -- alternative: "strict"
+				},
+			},
+		},
+	}
+	vim.lsp.config["nixd"] =
+		{ ----------------------------------------------------------------------------------------- NIX
+			cmd = { "nixd" },
+			filetypes = { "nix" },
+			root_markers = { "flake.nix", ".git" },
+			settings = {},
+		}
+	vim.lsp.config["rust-analyzer"] =
+		{ ------------------------------------------------------------------------------- RUST
+			cmd = { "rust-analyzer" },
+			filetypes = { "rust" },
+			root_markers = { { "Cargo.toml", "cargo.lock" }, ".git" },
+			settings = {},
+		}
+end
 
 old_lsp = true
 if old_lsp then
@@ -1534,10 +3125,9 @@ vim.keymap.set("n", "<leader>tk", taskfile_picker, { desc = "Pick Taskfile task"
 
 -- UNSORTED =================================================================================================
 
-utils.setup_plugin("xit")
-
 -- from recent init.lua
-if false then --=============
+recent_init = true
+if recent_init then --=============
 	setup_plugin("plenary")
 	setup_plugin("nio")
 	setup_plugin("nvim-web-devicons")
@@ -2211,310 +3801,10 @@ if init_from_stable then
 	vim.cmd("hi link Floaterm Normal")
 	vim.cmd("hi link FloatermBorder Normal")
 	-------------------------------------------------------------------------------------------------------------------- LSP
-	local diagnostic_modes = {
-		{
-			name = "End of Line (Virtual Text)",
-			config = {
-				virtual_text = {
-					prefix = "●", -- Could be '■', '▎', 'x'
-					spacing = 4,
-					source = "if_many",
-				},
-				virtual_lines = false,
-				signs = true,
-				underline = true,
-				update_in_insert = false,
-			},
-		},
-		{
-			name = "Under Line (Virtual Lines)",
-			config = {
-				virtual_text = false,
-				-- 'virtual_lines' is now a built-in handler in Nvim 0.10/0.11+
-				virtual_lines = {
-					only_current_line = true, -- Only show for current line to reduce clutter
-					highlight_whole_line = false,
-				},
-				signs = true,
-				underline = true,
-				update_in_insert = false,
-			},
-		},
-		{
-			name = "Gutter Only (Signs)",
-			config = {
-				virtual_text = false,
-				virtual_lines = false,
-				signs = {
-					-- Custom mapping for signs if you want specific characters
-					text = {
-						[vim.diagnostic.severity.ERROR] = "E",
-						[vim.diagnostic.severity.WARN] = "W",
-						[vim.diagnostic.severity.HINT] = "H",
-						[vim.diagnostic.severity.INFO] = "I",
-					},
-				},
-				underline = false, -- Often cleaner to disable underline in "minimal" mode
-				update_in_insert = false,
-			},
-		},
-	}
 
-	local function set_diagnostics_mode()
-		if not diagnostics_active then
-			vim.diagnostic.enable(false)
-			printv("LSP Diagnostics: OFF")
-			return
-		end
-
-		vim.diagnostic.enable(true)
-		local mode = diagnostic_modes[current_mode_index]
-		vim.diagnostic.config(mode.config)
-		printv("LSP Mode: " .. mode.name)
-	end
-
-	set_diagnostics_mode()
-
-	vim.lsp.config["haskell-language-server"] =
-		{ ------------------------------------------------------------------ HASKELL
-			cmd = { "haskell-language-server" },
-			filetypes = { "haskell" },
-			root_markers = { { "*.cabal" }, ".git" },
-			settings = {},
-		}
-	vim.lsp.config["luals"] =
-		{ ---------------------------------------------------------------------------------------- LUA
-			-- Command and arguments to start the server.
-			cmd = { "lua-language-server" },
-			-- Filetypes to automatically attach to.
-			filetypes = { "lua" },
-			-- Sets the "workspace" to the directory where any of these files is found.
-			-- Files that share a root directory will reuse the LSP server connection.
-			-- Nested lists indicate equal priority, see |vim.lsp.Config|.
-			root_markers = { { ".luarc.json", ".luarc.jsonc" }, ".git" },
-			-- Specific settings to send to the server. The schema is server-defined.
-			-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
-			settings = {
-				Lua = {
-					runtime = {
-						version = "LuaJIT",
-					},
-					workspace = {
-						library = vim.api.nvim_get_runtime_file("", true),
-					},
-					diagnostics = {
-						globals = {
-							"vim",
-						},
-					},
-				},
-			},
-		}
-	vim.lsp.config["ruff"] =
-		{ -------------------------------------------------------------------------------------- PYTHON
-			cmd = { "ruff", "server" },
-			filetypes = { "python" },
-			-- Sets the "workspace" to the directory where any of these files is found.
-			-- Files that share a root directory will reuse the LSP server connection.
-			-- Nested lists indicate equal priority, see |vim.lsp.Config|.
-			root_markers = { { ".ruff_cache", "pyproject.toml" }, ".git" },
-			settings = {},
-		}
-	vim.lsp.config["pyright"] = {
-		cmd = { "pyright-langserver", "--stdio" },
-		filetypes = { "python" },
-		root_markers = {
-			{ "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile" },
-			".git",
-		},
-		settings = {
-			python = {
-				analysis = {
-					autoSearchPaths = true,
-					useLibraryCodeForTypes = true,
-					typeCheckingMode = "basic", -- alternative: "strict"
-				},
-			},
-		},
-	}
-	vim.lsp.config["nixd"] =
-		{ ----------------------------------------------------------------------------------------- NIX
-			cmd = { "nixd" },
-			filetypes = { "nix" },
-			root_markers = { "flake.nix", ".git" },
-			settings = {},
-		}
-	vim.lsp.config["rust-analyzer"] =
-		{ ------------------------------------------------------------------------------- RUST
-			cmd = { "rust-analyzer" },
-			filetypes = { "rust" },
-			root_markers = { { "Cargo.toml", "cargo.lock" }, ".git" },
-			settings = {},
-		}
 	------------------------------------------------------------------------------------------------------- COMMANDS (empty)
 	----------------------------------------------------------------------------------------------------------------- COLORS
 
-	--vim.api.nvim_set_hl(0, "Comment", { bg = "Purple" })
-	--vim.api.nvim_set_hl(0, 'Normal', { fg = "Green", bg = "Red" })
-	--vim.api.nvim_set_hl(0, 'Error', { fg = "<white>", undercurl = true })
-	--vim.api.nvim_set_hl(0, 'Cursor', { reverse = true })
-
-	--vim.cmd("highlight clear")
-
-	-- print(vim.opt.rtp)
-	vim.cmd("syntax reset")
-	--vim.g.colors_name = 'melange'
-
-	-- local bg = vim.opt.background:get(n)
-
-	-- package.loaded['melange/palettes/' .. bg] = nil -- Only needed for development
-	--local palette = require('melange/palettes/' .. bg)
-
-	--local a = palette.a -- Grays
-	--local b = palette.b -- Bright foreground colors
-	--local c = palette.c -- Foreground colors
-	--local d = palette.d -- Background colors
-
-	-- See https://github.com/neovim/neovim/pull/7406
-	--[[
-	vim.g.terminal_color_0 = "$color.terminalColor00$"
-	vim.g.terminal_color_1 = "$color.terminalColor01$"
-	vim.g.terminal_color_2 = "$color.terminalColor02$"
-	vim.g.terminal_color_3 = "$color.terminalColor03$"
-	vim.g.terminal_color_4 = "$color.terminalColor04$"
-	vim.g.terminal_color_5 = "$color.terminalColor05$"
-	vim.g.terminal_color_6 = "$color.terminalColor06$"
-	vim.g.terminal_color_7 = "$color.terminalColor07$"
-	vim.g.terminal_color_8 = "$color.terminalColor08$"
-	vim.g.terminal_color_9 = "$color.terminalColor09$"
-	vim.g.terminal_color_10 = "$color.terminalColor0A$"
-	vim.g.terminal_color_11 = "$color.terminalColor0B$"
-	vim.g.terminal_color_12 = "$color.terminalColor0C$"
-	vim.g.terminal_color_13 = "$color.terminalColor0D$"
-	vim.g.terminal_color_14 = "$color.terminalColor0E$"
-	vim.g.terminal_color_15 = "$color.terminalColor0F$"
-	--]]
-	local enable_font_variants = true
-	--vim.g.melange_enable_font_variants == nil or vim.g.melange_enable_font_variants
-
-	local bold = enable_font_variants
-	local italic = enable_font_variants
-	local underline = enable_font_variants
-	local undercurl = enable_font_variants
-	local strikethrough = enable_font_variants
-
-	-- local aliases = {
-	--     DARK_PINK = "#913d55",
-	--
-	--
-	-- }
-	vim.api.nvim_set_hl(0, "Normal", { bg = "#020802" })
-	for name, attrs in pairs({
-		---- :help highlight-default -------------------------------
-
-		Normal = { bg = "#000800", fg = "#808080" },
-		NormalFloat = { bg = "#000800", fg = "#808080" },
-		NormalNC = "Normal",
-
-		-- Cursor: TODO...
-
-		WinSeparator = { bg = "#000800", fg = "#111211" },
-		-- VertSplit = { bg = "<|color.nvim.VertSplit.bg |>", fg = "<|color.nvim.VertSplit.fg |>" },
-		-- Special = { fg = "<|%color.nvim.Special |>" },
-		-- CursorLine = { bg = "<|%color.nvim.CursorLine.bg |>" },
-
-		Identifier = { fg = "#426989" }, --$color.nvim.Identifier.fg$" },
-		["@variable"] = { fg = "#13446c" },
-		Function = { fg = "#246b44" },
-		Statement = { fg = "#913d55" },
-		Constant = { fg = "#7080a8" },
-		Type = { fg = "#8888dd" },
-		["@module"] = { fg = "#aaaacc" },
-		String = { fg = "#434f6f" }, --"#3e4966" }, -- 808080 55668f 1c2e8b
-		Comment = { fg = "#625c3f" }, -- 333933
-		PreProc = { fg = "#123622" },
-		Operator = { fg = "#246b44" },
-		Delimiter = { fg = "#123622" },
-		NeotreeFileName = { fg = "#9a9a9a" },
-
-		-- inheriting background from default Nvim* colors
-		Search = { fg = "#8AA88A", bg = "#003600" },
-		CurSearch = { fg = "#809880", bg = "#002600" },
-
-		StatusLine = { fg = "#455684", bg = "#111211" },
-		StatusLineNC = { fg = "#455684", bg = "#111211" },
-		Visual = { fg = "#061815", bg = "#0d8f77" },
-		Folded = { fg = "#808080", bg = "#001300" },
-		DiffAdd = { fg = "#668366", bg = "#002200" },
-		DiffChange = { fg = "#7f86f3", bg = "#050a58" },
-		DiffDelete = { fg = "#d5776f" },
-		DiffText = { fg = "#050a58", bg = "#7f86f3" },
-		Pmenu = { fg = "#505ad6", bg = "#000800" },
-		PmenuSel = { fg = "#737df1", bg = "#002600" },
-		PmenuThumb = { bg = "#777777" },
-		CursorColumn = { bg = "#000e00" },
-		CursorLine = { bg = "#000e00" },
-		ColorColumn = { bg = "#9b73f1" },
-		WinBar = { fg = "#dddddd", bg = "#000800" },
-		WinBarNC = { fg = "#dddddd", bg = "#000800" },
-		FloatShadow = { bg = "#002600" },
-		FloatShadowThrough = {
-			bg = "#118811",
-		},
-		MatchParen = { bg = "#51136e" },
-		RedrawDebugClear = { bg = "#dddddd" },
-		RedrawDebugComposed = {
-			bg = "#dddddd",
-		},
-		RedrawDebugRecompose = {
-			bg = "#dddddd",
-		},
-		Error = { fg = "#bd1dc5", bg = "#000800" },
-
-		-- inheriting foreground from default Nvim* colors
-		SpecialKey = { fg = "#491d5e" },
-		NonText = { fg = "#111211" },
-		Directory = { fg = "#13446c" },
-		ErrorMsg = { fg = "#bd1dc5" },
-		MoreMsg = { fg = "#1db6c5" },
-		ModeMsg = { fg = "#376808" },
-		LineNr = { fg = "#333833" },
-		Question = { fg = "#402967" },
-		WarningMsg = { fg = "#CBC383" },
-		SignColumn = { fg = "#1b8984" },
-		Conceal = { fg = "#808080", bg = "#000800" },
-		QuickFixLine = { fg = "#A30101" },
-		Special = { fg = "#741d96" }, --"#49125e" },
-
-		DiagnosticError = { fg = "#bd1dc5" },
-		DiagnosticFloatingWarn = { fg = "#CBC383" },
-		DiagnosticWarn = { fg = "#CBC383" },
-		DiagnosticFloatingInfo = { fg = "#555555" },
-		DiagnosticInfo = { fg = "#555555" },
-		DiagnosticFloatingHint = { fg = "#9b73f1" },
-		DiagnosticHint = { fg = "#9b73f1" },
-		DiagnosticFloatingOk = { fg = "#555555" },
-		DiagnosticOk = { fg = "#555555" },
-		Added = { fg = "#368366" },
-		["@diff.minus"] = { fg = "#d5776f" },
-		Removed = { fg = "#d5776f" },
-		Changed = { fg = "#7f86f3" },
-		CmpItemAbbrDeprecatedDefault = { fg = "#ffffff" },
-		CmpItemKindDefault = { fg = "#eeeeee" },
-		RainbowDelimiter1 = { fg = "#2b1400" },
-		RainbowDelimiter2 = { fg = "#4f473b" },
-		RainbowDelimiter3 = { fg = "#381900" },
-		RainbowDelimiter4 = { fg = "#726c62" },
-		RainbowDelimiter5 = { fg = "#51331a" },
-		RainbowDelimiter6 = { fg = "#959189" },
-		RainbowDelimiter7 = { fg = "#78604d" },
-	}) do
-		if type(attrs) == "table" then
-			vim.api.nvim_set_hl(0, name, attrs)
-		else
-			vim.api.nvim_set_hl(0, name, { link = attrs })
-		end
-	end
 	---------------------------------------------------------------------------------------------------- END VERBATIM COPIED
 	setup_plugin({
 		name = "bamboo",
@@ -2572,70 +3862,6 @@ if init_from_stable then
 	--     },
 	-- })
 
-	vim.lsp.enable("lua_ls")
-	vim.lsp.enable("ruff")
-	vim.lsp.enable("tinymist")
-	vim.lsp.config("lua_ls", {
-		settings = {
-			Lua = {
-				workspace = { library = vim.api.nvim_get_runtime_file("", true) },
-			},
-		},
-	})
-	vim.lsp.config("ruff", {}) -- TODO
-	vim.lsp.config("tinymist", {}) -- TODO
-	vim.lsp.config("rust-analyzer", {}) -- TODO
-	vim.lsp.config("haskell-ls", {}) -- TODO
-
-	vim.api.nvim_create_autocmd("LspAttach", {
-		callback = function(ev)
-			local client = vim.lsp.get_client_by_id(ev.data.client_id)
-			if client:supports_method("textDocument/completion") then
-				vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-			end
-		end,
-	})
-	vim.cmd("set completeopt+=noselect")
-	printv("CHECKPOINT A")
-	setup_plugin({ -------------------------------------------------------------------------------------------- conform.nvim
-		name = "conform",
-		setup_fn = function()
-			require("conform").setup({
-				formatters_by_ft = {
-					python = {
-						-- To fix auto-fixable lint errors.
-						"ruff_fix",
-						-- To run the Ruff formatter.
-						"ruff_format",
-						-- To organize the imports.
-						"ruff_organize_imports",
-					},
-					nix = {
-						"alejandra",
-					},
-					lua = {
-						"stylua",
-					},
-					haskell = {
-						"fourmolu",
-					},
-					rust = {
-						"rustfmt",
-					},
-					go = {
-						"gofmt",
-					},
-				},
-			})
-
-			-- Optional: format on save
-			vim.api.nvim_create_autocmd("BufWritePre", {
-				callback = function(args)
-					require("conform").format({ bufnr = args.buf })
-				end,
-			})
-		end,
-	})
 	setup_plugin({ ----------------------------------------------------------------------------------------------- blink.cmp
 		name = "blink.cmp",
 		setup_fn = function()
@@ -2720,33 +3946,6 @@ if init_from_stable then
 	-- More details: https://github.com/mikavilpas/yazi.nvim/issues/802
 	vim.g.loaded_netrwPlugin = 1
 
-	map({
-		mode = { "n", "v" },
-		sequence = "<leader>-",
-		action = function()
-			load_yazi()
-			vim.cmd("Yazi")
-		end,
-		opts = { desc = "Open yazi at the current file." },
-	})
-	map({
-		mode = { "n", "v" },
-		sequence = "<leader>cw",
-		action = function()
-			load_yazi()
-			vim.cmd("Yazi cwd")
-		end,
-		opts = { desc = "Open the file manager in nvim's working directory." },
-	})
-	map({
-		mode = { "n", "v" },
-		sequence = "<c-up>",
-		action = function()
-			load_yazi()
-			vim.cmd("Yazi toggle")
-		end,
-		opts = { desc = "Resume the last yazi session." },
-	})
 	printv("CHECKPOINT AB")
 	-------------------------------------------------------------------------------------------------------- toggleterm.nvim
 	setup_plugin({
@@ -3028,347 +4227,6 @@ if init_from_stable then
 	printv("CHECKPOINT C")
 	------------------------------------------------------------------------------------------------------- vim-visual-multi
 	vim.g.VM_default_mappings = true
-	---------------------------------------------------------------------------------------------------------------- KEYMAPS
-	local nvx = { "n", "v", "x" }
-	map({
-		mode = "n",
-		sequence = "<leader>o",
-		action = ":update<CR> :source<CR>",
-		opts = {},
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>ww",
-		action = ":write<CR>",
-		opts = {},
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>qq",
-		action = ":quit<CR>",
-		opts = {},
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>wq",
-		action = ":wq<CR>",
-		opts = {},
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>f",
-		action = ":Pick files<CR>",
-		opts = {},
-	})
-	map({
-		mode = "t",
-		sequence = "<Esc>",
-		action = [[<C-\><C-n>]],
-		opts = { desc = "Exit terminal mode" },
-	})
-	map({
-		mode = "t",
-		sequence = "kj",
-		action = [[<C-\><C-n>]],
-		opts = { desc = "Exit terminal mode" },
-	})
-	map({
-		mode = "t",
-		sequence = "<C-o>",
-		action = [[<C-\><C-o>]],
-		opts = { desc = "Temporary normal mode" },
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>lf",
-		action = vim.lsp.buf.format,
-		opts = { desc = "" },
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>h",
-		action = ":Pick help",
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>e",
-		action = ":Oil<CR>",
-	})
-	map({
-		mode = nvx,
-		sequence = "<leader>y",
-		action = "+y<CR>",
-		opts = { desc = "Yank to system clipboard" },
-	})
-	map({
-		mode = nvx,
-		sequence = "<leader>d",
-		action = "+d<CR>",
-		opts = { desc = "Paste from system clipboard" },
-	})
-	-- map({
-	--     mode = "",
-	--     sequence = "",\
-	--     action = [[]],
-	--     opts = { desc = "" }
-	-- })
-	-- map({
-	--     mode = "",
-	--     sequence = "",
-	--     action = [[]],
-	--     opts = { desc = "" }
-	-- })
-	-- map('t', '^[', "^\^N")
-	-- map('t', '^O', '^\^O')
-	map({
-		mode = "x",
-		sequence = "<leader>mf",
-		action = ":'<,'>lua move_selection_to_new_file()<CR>",
-		opts = { desc = "Move selection to new file (split)" },
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>lu",
-		action = function()
-			-- Create a new empty floating window or split
-			vim.cmd("vsplit | enew")
-			vim.bo.filetype = "lua"
-			vim.bo.bufhidden = "hide"
-
-			-- Map <CR> to execute the current line or selection
-			vim.keymap.set("n", "<CR>", ":.lua<CR>", { buffer = true })
-			vim.keymap.set("v", "<CR>", ":lua<CR>", { buffer = true })
-		end,
-		opts = { desc = "Open Lua Scratchpad" },
-	})
-	map({
-		mode = "v",
-		sequence = "<leader>ms",
-		action = move_selection_to_new_file,
-	})
-	map({ ------------------------------------------------------------------------------------------------------ diagnostics
-		mode = "n",
-		sequence = "<leader>dt",
-		action = function()
-			diagnostics_active = not diagnostics_active
-			set_diagnostics_mode()
-		end,
-		opts = { desc = "Toggle LSP Diagnostics" },
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>dm",
-		action = function()
-			-- only cycle if active; otherwise turn on and reset to 1
-			if not diagnostics_active then
-				diagnostics_active = true
-				current_mode_index = 1
-			else
-				current_mode_index = current_mode_index + 1
-				if current_mode_index > #diagnostic_modes then
-					current_mode_index = 1
-				end
-			end
-			set_diagnostics_mode()
-		end,
-		opts = { desc = "Cycle LSP Diagnostic Modes" },
-	})
-	map({ -------------------------------------------------------------------------------------------------------- telescope
-		mode = "n",
-		sequence = "<leader>ff",
-		action = make_setup_function(function()
-			require("telescope.builtin").find_files()
-		end),
-		opts = { desc = "Find Files" },
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>gf",
-		action = function()
-			require("telescope.builtin").git_files()
-		end,
-		opts = { desc = "Find Git Files" },
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>fg",
-		action = function()
-			require("telescope.builtin").live_grep()
-		end,
-		opts = { desc = "Live Grep" },
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>fb",
-		action = function()
-			require("telescope.builtin").buffers()
-		end,
-		opts = { desc = "Find Buffers" },
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>fh",
-		action = function()
-			require("telescope.builtin").help_tags()
-		end,
-		opts = { desc = "Find Help Tags" },
-	})
-	map({ --------------------------------------------------------------------------------------------------------- floaterm
-		mode = "n",
-		sequence = "<leader>ft",
-		action = "<Cmd>FloatermToggle<CR>",
-		opts = { desc = "Toggle floaterm" },
-	})
-	map({
-		mode = "t",
-		sequence = "<leader>ft",
-		action = "<C-\\><C-n><Cmd>FloatermToggle<CR>",
-		opts = { desc = "Toggle floaterm" },
-	})
-	-------------------------------------------------------------------------------------------------------------------- LSP
-	-- autocommand group to attach keymaps only to buffers with an active LSP client.
-	local lsp_keymaps_group = vim.api.nvim_create_augroup("LspKeymaps", { clear = true })
-
-	vim.api.nvim_create_autocmd("LspAttach", {
-		group = lsp_keymaps_group,
-		callback = function(ev)
-			local lsp_map = function(keys, func, desc)
-				map({
-					mode = "n",
-					sequence = keys,
-					action = func,
-					opts = { buffer = ev.buf, desc = "LSP: " .. desc },
-				})
-			end
-
-			-- Navigation and Information
-			lsp_map("gd", vim.lsp.buf.definition, "Go to Definition")
-			lsp_map("gD", vim.lsp.buf.declaration, "Go to Declaration")
-			lsp_map("gr", vim.lsp.buf.references, "Go to References")
-			lsp_map("gI", vim.lsp.buf.implementation, "Go to Implementation")
-			lsp_map("K", vim.lsp.buf.hover, "Hover Documentation")
-			lsp_map("<C-k>", vim.lsp.buf.signature_help, "Signature Help")
-
-			-- Actions
-			lsp_map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
-			lsp_map("<leader>rn", vim.lsp.buf.rename, "Rename")
-
-			-- Diagnostics
-			lsp_map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic")
-			lsp_map("]d", vim.diagnostic.goto_next, "Next Diagnostic")
-			lsp_map("<leader>dl", vim.diagnostic.open_float, "Show Line Diagnostics")
-
-			-- format on save (to use LSP formatter instead of conform)
-			-- vim.api.nvim_buf_create_autocmd("BufWritePre", {
-			--   buffer = ev.buf,
-			--   callback = function() vim.lsp.buf.format { async = false } end
-			-- })
-			--
-			local bufopts = { noremap = true, silent = true, buffer = bufnr }
-		end,
-	})
-	map({ --------------------------------------------------------------------------------------------------------- quickfix
-		mode = { "i" },
-		sequence = "kj",
-		action = "<escape>",
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>wq",
-		action = function()
-			vim.cmd("wq")
-		end,
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>ww",
-		action = function()
-			vim.cmd("w")
-		end,
-	})
-	map({
-		mode = "n",
-		sequence = "<leader>q",
-		action = function()
-			-- Populates the Quickfix list with all diagnostics from the current buffer
-			vim.diagnostic.setqflist({ bufnr = 0 })
-			vim.cmd("copen")
-		end,
-		opts = { desc = "Open Quickfix with diagnostics" },
-	})
-	map({ ------------------------------------------------------------------------------------------------------------- dial
-		mode = "n",
-		sequence = "<C-a>",
-		action = function()
-			require("dial.map").manipulate("increment", "normal")
-		end,
-		opts = { desc = "" },
-	})
-	map({
-		mode = "n",
-		sequence = "<C-x>",
-		action = function()
-			require("dial.map").manipulate("decrement", "normal")
-		end,
-		opts = { desc = "" },
-	})
-	map({
-		mode = "n",
-		sequence = "g<C-a>",
-		action = function()
-			require("dial.map").manipulate("increment", "gnormal")
-		end,
-		opts = { desc = "" },
-	})
-	map({
-		mode = "n",
-		sequence = "g<C-x>",
-		action = function()
-			require("dial.map").manipulate("decrement", "gnormal")
-		end,
-		opts = { desc = "" },
-	})
-	map({
-		mode = "x",
-		sequence = "<C-a>",
-		action = function()
-			require("dial.map").manipulate("increment", "visual")
-		end,
-		opts = { desc = "" },
-	})
-	map({
-		mode = "x",
-		sequence = "<C-x>",
-		action = function()
-			require("dial.map").manipulate("decrement", "visual")
-		end,
-		opts = { desc = "" },
-	})
-	map({
-		mode = "x",
-		sequence = "g<C-a>",
-		action = function()
-			require("dial.map").manipulate("increment", "gvisual")
-		end,
-		opts = { desc = "" },
-	})
-	map({
-		mode = "x",
-		sequence = "g<C-x>",
-		action = function()
-			require("dial.map").manipulate("decrement", "gvisual")
-		end,
-		opts = { desc = "" },
-	})
-	map({ --------------------------------------------------------------------------------------------------------- zen-mode
-		mode = "n",
-		sequence = "<leader>zm",
-		action = function()
-			-- width will be 85% of the editor width
-			require("zen-mode").toggle({ window = { width = 0.85 } })
-		end,
-		opts = { desc = "" },
-	})
 
 	require("blink.cmp").setup({ ------------------------------------------------------------------------------------- blink
 		fuzzy = { implementation = "lua" }, -- TODO: change to Rust
@@ -4020,843 +4878,4 @@ if lazy_configs then
 		},
 	}
 	return M
-end
-
-if mappings_lua then
-	--[[
-	DESIRED MAPPINGS/ACTIONS
-
-	- open quickfix window
-	- open floating terminal
-	- copy selection to new file
-	- jump to reference (next, previous)
-	- jump to definition
-	- open search and replace (with preview)
-	- fold block
-	- fold/unfold all of given level
-	- toggle value under cursor
-	- rename everywhere (optionally with preview)
-	- search pattern/regex in given files -> save results list & use it to navigate
-	- show keybinds available
-	- add/view/edit comment/annotation pointing to given location
-	- view/navigate TODOs and comments
-	- insert snippet
-	- format code (optionally only under selection)
-	- edit selection in new buffer
-	- dull colors outside of selection
-	- edit filesystem as a buffer (oil.nvim?)
-	- get autocomplete suggestion
-	- check spelling in file (ONLY on command!)
-	- view diff (with saved, last commit, etc.)
-	- file tree view
-	- navigate between search results
-	- toggle to light colors (or even lighten/darken colors, increase contrast -> write plugin?)
-	- jump to next syntactic object ( 
-	- command to run changed tests (use testmon or analogous)
-	- get LLM feedback
-	- unified preview_+accept/reject framework
-	- multi-line / multi-location edits
-
-	AUTOMATIC/TOGGLABLE FUNCTIONALITIES
-	--> dull colors everywhere except in active block (via treesitter?)
-	--> custom syntax highlighting for my special formats (from consilium-notes: jn, ...)
-
-	--]]
-
-	-- Set up a local map function for convenience
-	local map = vim.keymap.set
-
-	-- telescope ----------------------------------------------------------------------------------------------------------
-	map("n", "<leader>ff", function()
-		require("telescope.builtin").find_files()
-	end, { desc = "Find Files" })
-	map("n", "<leader>gf", function()
-		require("telescope.builtin").git_files()
-	end, { desc = "Find Git Files" })
-	map("n", "<leader>fg", function()
-		require("telescope.builtin").live_grep()
-	end, { desc = "Live Grep" })
-	map("n", "<leader>fb", function()
-		require("telescope.builtin").buffers()
-	end, { desc = "Find Buffers" })
-	map("n", "<leader>fh", function()
-		require("telescope.builtin").help_tags()
-	end, { desc = "Find Help Tags" })
-
-	-- floaterm -----------------------------------------------------------------------------------------------------------
-	vim.keymap.set("n", "<leader>ft", "<Cmd>FloatermToggle<CR>", { desc = "Toggle floaterm" })
-	vim.keymap.set("t", "<leader>ft", "<C-\\><C-n><Cmd>FloatermToggle<CR>", { desc = "Toggle floaterm" })
-
-	-- LSP ----------------------------------------------------------------------------------------------------------------
-	-- We will create an autocommand group to attach keymaps only to buffers with an active LSP client.
-	local lsp_keymaps_group = vim.api.nvim_create_augroup("LspKeymaps", { clear = true })
-
-	vim.api.nvim_create_autocmd("LspAttach", {
-		group = lsp_keymaps_group,
-		callback = function(ev)
-			local lsp_map = function(keys, func, desc)
-				vim.keymap.set("n", keys, func, { buffer = ev.buf, desc = "LSP: " .. desc })
-			end
-
-			-- Navigation and Information
-			lsp_map("gd", vim.lsp.buf.definition, "Go to Definition")
-			lsp_map("gD", vim.lsp.buf.declaration, "Go to Declaration")
-			lsp_map("gr", vim.lsp.buf.references, "Go to References")
-			lsp_map("gI", vim.lsp.buf.implementation, "Go to Implementation")
-			lsp_map("K", vim.lsp.buf.hover, "Hover Documentation")
-			lsp_map("<C-k>", vim.lsp.buf.signature_help, "Signature Help")
-
-			-- Actions
-			lsp_map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
-			lsp_map("<leader>rn", vim.lsp.buf.rename, "Rename")
-
-			-- Diagnostics
-			lsp_map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic")
-			lsp_map("]d", vim.diagnostic.goto_next, "Next Diagnostic")
-			lsp_map("<leader>dl", vim.diagnostic.open_float, "Show Line Diagnostics")
-
-			-- format on save (to use LSP formatter instead of conform)
-			-- vim.api.nvim_buf_create_autocmd("BufWritePre", {
-			--   buffer = ev.buf,
-			--   callback = function() vim.lsp.buf.format { async = false } end
-			-- })
-			--
-			local bufopts = { noremap = true, silent = true, buffer = bufnr }
-		end,
-	})
-
-	-- quickfix -----------------------------------------------------------------------------------------------------------
-	vim.keymap.set("i", "kj", "<escape>")
-	vim.keymap.set("n", "<leader>wq", function()
-		vim.cmd("wq")
-	end)
-	vim.keymap.set("n", "<leader>ww", function()
-		vim.cmd("w")
-	end)
-	vim.keymap.set("n", "<leader>q", function()
-		-- Populates the Quickfix list with all diagnostics from the current buffer
-		vim.diagnostic.setqflist({ bufnr = 0 })
-		vim.cmd("copen")
-	end, { desc = "Open Quickfix with diagnostics" })
-
-	--- dial---------------------------------------------------------------------------------------------------------------
-	vim.keymap.set("n", "<C-a>", function()
-		require("dial.map").manipulate("increment", "normal")
-	end)
-	vim.keymap.set("n", "<C-x>", function()
-		require("dial.map").manipulate("decrement", "normal")
-	end)
-	vim.keymap.set("n", "g<C-a>", function()
-		require("dial.map").manipulate("increment", "gnormal")
-	end)
-	vim.keymap.set("n", "g<C-x>", function()
-		require("dial.map").manipulate("decrement", "gnormal")
-	end)
-	vim.keymap.set("x", "<C-a>", function()
-		require("dial.map").manipulate("increment", "visual")
-	end)
-	vim.keymap.set("x", "<C-x>", function()
-		require("dial.map").manipulate("decrement", "visual")
-	end)
-	vim.keymap.set("x", "g<C-a>", function()
-		require("dial.map").manipulate("increment", "gvisual")
-	end)
-	vim.keymap.set("x", "g<C-x>", function()
-		require("dial.map").manipulate("decrement", "gvisual")
-	end)
-
-	--- zen-mode ----------------------------------------------------------------------------------------------------------
-
-	vim.keymap.set("n", "<leader>zm", function()
-		require("zen-mode").toggle({
-			window = {
-				width = 0.85, -- width will be 85% of the editor width
-			},
-		})
-	end)
-end
-
-if willothy_wezterm then
-	local fmt = string.format
-
-	local wezterm = {
-		switch_tab = {},
-		switch_pane = {},
-		split_pane = {},
-	}
-
-	---@private
-	local did_setup = false
-
-	---@private
-	local wezterm_executable
-
-	---@private
-	local function err(e)
-		vim.notify("Wezterm failed to " .. e, vim.log.levels.ERROR, {
-			title = "Wezterm",
-		})
-	end
-
-	---@private
-	local function exit_handler(msg)
-		---@param obj vim.SystemCompleted
-		return function(obj)
-			if obj.code ~= 0 then
-				err(msg)
-			end
-		end
-	end
-
-	---@private
-	local function find_wezterm()
-		if vim.fn.executable("wezterm") ~= 0 then
-			return "wezterm"
-		end
-		if vim.fn.executable("wezterm.exe") ~= 0 then
-			return "wezterm.exe"
-		end
-
-		err("find 'wezterm' executable")
-		return nil
-	end
-
-	---@private
-	local function count_non_nil(...)
-		local n = 0
-		for i = 1, select("#", ...) do
-			if select(i, ...) ~= nil then
-				n = n + 1
-			end
-		end
-		return n
-	end
-
-	---@class wezterm.SplitOpts
-	---@field cwd string|nil
-	---@field pane number|nil The pane to split (default current)
-	---@field top boolean|nil (default false)
-	---@field left boolean|nil (default false)
-	---@field bottom boolean|nil (default false)
-	---@field right boolean|nil (default false)
-	---@field move_pane number|nil Move a pane instead of spawning a command in it (default nil/disabled)
-	---@field percent number|nil The percentage of the pane to split (default nil)
-	---@field program string[]|nil The program to spawn in the new pane (default nil/Wezterm default)
-	---@field top_level boolean|nil Split the window instead of the pane (default false)-
-
-	---@class wezterm.SpawnOpts
-	---@field pane number|nil Set the current pane
-	---@field new_window boolean|nil Open in a new window
-	---@field workspace string|nil Set the workspace for the new window (requires new window)
-	---@field cwd string|nil Set the cwd for the spawned program
-	---@field args string[]|nil Additional args to pass to the spawned program
-
-	---@class wezterm.GetTextOpts
-	---@field pane_id number|nil
-	---@field start_line number|nil
-	---@field end_line number|nil
-	---@field escapes boolean|nil Include escape sequences in the output
-
-	---Exec an arbitrary command in wezterm (does not return result)
-	---@param args string[]
-	---@param handler fun(res: vim.SystemObj)
-	---@param stdin string|string[]|boolean If `true`, then a pipe to stdin is opened and can be written to via the `write()` method to SystemObj. If string or string[] then will be written to stdin
-	function wezterm.exec(args, handler, stdin)
-		if not wezterm.setup({}) then
-			return
-		end
-		vim.system({ wezterm_executable, unpack(args) }, {
-			stdin = stdin,
-			text = true,
-		}, vim.schedule_wrap(handler))
-	end
-
-	---Synchronously exec an arbitrary command in wezterm
-	---@param args string[]
-	---@return boolean success
-	---@return string stdout
-	---@return string stderr
-	function wezterm.exec_sync(args)
-		if not wezterm.setup({}) then
-			return false, "", ""
-		end
-		local rv = vim.system({ wezterm_executable, unpack(args) }, {
-			text = true,
-		}):wait()
-
-		return rv.code == 0, rv.stdout, rv.stderr
-	end
-
-	---Set a user var in the current wezterm pane
-	---@param name string
-	---@param value string | number | boolean | table | nil
-	function wezterm.set_user_var(name, value)
-		local ty = type(value)
-
-		if ty == "table" then
-			value = vim.json.encode(value)
-		elseif ty == "function" or ty == "thread" then
-			error("cannot serialize " .. ty)
-		elseif ty == "boolean" then
-			value = value and "true" or "false"
-		elseif ty == "nil" then
-			value = ""
-		end
-
-		local template = "\x1b]1337;SetUserVar=%s=%s\a"
-		local command = template:format(name, vim.base64.encode(tostring(value)))
-		vim.api.nvim_chan_send(vim.v.stderr, command)
-	end
-
-	---Show a desktop notification from wezterm
-	---@param title string
-	---@param body string
-	function wezterm.notify(title, body)
-		local template = "\x1b]777;notify;%s;%s\x1b\\"
-		local command = template:format(title or "", body or "")
-		vim.api.nvim_chan_send(vim.v.stderr, command)
-	end
-
-	---Spawn a program in wezterm
-	---@param program string
-	---@param opts wezterm.SpawnOpts
-	function wezterm.spawn(program, opts)
-		opts = opts or {}
-		local args = { "cli", "spawn" }
-		args.insert = table.insert
-		if opts.pane then
-			args:insert("--pane-id")
-			args:insert(fmt("%d", opts.pane))
-		end
-		if opts.new_window then
-			args:insert("--new-window")
-		end
-		if opts.workspace then
-			if not opts.new_window then
-				err("workspace option requires new_window")
-				return
-			end
-			args:insert("--workspace")
-			args:insert(opts.workspace)
-		end
-		if opts.cwd then
-			args:insert("--cwd")
-			args:insert(opts.cwd)
-		end
-		if program then
-			args:insert(program)
-			if opts.args then
-				for _, arg in ipairs(opts.args) do
-					args:insert(arg)
-				end
-			end
-		end
-
-		local emsg = "spawn " .. program .. " " .. table.concat(args, " ")
-		wezterm.exec(args, exit_handler(emsg))
-	end
-
-	---@param args string[]
-	---@param opts wezterm.SplitOpts
-	local function split_pane_args(args, opts)
-		if opts.cwd then
-			table.insert(args, "--cwd")
-			table.insert(args, opts.cwd)
-		end
-		if opts.percent then
-			table.insert(args, "--percent")
-			table.insert(args, fmt("%d", opts.percent))
-		end
-		if opts.pane then
-			table.insert(args, "--pane-id")
-			table.insert(args, fmt("%d", opts.pane))
-		end
-		if opts.top_level then
-			table.insert(args, "--top-level")
-		end
-		if opts.move_pane then
-			if opts.program then
-				err("split: move_pane and program are mutually exclusive")
-				return
-			end
-		elseif opts.program then
-			for _, arg in ipairs(opts.program) do
-				table.insert(args, arg)
-			end
-		end
-	end
-
-	---Split a pane vertically
-	---@param opts wezterm.SplitOpts
-	function wezterm.split_pane.vertical(opts)
-		opts = opts or {}
-		local args = { "cli", "split-pane" }
-		split_pane_args(args, opts)
-		if opts.top then
-			table.insert(args, "--top")
-		elseif opts.bottom then
-			table.insert(args, "--bottom")
-		end
-		wezterm.exec(args, exit_handler("split pane"))
-	end
-
-	---Split a pane horizontally
-	---@param opts wezterm.SplitOpts
-	function wezterm.split_pane.horizontal(opts)
-		opts = opts or {}
-		local args = { "cli", "split-pane" }
-		split_pane_args(args, opts)
-		if opts.left then
-			table.insert(args, "--left")
-		elseif opts.right then
-			table.insert(args, "--right")
-		else
-			table.insert(args, "--horizontal")
-		end
-		wezterm.exec(args, exit_handler("split pane"))
-	end
-
-	---Set the title of a Wezterm tab
-	---@param title string
-	---@param id number | nil Tab id
-	function wezterm.set_tab_title(title, id)
-		if not title then
-			return
-		end
-		local args = { "cli", "set-tab-title" }
-		if id then
-			table.insert(args, "--tab-id")
-			table.insert(args, fmt("%d", id))
-			table.insert(args, title)
-		else
-			table.insert(args, title)
-		end
-		wezterm.exec(args, exit_handler("set tab title to '" .. title .. (id == nil and "'" or "' for tab " .. id)))
-	end
-
-	---Set the the title of a Wezterm window
-	---@param title string
-	---@param id number | nil Window id
-	function wezterm.set_win_title(title, id)
-		if not title then
-			return
-		end
-		local args = { "cli", "set-window-title" }
-		if id then
-			table.insert(args, "--window-id")
-			table.insert(args, fmt("%d", id))
-			table.insert(args, title)
-		else
-			table.insert(args, title)
-		end
-		wezterm.exec(
-			args,
-			exit_handler("set window title to '" .. title .. (id == nil and "'" or ("' for window " .. id)))
-		)
-	end
-
-	---Switch to the tab relative to the current tab
-	---@param relno number The relative number of tabs to switch
-	function wezterm.switch_tab.relative(relno)
-		if not relno then
-			relno = vim.v.count or 0
-		end
-		wezterm.exec(
-			{ "cli", "activate-tab", "--tab-relative", fmt("%d", relno) },
-			exit_handler("activate tab relative " .. relno)
-		)
-	end
-
-	---Switch to the tab with the given index
-	---@param index number The absolute index of the tab to switch to
-	function wezterm.switch_tab.index(index)
-		if not index then
-			index = vim.v.count or 0
-		end
-		wezterm.exec(
-			{ "cli", "activate-tab", "--tab-index", fmt("%d", index) },
-			exit_handler("activate tab by index " .. index)
-		)
-	end
-
-	---Switch to the tab with the given id
-	---@param id number The id of the tab to switch to
-	function wezterm.switch_tab.id(id)
-		if not id then
-			id = vim.v.count or 0
-		end
-		wezterm.exec({ "cli", "activate-tab", "--tab-id", fmt("%d", id) }, exit_handler("activate tab by id " .. id))
-	end
-
-	---Switch to the given pane
-	---@param id number The id of the pane to switch to
-	function wezterm.switch_pane.id(id)
-		if not id then
-			id = vim.v.count or 0
-		end
-		wezterm.exec({ "cli", "activate-pane", "--pane-id", fmt("%d", id) }, exit_handler("activate pane by id " .. id))
-	end
-
-	---Used for validating directions
-	local directions = {
-		Up = true,
-		Down = true,
-		Left = true,
-		Right = true,
-		Next = true,
-		Prev = true,
-	}
-
-	---@param dir 'Up' | 'Down' | 'Left' | 'Right' | 'Next' | 'Prev'
-	---@param pane integer | nil Specify the current pane
-	function wezterm.get_pane_direction(dir, pane)
-		if not dir then
-			err("dir is required for get-pane-direction")
-		end
-		local first_char = dir:sub(1, 1)
-		dir = first_char:upper() .. dir:sub(2, -1)
-
-		if not directions[dir] then
-			err("get pane: invalid direction " .. vim.inspect(dir))
-		end
-
-		local args = { "cli", "get-pane-direction" }
-
-		if pane then
-			table.insert(args, "--pane-id")
-			table.insert(args, pane)
-		end
-
-		table.insert(args, dir)
-
-		local ok, pane_id, errmsg = wezterm.exec_sync(args)
-
-		if not ok then
-			errmsg("get pane direction: " .. errmsg)
-			return
-		end
-
-		pane_id = pane_id:gsub("^%s+", ""):gsub("%s+$", "")
-
-		return tonumber(pane_id)
-	end
-
-	---Get the id of the current pane
-	---@return number | nil
-	function wezterm.get_current_pane()
-		local id = vim.env.WEZTERM_PANE
-		if id then
-			id = id:gsub("^%s+", ""):gsub("%s+$", "")
-			return tonumber(id)
-		end
-	end
-
-	---Zoom or unzoom a pane.
-	---
-	---If no options are provided, toggles zoom for the provided (or current) pane.
-	---@param pane number | nil The pane to zoom (default current)
-	---@param opts { zoom: boolean, unzoom: boolean, toggle: boolean } # Default: { toggle = true }
-	function wezterm.zoom_pane(pane, opts)
-		opts = opts or {}
-		local args = { "cli", "zoom-pane" }
-
-		if count_non_nil(opts.zoom, opts.unzoom, opts.toggle) > 1 then
-			err("zoom pane: 'zoom', 'unzoom', and 'toggle' are mutually exclusive")
-			return
-		end
-
-		if pane then
-			table.insert(args, "--pane-id")
-			table.insert(args, pane)
-		end
-
-		if opts.zoom then
-			table.insert(args, "--zoom")
-		elseif opts.unzoom then
-			table.insert(args, "--unzoom")
-		else
-			table.insert(args, "--toggle")
-		end
-		wezterm.exec(args, exit_handler("zoom pane"))
-	end
-
-	---@param opts wezterm.GetTextOpts
-	function wezterm.get_text(opts)
-		local args = {}
-
-		if opts.pane_id then
-			table.insert(args, "--pane-id")
-			table.insert(args, opts.pane_id)
-		end
-
-		if opts.start_line then
-			table.insert(args, "--start-line")
-			table.insert(args, opts.start_line)
-		end
-
-		if opts.end_line then
-			table.insert(args, "--end-line")
-			table.insert(args, opts.end_line)
-		end
-
-		if opts.escapes then
-			table.insert(args, "--escapes")
-		end
-
-		local ok, stdout, stderr = wezterm.exec_sync(args)
-
-		if not ok then
-			err("get text: " .. stderr)
-			return
-		end
-
-		return stdout
-	end
-
-	---Switch pane in the given direction
-	---@param dir 'Up' | 'Down' | 'Left' | 'Right' | 'Next' | 'Prev' The direction to switch to
-	---@param pane integer | nil Specify the current pane
-	function wezterm.switch_pane.direction(dir, pane)
-		if not dir then
-			err("dir is required for split-pane")
-		end
-
-		local first_char = dir:sub(1, 1)
-		dir = first_char:upper() .. dir:sub(2, -1)
-
-		if not directions[dir] then
-			err("switch pane: invalid direction " .. vim.inspect(dir))
-			return
-		end
-
-		local args = { "cli", "activate-pane-direction" }
-
-		if pane then
-			table.insert(args, "--pane-id")
-			table.insert(args, pane)
-		end
-
-		table.insert(args, dir)
-
-		wezterm.exec(args, exit_handler("activate pane by direction " .. dir))
-	end
-
-	---Send text to a pane
-	---@param text string Text to send
-	---@param pane integer | nil Specify thecurrent pane
-	---@param no_paste boolean|nil (default false)
-	function wezterm.send_text(text, pane, no_paste)
-		if not text then
-			err("text is required for send-text")
-		end
-
-		local args = { "cli", "send-text" }
-
-		if pane then
-			table.insert(args, "--pane-id")
-			table.insert(args, pane)
-		end
-
-		if no_paste then
-			table.insert(args, "--no-paste")
-		end
-
-		wezterm.exec(args, exit_handler("send text to pane"), text)
-	end
-
-	local function trim(str)
-		return str:gsub("^%s+", ""):gsub("%s+$", "")
-	end
-
-	---@text The size of a Wezterm pane
-	---@class Wezterm.PaneSize
-	---@field cols integer
-	---@field rows integer
-	---@field pixel_width integer
-	---@field pixel_height integer
-	---@field dpi integer
-
-	---@text Information about a Wezterm pane
-	---@class Wezterm.Pane
-	---@field cursor_shape string
-	---@field cursor_visibility string
-	---@field cursor_x integer
-	---@field cursor_y integer
-	---@field cwd string
-	---@field is_active boolean
-	---@field is_zoomed boolean
-	---@field left_col integer
-	---@field pane_id integer
-	---@field size Wezterm.PaneSize
-	---@field tab_id integer
-	---@field tab_title string
-	---@field title string
-	---@field top_row integer
-	---@field tty_name string
-	---@field window_id integer
-	---@field window_title string
-	---@field workspace string
-
-	---@text Information about a Wezterm tab
-	---@class Wezterm.Tab
-	---@field tab_id integer
-	---@field tab_title string
-	---@field window_id integer
-	---@field window_title string
-	---@field panes Wezterm.Pane[]
-
-	---@text Information about a Wezterm GUI window
-	---@class Wezterm.Window
-	---@field window_id integer
-	---@field window_title string
-	---@field tabs Wezterm.Tab[]
-
-	---@text Wrapper around `wezterm cli list`
-	---
-	---@return Wezterm.Pane[]?
-	function wezterm.list_panes()
-		local ok, stdout, stderr = wezterm.exec_sync({ "cli", "list", "--format", "json" })
-		if not ok then
-			err("list panes: " .. stderr)
-			return
-		end
-		local decoded, obj = pcall(vim.json.decode, trim(stdout), {
-			luanil = {
-				object = true,
-				array = true,
-			},
-		})
-		if not decoded then
-			err("list panes: " .. obj)
-			return
-		end
-		return obj
-	end
-
-	---@text Wrapper around `wezterm cli list`
-	---
-	---@return Wezterm.Tab[]?
-	function wezterm.list_tabs()
-		local tabs = {}
-		local by_id = {}
-		local panes = wezterm.list_panes()
-		if not panes then
-			return
-		end
-		for _, pane in ipairs(panes) do
-			local tab_id = pane.tab_id
-			if not by_id[tab_id] then
-				by_id[tab_id] = {
-					tab_id = tab_id,
-					tab_title = pane.tab_title,
-					window_id = pane.window_id,
-					window_title = pane.window_title,
-					panes = {},
-				}
-				table.insert(tabs, by_id[tab_id])
-			end
-			table.insert(by_id[tab_id].panes, pane)
-		end
-		return tabs
-	end
-
-	---@text Wrapper around `wezterm cli list`
-	---
-	---@return Wezterm.Window[]?
-	function wezterm.list_windows()
-		local windows = {}
-		local by_id = {}
-
-		local tabs = wezterm.list_tabs()
-		if not tabs then
-			return
-		end
-
-		for _, tab in ipairs(tabs) do
-			local window_id = tab.window_id
-			if not by_id[window_id] then
-				by_id[window_id] = {
-					window_id = window_id,
-					window_title = tab.window_title,
-					tabs = {},
-				}
-				table.insert(windows, by_id[window_id])
-			end
-			table.insert(by_id[window_id].tabs, tab)
-		end
-
-		return windows
-	end
-
-	---Wrapper around `wezterm cli list-clients`
-	---
-	---@return table[]?
-	function wezterm.list_clients()
-		local ok, stdout, stderr = wezterm.exec_sync({ "cli", "list-clients", "--format", "json" })
-		if not ok then
-			err("list panes: " .. stderr)
-			return
-		end
-		local decoded, obj = pcall(vim.json.decode, trim(stdout), {
-			luanil = {
-				object = true,
-				array = true,
-			},
-		})
-		if not decoded then
-			err("list panes: " .. obj)
-			return
-		end
-		return obj
-	end
-
-	---@private
-	function wezterm.create_commands()
-		vim.api.nvim_create_user_command("WeztermSpawn", "lua require('wezterm').spawn(<f-args>)", {
-			nargs = "*",
-			complete = "shellcmd",
-		})
-	end
-
-	---@private
-	---@class wezterm.Config
-	---@field create_commands boolean | nil
-	local config = {
-		create_commands = true,
-	}
-
-	---@param opts wezterm.Config
-	function wezterm.setup(opts)
-		if did_setup then
-			return wezterm_executable ~= nil
-		end
-		did_setup = true
-
-		opts = vim.tbl_deep_extend("force", config, opts or {})
-
-		if vim.system == nil or vim.base64 == nil then
-			vim.notify_once(
-				"Wezterm.nvim requires Neovim >= 0.10. If you are using an older version, consider upgrading or pinning v0.4.0 of this plugin.",
-				vim.log.levels.ERROR,
-				{
-					title = "Wezterm",
-				}
-			)
-		end
-
-		local exe = find_wezterm()
-		if not exe then
-			err("find 'wezterm' executable")
-			return false
-		end
-		wezterm_executable = exe
-
-		if opts.create_commands == true then
-			wezterm.create_commands()
-		end
-
-		return true
-	end
-
-	return wezterm
 end
