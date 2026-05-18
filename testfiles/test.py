@@ -1,7 +1,7 @@
-import src
+import src  # type: ignore
 from pathlib import Path
 
-import pandas
+import pandas as pd  # type: ignore
 
 hello = "some string"
 

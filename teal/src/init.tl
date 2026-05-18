@@ -11,7 +11,7 @@ vim.opt.runtimepath:prepend(PARSER_DIR)
 vim.opt.packpath:prepend(DERIVATION_DIR)
 
 -- PRE HOOKS ===========================================================================================================
-local NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string
+global NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string
 global VERBOSE: boolean = false
 global SAFE: boolean = true
 global LAYERS: {number}|nil = nil

@@ -1,0 +1,1 @@
+cyan --gen-target 5.1 --global-env-def vim check
