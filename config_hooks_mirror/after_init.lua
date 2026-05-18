@@ -1,216 +1,189 @@
 print("Entering after_init.lua.")
 
-vim.opt.number = true -- Show absolute line number on the current line
-vim.opt.relativenumber = true -- Show relative numbers on other lines
-vim.g.mapleader = " "
-vim.opt.termguicolors = true
-
--- OLD LSP ========================================================================================
-
-vim.lsp.config["rust-analyzer"] = {
-	cmd = { "rust-analyzer" },
-	filetypes = { "rust" },
-	root_markers = { { "Cargo.toml", "cargo.lock" }, ".git" },
-	settings = {},
-}
-
-vim.lsp.config["nixd"] = {
-	cmd = { "nixd" },
-	filetypes = { "nix" },
-	root_markers = { "flake.nix", ".git" },
-	settings = {},
-}
-
-vim.lsp.config["luals"] = {
-	-- Command and arguments to start the server.
-	cmd = { "lua-language-server" },
-	-- Filetypes to automatically attach to.
-	filetypes = { "lua" },
-	-- Sets the "workspace" to the directory where any of these files is found.
-	-- Files that share a root directory will reuse the LSP server connection.
-	-- Nested lists indicate equal priority, see |vim.lsp.Config|.
-	root_markers = { { ".luarc.json", ".luarc.jsonc" }, ".git" },
-	-- Specific settings to send to the server. The schema is server-defined.
-	-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
-	settings = {
-		Lua = {
-			runtime = {
-				version = "LuaJIT",
-			},
-			workspace = {
-				library = vim.api.nvim_get_runtime_file("", true),
-			},
-			diagnostics = {
-				globals = {
-					"vim",
-				},
-			},
-		},
-	},
-}
-
-vim.lsp.config["ruff"] = {
-	-- Command and arguments to start the server.
-	cmd = { "ruff", "server" },
-	-- Filetypes to automatically attach to.
-	filetypes = { "python" },
-	-- Sets the "workspace" to the directory where any of these files is found.
-	-- Files that share a root directory will reuse the LSP server connection.
-	-- Nested lists indicate equal priority, see |vim.lsp.Config|.
-	root_markers = { { ".ruff_cache", "pyproject.toml" }, ".git" },
-	-- Specific settings to send to the server. The schema is server-defined.
-	-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
-	settings = {},
-}
-
-vim.lsp.config["pyright"] = {
-	cmd = { "pyright-langserver", "--stdio" },
-	filetypes = { "python" },
-	root_markers = {
-		{ "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile" },
-		".git",
-	},
-	settings = {
-		python = {
-			analysis = {
-				autoSearchPaths = true,
-				useLibraryCodeForTypes = true,
-				typeCheckingMode = "basic", -- You can change this to "strict"
-			},
-		},
-	},
-}
-
-local diagnostic_modes = {
-	{
-		name = "End of Line (Virtual Text)",
-		config = {
-			virtual_text = {
-				prefix = "●", -- Could be '■', '▎', 'x'
-				spacing = 4,
-				source = "if_many",
-			},
-			virtual_lines = false,
-			signs = true,
-			underline = true,
-			update_in_insert = false,
-		},
-	},
-	{
-		name = "Under Line (Virtual Lines)",
-		config = {
-			virtual_text = false,
-			-- 'virtual_lines' is now a built-in handler in Nvim 0.10/0.11+
-			virtual_lines = {
-				only_current_line = true, -- Only show for current line to reduce clutter
-				highlight_whole_line = false,
-			},
-			signs = true,
-			underline = true,
-			update_in_insert = false,
-		},
-	},
-	{
-		name = "Gutter Only (Signs)",
-		config = {
-			virtual_text = false,
-			virtual_lines = false,
-			signs = {
-				-- Custom mapping for signs if you want specific characters
-				text = {
-					[vim.diagnostic.severity.ERROR] = "E",
-					[vim.diagnostic.severity.WARN] = "W",
-					[vim.diagnostic.severity.HINT] = "H",
-					[vim.diagnostic.severity.INFO] = "I",
-				},
-			},
-			underline = false, -- Often cleaner to disable underline in "minimal" mode
-			update_in_insert = false,
-		},
-	},
-}
-
--- State tracking
-local current_mode_index = 1
-local diagnostics_active = false
-
--- 2. Function to set the configuration
-local function set_diagnostics_mode()
-	if not diagnostics_active then
-		vim.diagnostic.enable(false)
-		-- print("LSP Diagnostics: OFF")
-		return
-	end
-
-	vim.diagnostic.enable(true)
-	local mode = diagnostic_modes[current_mode_index]
-	vim.diagnostic.config(mode.config)
-	print("LSP Mode: " .. mode.name)
-end
-
--- 3. Keybind: Toggle On/Off
-vim.keymap.set("n", "<leader>dt", function()
-	diagnostics_active = not diagnostics_active
-	set_diagnostics_mode()
-end, { desc = "Toggle LSP Diagnostics" })
-
--- 4. Keybind: Cycle Modes
-vim.keymap.set("n", "<leader>dm", function()
-	-- Only cycle if active; otherwise turn on and reset to 1
-	if not diagnostics_active then
-		diagnostics_active = true
-		current_mode_index = 1
-	else
-		current_mode_index = current_mode_index + 1
-		if current_mode_index > #diagnostic_modes then
-			current_mode_index = 1
-		end
-	end
-	set_diagnostics_mode()
-end, { desc = "Cycle LSP Diagnostic Modes" })
-
--- Initialize on startup
-set_diagnostics_mode()
-
-vim.lsp.enable("luals")
-vim.lsp.enable("ruff")
-vim.lsp.enable("pyright")
-vim.lsp.enable("nixd")
-
-local config_dir = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h")
-vim.opt.runtimepath:prepend(config_dir)
--- print(config_dir)
-
-package.path = config_dir .. "/lua/?.lua;" .. config_dir .. "/lua/?/init.lua;" .. package.path
-
-vim.api.nvim_set_hl(0, "Normal", { bg = "#020802" })
-
-vim.diagnostic.config({ virtual_text = false, virtual_lines = { current_line = true } })
-
--- ADDED: Initialize which-key
-utils.setup_plugin("which-key")
-
-vim.cmd("hi link Floaterm Normal")
-vim.cmd("hi link FloatermBorder Normal")
-vim.api.nvim_set_hl(0, "Normal", { bg = "#020802" })
-
---=================================================================================================
-
 utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
 utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
 utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
-
-if HAS_NIX then
-	vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
-end
 
 local setup_plugin = utils.setup_plugin
 local packadd = utils.packadd
 local map = utils.map
 
+-- utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
+
+
+
+-- WEZTERM ========================================================================================
+
+-- WEZTERM SCRATCH
+
+if WEZTERM then
+	-- https://github.com/ianhomer/wezterm.nvim/blob/main/lua/wezterm.lua --------------------------------------------------
+	local wez = {}
+
+	local directions = {
+		h = "Left",
+		l = "Right",
+		j = "Down",
+		k = "Up",
+	}
+
+	local arrows = {
+		h = "left",
+		l = "right",
+		j = "down",
+		k = "up",
+	}
+
+	local function command(args)
+		os.execute("wezterm cli " .. args)
+	end
+
+	function wez.navigate(direction)
+		command("activate-pane-direction " .. directions[direction])
+	end
+
+	function wez.go_direction(direction)
+		local current_window = vim.fn.win_getid()
+		vim.api.nvim_command("wincmd " .. direction)
+		local at_edge = current_window == vim.fn.win_getid()
+		if at_edge then
+			wez.navigate(direction)
+		end
+	end
+
+	function wez.keys()
+		local keys = {}
+		for key, _ in pairs(directions) do
+			table.insert(keys, {
+				"<c-" .. key .. ">",
+				function()
+					wez.go_direction(key)
+				end,
+				mode = { "n" },
+				desc = "Navigate " .. arrows[key],
+			})
+		end
+
+		return keys
+	end
+
+	function wez.setup(opts)
+		for key, _ in pairs(directions) do
+			vim.keymap.set("", "<c-" .. key .. ">", function()
+				wez.go_direction(key)
+			end)
+			-- support ctrl arrow keys in normal an insert mode
+			vim.keymap.set({ "i", "n", "v", "x", "c" }, "<c-" .. arrows[key] .. ">", function()
+				print("D" .. key)
+				M.go_direction(key)
+			end)
+		end
+	end
+
+	-- return wez
+	--
+	-- https://github.com/letieu/wezterm-move.nvim/blob/master/lua/wezterm-move/init.lua ----------------------------------
+	local WM = {}
+
+	local wezterm_directions = { h = "Left", j = "Down", k = "Up", l = "Right" }
+
+	-- @param direction: string (h, j, k, l)
+	local function at_edge(direction)
+		return vim.fn.winnr() == vim.fn.winnr(direction)
+	end
+
+	local function wezterm_exec(cmd)
+		local command = vim.deepcopy(cmd)
+		if vim.fn.executable("wezterm.exe") == 1 then
+			table.insert(command, 1, "wezterm.exe")
+		else
+			table.insert(command, 1, "wezterm")
+		end
+		table.insert(command, 2, "cli")
+		return vim.fn.system(command)
+	end
+
+	-- @param direction: string (h, j, k, l)
+	local function send_key_to_wezterm(direction)
+		wezterm_exec({ "activate-pane-direction", wezterm_directions[direction] })
+	end
+
+	-- @param direction: string (h, j, k, l)
+	WM.move = function(direction)
+		if at_edge(direction) then
+			send_key_to_wezterm(direction)
+		else
+			vim.cmd("wincmd " .. direction)
+		end
+	end
+end
+
+-- DAP ========================================================================================
+
+setup_plugin("dap-python", function()
+	local dap_python = get_plugin("dap-python")
+	dap_python.setup("debugpy-adapter")
+	dap_python.test_runner = "pytest"
+	vim.keymap.set("n", "<leader>tt", function()
+		print("Leader is working!")
+	end)
+	vim.keymap.set("n", "<leader>pp", function()
+		print("This works")
+	end)
+	vim.keymap.set("n", "<leader>dn", function()
+		get_plugin("dap-python").test_method()
+	end)
+	vim.keymap.set("n", "<leader>df", function()
+		get_plugin("dap-python").test_class()
+	end)
+	vim.keymap.set("v", "<leader>ds", function()
+		get_plugin("dap-python").debug_selection()
+	end)
+end)
+setup_plugin("dapui")
+setup_plugin("nvim-dap-virtual-text")
+setup_plugin("dap")
+
+-- PATH MANAGEMENT ========================================================================================
+
+local config_dir = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h")
+vim.opt.runtimepath:prepend(config_dir)
+-- print(config_dir)
+
+if HAS_NIX then
+	vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
+end
+
+package.path = config_dir .. "/lua/?.lua;" .. config_dir .. "/lua/?/init.lua;" .. package.path
+
+vim.opt.runtimepath:prepend("/nix/store/ydlwparyk4mxl6wzhlp3x54zl3nk82c5-pde")
+
+vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
+
+-- OPTIONS ========================================================================================
+
+vim.opt.number = true -- Show absolute line number on the current line
+vim.opt.relativenumber = true -- Show relative numbers on other lines
+vim.g.mapleader = " "
+vim.opt.termguicolors = true
+
+
+-- FILETYPES ========================================================================================
+
 vim.filetype.add({
 	extension = { xit = "xit" },
 })
+
+-- AUTOCOMMANDS =================================================================================================
+
+-- COLORS ========================================================================================
+
+vim.api.nvim_set_hl(0, "Normal", { bg = "#020802" })
+
+vim.cmd("hi link Floaterm Normal")
+vim.cmd("hi link FloatermBorder Normal")
+vim.api.nvim_set_hl(0, "Normal", { bg = "#020802" })
+
 
 if custom_colors then
 	--vim.api.nvim_set_hl(0, "Comment", { bg = "Purple" })
@@ -236,23 +209,23 @@ if custom_colors then
 
 	-- See https://github.com/neovim/neovim/pull/7406
 	--[[
-vim.g.terminal_color_0 = "$color.terminalColor00$"
-vim.g.terminal_color_1 = "$color.terminalColor01$"
-vim.g.terminal_color_2 = "$color.terminalColor02$"
-vim.g.terminal_color_3 = "$color.terminalColor03$"
-vim.g.terminal_color_4 = "$color.terminalColor04$"
-vim.g.terminal_color_5 = "$color.terminalColor05$"
-vim.g.terminal_color_6 = "$color.terminalColor06$"
-vim.g.terminal_color_7 = "$color.terminalColor07$"
-vim.g.terminal_color_8 = "$color.terminalColor08$"
-vim.g.terminal_color_9 = "$color.terminalColor09$"
-vim.g.terminal_color_10 = "$color.terminalColor0A$"
-vim.g.terminal_color_11 = "$color.terminalColor0B$"
-vim.g.terminal_color_12 = "$color.terminalColor0C$"
-vim.g.terminal_color_13 = "$color.terminalColor0D$"
-vim.g.terminal_color_14 = "$color.terminalColor0E$"
-vim.g.terminal_color_15 = "$color.terminalColor0F$"
---]]
+	vim.g.terminal_color_0 = "$color.terminalColor00$"
+	vim.g.terminal_color_1 = "$color.terminalColor01$"
+	vim.g.terminal_color_2 = "$color.terminalColor02$"
+	vim.g.terminal_color_3 = "$color.terminalColor03$"
+	vim.g.terminal_color_4 = "$color.terminalColor04$"
+	vim.g.terminal_color_5 = "$color.terminalColor05$"
+	vim.g.terminal_color_6 = "$color.terminalColor06$"
+	vim.g.terminal_color_7 = "$color.terminalColor07$"
+	vim.g.terminal_color_8 = "$color.terminalColor08$"
+	vim.g.terminal_color_9 = "$color.terminalColor09$"
+	vim.g.terminal_color_10 = "$color.terminalColor0A$"
+	vim.g.terminal_color_11 = "$color.terminalColor0B$"
+	vim.g.terminal_color_12 = "$color.terminalColor0C$"
+	vim.g.terminal_color_13 = "$color.terminalColor0D$"
+	vim.g.terminal_color_14 = "$color.terminalColor0E$"
+	vim.g.terminal_color_15 = "$color.terminalColor0F$"
+	--]]
 	local enable_font_variants = true
 	--vim.g.melange_enable_font_variants == nil or vim.g.melange_enable_font_variants
 
@@ -377,23 +350,6 @@ vim.g.terminal_color_15 = "$color.terminalColor0F$"
 	end
 end
 
--- utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
-
-local telescope = utils.setup_plugin_default("telescope", function(telescope)
-	telescope.setup({
-		extensions = {
-			fzf = {
-				fuzzy = true, -- false will only do exact matching
-				override_generic_sorter = true, -- override the generic sorter
-				override_file_sorter = true, -- override the file sorter
-				case_mode = "smart_case", -- or "ignore_case" or "respect_case"
-				-- the default case_mode is "smart_case"
-			},
-		},
-	})
-	telescope.load_extension("fzf")
-	print("loaded telescope with fzf-native")
-end)
 
 setup_plugin("bamboo", function(bamboo)
 	(bamboo.setup)({
@@ -406,722 +362,15 @@ setup_plugin("bamboo", function(bamboo)
 	utils.printbv("Set up bamboo")
 end)
 
-if false then --=============
-	setup_plugin("plenary")
-	setup_plugin("nio")
-	setup_plugin("nvim-web-devicons")
+-- MISC ========================================================================================
 
-	setup_plugin("zen-mode")
-	setup_plugin("lualine")
-	setup_plugin("nvim-navic")
-	setup_plugin("bufferline")
-	setup_plugin("statuscol")
 
-	setup_plugin("treesitter-modules")
-	setup_plugin("dropbar")
-	utils.packadd("nvim-navbuddy")
-	setup_plugin("aerial")
 
-	setup_plugin("oil")
-	setup_plugin("yazi")
-	setup_plugin("neo-tree")
-	setup_plugin("nvim-tree")
+-- ADDED: Initialize which-key
+utils.setup_plugin("which-key")
 
-	setup_plugin("pickme")
-	-- setup_plugin("telescope") MOVED
-
-	setup_plugin("fzf-lua")
-	setup_plugin("deck")
-
-	setup_plugin("mini.indent")
-	setup_plugin("mini.keymap")
-	setup_plugin("mini.sessions")
-
-	setup_plugin("snacks")
-	setup_plugin("blink")
-
-	setup_plugin("hlslens")
-	setup_plugin("hlsearch")
-
-	setup_plugin("grug-far")
-	setup_plugin("spectre")
-
-	setup_plugin("flybuf")
-	setup_plugin("stickybuf")
-	setup_plugin("swm", function(swm)
-		map("n", "<C-w>h", swm.h)
-		map("n", "<C-w>j", swm.j)
-		map("n", "<C-w>k", swm.k)
-		map("n", "<C-w>l", swm.l)
-	end)
-
-	setup_plugin("smart-splits")
-
-	setup_plugin("ufo")
-
-	setup_plugin("NeoComposer")
-	setup_plugin("nvim-macros", {
-		json_file_path = "./macros.json",
-		default_macro_register = "a",
-		json_formatter = "jq",
-	})
-	setup_plugin("recorder")
-
-	utils.packadd("vim-visual-multi")
-
-	setup_plugin("leap")
-	setup_plugin("flash")
-	setup_plugin("hop")
-
-	setup_plugin("rainbow-delimiters")
-	setup_plugin("nvim-autopairs")
-
-	utils.packadd("vim-sandwich")
-
-	setup_plugin("nvim-surround")
-
-	utils.packadd("vim-mundo")
-
-	setup_plugin("mini.keymap")
-	setup_plugin("hydra")
-	setup_plugin("insx")
-	setup_plugin("which-key")
-
-	setup_plugin("indentmini")
-	utils.packadd("indent-blankline")
-	setup_plugin("nvim-anydent")
-	setup_plugin("mini.align")
-	utils.packadd("tabular")
-
-	setup_plugin("nvim-treesitter-textobjects")
-	utils.packadd("nvim-various-textobjs")
-
-	setup_plugin("Comment")
-	setup_plugin("todo-comments")
-	utils.packadd("vim-commentary")
-
-	setup_plugin("treesj")
-	setup_plugin("dial")
-	setup_plugin("harpoon-core")
-	setup_plugin("marks")
-	setup_plugin("markit")
-
-	setup_plugin("nvim-pasta")
-
-	setup_plugin("beam")
-
-	setup_plugin("blink.cmp")
-	setup_plugin("nvim-cmp")
-
-	setup_plugin("friendly-snippets")
-	setup_plugin("ultisnips")
-	setup_plugin("LuaSnip")
-
-	setup_plugin("cmp-nvim-lsp")
-	setup_plugin("cmp-buffer")
-	setup_plugin("cmp-path")
-	setup_plugin("cmp-cmdline")
-
-	setup_plugin("lsp-format")
-	setup_plugin("lspkind")
-
-	setup_plugin("lspsaga")
-
-	setup_plugin("lazydev")
-	setup_plugin("rustaceanvim")
-	setup_plugin("crates")
-	setup_plugin("haskell-tools")
-
-	setup_plugin("none-ls")
-
-	setup_plugin("guard")
-	setup_plugin("conform")
-
-	setup_plugin("asyncrun")
-	setup_plugin("neotest-haskell")
-	setup_plugin("neotest-python")
-	setup_plugin("neotest")
-	setup_plugin("dap-python", function(dap_python)
-		(dap_python.setup)("debugpy-adapter")
-		dap_python.test_runner = "pytest"
-		map("n", "<leader>tt", function()
-			print("Leader is working!")
-		end)
-		map("n", "<leader>pp", function()
-			print("This works")
-		end)
-		map("n", "<leader>dn", dap_python.test_method)
-		map("n", "<leader>df", dap_python.test_class)
-		map("v", "<leader>ds", dap_python.debug_selection)
-	end)
-	setup_plugin("dapui")
-	setup_plugin("nvim-dap-virtual-text")
-	setup_plugin("dap")
-	setup_plugin("mypy")
-	setup_plugin("nvim-lint")
-
-	setup_plugin("trouble.nvim")
-	setup_plugin("quicker")
-	setup_plugin("nvim-bqf")
-
-	setup_plugin("vim-floaterm")
-	setup_plugin("toggleterm")
-
-	setup_plugin("overseer")
-
-	setup_plugin("refactoring")
-
-	setup_plugin("project")
-	setup_plugin("telescope-project")
-
-	setup_plugin("jj")
-	setup_plugin("jujutsu")
-	setup_plugin("lazygit")
-	setup_plugin("git-conflict")
-	setup_plugin("neogit")
-	setup_plugin("jiejie")
-	setup_plugin("diffview")
-	setup_plugin("gitsigns")
-	setup_plugin("vim-fugitive")
-
-	setup_plugin("octo")
-	setup_plugin("gitlab-nvim")
-	setup_plugin("gitlab")
-
-	setup_plugin("dashboard-nvim")
-	setup_plugin("dashboard")
-	setup_plugin("noice")
-	setup_plugin("modes")
-
-	setup_plugin("fidget")
-	setup_plugin("nvim-notify")
-	setup_plugin("headlines")
-
-	setup_plugin("auto-session")
-	setup_plugin("persistence")
-
-	utils.packadd("vimtex", function()
-		vim.g.vimtex_view_method = "zathura"
-	end)
-	setup_plugin("texmagic")
-	setup_plugin("schemastore")
-	setup_plugin("firenvim")
-	setup_plugin("render-markdown")
-	setup_plugin("jupytext")
-	setup_plugin("quarto")
-	setup_plugin("markdown-preview")
-
-	setup_plugin("structlog")
-	setup_plugin("neorepl")
-end
-
-utils.setup_plugin("xit")
-
-vim.treesitter.language.register("py", "python")
-
-vim.filetype.add({
-	extension = { xit = "xit" },
-})
-vim.treesitter.language.register("xit", "xit")
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "xit",
-	callback = function(ev)
-		print("executing xit callback")
-		vim.treesitter.language.add("xit", { path = PARSER_DIR .. "/xit.so" })
-		vim.treesitter.start(ev.buf, "xit")
-	end,
-})
-
--- v_an, v_in, v_]n, v_[n now provide incremental selection of treesitter nodes
-
--- put in ftplugin/<filetype>.lua ?
-
--- config/
--- ├── ftdetect/
--- │   └── xit.lua
--- ├── ftplugin/
--- │   └── xit.lua       ← here
--- ├── syntax/
--- │   └── xit.lua
--- └── init.lua
-
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "lua",
-	callback = function()
-		vim.treesitter.start()
-	end,
-})
-
-vim.api.nvim_create_autocmd("FileType", {
-	callback = function()
-		pcall(vim.treesitter.start) -- pcall: silently skips if no parser
-	end,
-})
-
-vim.opt.indentexpr = "v:lua.vim.treesitter.indent()"
--- vim.opt.foldmethod = "expr" + foldexpr
--- vim.treesitter.query.add(lang, name, str) -- TODO
--- vim.treesitter.language.register() -- TODO
-
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-vim.opt.indentexpr = "v:lua.vim.treesitter.indent()"
-
--- Register filetype aliases
-vim.treesitter.language.register("cpp", "cuda")
-vim.treesitter.language.register("javascript", "jsx")
-vim.treesitter.language.register("typescript", "tsx")
-
--- Optional: Auto-install parsers on first run (custom helper)
--- local parsers_to_ensure = { "c", "lua", "python", "javascript", "typescript", "bash", "json" }
--- for _, lang in ipairs(parsers_to_ensure) do
--- 	if not vim.treesitter.language.is_installed(lang) then  TODO
--- 		vim.cmd.TSInstall(lang)
--- 	end
--- end
-
-vim.opt.foldmethod = "expr"
-vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-vim.opt.indentexpr = "v:lua.vim.treesitter.indent()"
-
--- vim.g.treesitter_filetype_exclude = { "markdown", "txt" }
-
--- TODO: treesitter queries in RTP/queries/<lang>/
-
-vim.treesitter.query.add_predicate(
-	"python",
-	"highlights",
-	[[
-  (function_definition
-    name: (identifier) @function.def)
-]]
-)
-
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "rust", "go", "python" }, -- add languages
-	callback = function()
-		if not vim.treesitter.language.get_lang(vim.bo.filetype) then
-			-- Or use a plugin/helper for installation
-			print("No Treesitter parser for " .. vim.bo.filetype)
-		end
-	end,
-})
-
-pcall(vim.api.nvim_del_user_command, "TSInstall")
-pcall(vim.api.nvim_del_user_command, "TSInstallSync") -- if it exists
-pcall(vim.api.nvim_del_user_command, "TSInstallFromGrammar")
-
--- OR:
-for _, cmd in ipairs({ "TSInstall", "TSInstallSync", "TSInstallFromGrammar" }) do
-	pcall(vim.api.nvim_del_user_command, cmd)
-end
-
--- OR:
-vim.api.nvim_create_user_command("TSInstall", function()
-	vim.notify("TSInstall is disabled. Manage parsers externally.", vim.log.levels.WARN)
-end, {
-	nargs = "*",
-	complete = function()
-		return {}
-	end,
-})
-
--- To manually toggle highlighting at runtime:
--- ```vim
--- :TSEnable highlight
--- :TSDisable highlight
--- ```
-
--- print(vim.o.runtimepath:find(vim.env.VIMRUNTIME) ~= nil)
-
--- print(vim.inspect(vim.opt.runtimepath))
-
--- setup_plugin("nvim-treesitter", function(treesitter)
--- 	local TS_LANGUAGES = {
--- 		"haskell",
--- 		"javascript",
--- 		"json",
--- 		"lua",
--- 		"markdown",
--- 		"nix",
--- 		"python",
--- 		"rust",
--- 		"toml",
--- 		"typescript",
--- 		"yaml",
--- 		"zig",
--- 	}
-
--- 	utils.printbv("Setting up treesitter.")
--- 	local my_install_dir = (not HAS_NIX) and ((vim.fn.stdpath("data")) .. "/site") or DERIVATION_DIR
--- 	utils.printv(my_install_dir)
--- 	local my_parser_install_dir = (not HAS_NIX) and (vim.fn.stdpath("data")) .. "/site/parsers" or nil
--- 	utils.printv(my_parser_install_dir)
--- 	local my_ensure_installed = HAS_NIX and {} or TS_LANGUAGES
--- 	utils.printv(vim.inspect(my_ensure_installed))
-
--- 	utils.printbv("Treesitter exists")
--- 	(treesitter.setup)({
--- 		install_dir = my_install_dir,
--- 		parser_install_dir = my_parser_install_dir,
--- 		ensure_installed = my_ensure_installed,
--- 		highlight = { enable = true },
--- 		indent = { enable = true },
--- 	})
--- end)
-
-local my_install_dir = (not HAS_NIX) and ((vim.fn.stdpath("data")) .. "/site") or DERIVATION_DIR
-
-local my_parser_install_dir = my_install_dir .. "/parser"
--- (not HAS_NIX) and (vim.fn.stdpath("data")) .. "/site/parsers" or DERIVATION_DIR ..
-
-local my_ensure_installed = HAS_NIX and {} or TS_LANGUAGES
-
-utils.printbv("Setting up treesitter.")
-utils.printb("my_install_dir:        " .. my_install_dir)
-utils.printb("my_parser_install_dir: " .. my_parser_install_dir)
-utils.printb("my_ensure_installed:   " .. vim.inspect(my_ensure_installed))
-
--- vim.treesitter.setup(
---     {
--- 		install_dir = my_install_dir,
--- 		parser_install_dir = my_parser_install_dir,
--- 		ensure_installed = my_ensure_installed,
--- 		highlight = { enable = true },
--- 		indent = { enable = true },
--- 	}
--- )
-
-parser_root = vim.fn.fnamemodify(OPT_DIR, ":h:h:h")
-vim.opt.runtimepath:prepend(PARSER_DIR)
-
-vim.opt.runtimepath:prepend("/nix/store/ydlwparyk4mxl6wzhlp3x54zl3nk82c5-pde")
-
-vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
-
-setup_plugin("dial")
 
 -- debug.getinfo(2, "S").source:sub(2):match("(.*/)") or "./"
-
--- OVERSEER
-local overseer = utils.setup_plugin("overseer", function(overseer)
-	overseer.setup({ templates = { "builtin", "my_custom_just_provider" } })
-end)
-
-local overseer = utils.get_plugin("overseer")
--- print(overseer)
-
--- sky.nvim?
--- just.nvim
--- Task.nvim
--- resession.nvim
--- toggleterm.nvim
-
-local function run_just_task()
-	local opts = {}
-	-- Use vim.system to get just tasks as a table
-	local obj = vim.system({ "just", "--summary" }, { text = true }):wait()
-	local tasks = vim.split(obj.stdout, " ")
-
-	vim.ui.select(tasks, { prompt = "Run Just Task:" }, function(choice)
-		if choice then
-			-- Run in a floating terminal (using toggleterm or built-in)
-			vim.cmd("TermExec cmd='just " .. choice .. "'")
-		end
-	end)
-end
-
--- local overseer = require("overseer")
-
-overseer.register_template({
-	name = "Taskfile Runner",
-	generator = function(opts, cb)
-		-- 1. Check for Taskfile
-		local taskfile = vim.fs.find({ "Taskfile.yml", "Taskfile.yaml" }, { upward = true, path = opts.dir })[1]
-		if not taskfile then
-			cb({})
-			return
-		end
-
-		-- 2. Fetch tasks via CLI
-		vim.system({ "task", "--list-all", "--json" }, { text = true }, function(obj)
-			if obj.code ~= 0 then
-				cb({})
-				return
-			end
-
-			local data = vim.json.decode(obj.stdout)
-			local tasks = {}
-
-			-- 3. Map JSON tasks to Overseer format
-			for _, task in ipairs(data.tasks or {}) do
-				table.insert(
-					tasks,
-					overseer.wrap_template({
-						name = task.name,
-						desc = task.desc or "Taskfile task",
-						params = {},
-						builder = function()
-							return {
-								cmd = { "task" },
-								args = { task.name },
-								components = { "default", "on_result_diagnostics" },
-							}
-						end,
-					}, { name = task.name })
-				)
-			end
-
-			cb(tasks)
-		end)
-	end,
-	condition = {
-		callback = function(opts)
-			return vim.fs.find({ "Taskfile.yml", "Taskfile.yaml" }, { upward = true, path = opts.dir })[1] ~= nil
-		end,
-	},
-})
-
-overseer.register_template({
-	name = "Taskfile (with Params)",
-	generator = function(opts, cb)
-		local taskfile = vim.fs.find({ "Taskfile.yml", "Taskfile.yaml" }, { upward = true, path = opts.dir })[1]
-		if not taskfile then
-			return cb({})
-		end
-
-		vim.system({ "task", "--list-all", "--json" }, { text = true }, function(obj)
-			if obj.code ~= 0 then
-				return cb({})
-			end
-			local data = vim.json.decode(obj.stdout)
-			local tasks = {}
-
-			for _, task in ipairs(data.tasks or {}) do
-				table.insert(
-					tasks,
-					overseer.wrap_template({
-						name = task.name,
-						desc = task.desc,
-						-- Define parameters here
-						params = {
-							args = {
-								type = "string",
-								name = "Extra Arguments",
-								desc = "Vars to pass (e.g. VERSION=1.0)",
-								optional = true,
-							},
-						},
-						builder = function(params)
-							local cmd_args = { task.name }
-							if params.args and params.args ~= "" then
-								table.insert(cmd_args, params.args)
-							end
-
-							return {
-								cmd = { "task" },
-								args = cmd_args,
-								components = {
-									"default",
-									{ "display_duration", detail_level = 2 },
-									"on_output_summarize",
-									"on_exit_set_status",
-								},
-							}
-						end,
-					}, { name = task.name })
-				)
-			end
-			cb(tasks)
-		end)
-	end,
-})
-
-local function run_task_with_ui()
-	vim.system({ "task", "--list-all", "--summary" }, { text = true }, function(obj)
-		local tasks = {}
-		for line in obj.stdout:gmatch("[^\r\n]+") do
-			local name = line:match("^%* ([%w%-_]+):")
-			if name then
-				table.insert(tasks, name)
-			end
-		end
-
-		vim.schedule(function()
-			vim.ui.select(tasks, { prompt = "Execute Task:" }, function(choice)
-				if not choice then
-					return
-				end
-				-- Run in a background job or terminal
-				vim.cmd("vsplit | term task " .. choice)
-			end)
-		end)
-	end)
-end
-
--- with watcher
-overseer.register_template({
-	name = "Taskfile (with Watcher)",
-	generator = function(opts, cb)
-		local taskfile = vim.fs.find({ "Taskfile.yml", "Taskfile.yaml" }, { upward = true, path = opts.dir })[1]
-		if not taskfile then
-			return cb({})
-		end
-
-		vim.system({ "task", "--list-all", "--json" }, { text = true }, function(obj)
-			if obj.code ~= 0 then
-				return cb({})
-			end
-			local data = vim.json.decode(obj.stdout)
-			local tasks = {}
-
-			for _, task in ipairs(data.tasks or {}) do
-				table.insert(
-					tasks,
-					overseer.wrap_template({
-						name = task.name,
-						desc = task.desc,
-						params = {
-							args = { type = "string", name = "Vars", optional = true },
-							watch = { type = "boolean", name = "Watch files?", default = false },
-						},
-						builder = function(params)
-							local cmd_args = { task.name }
-							if params.args and params.args ~= "" then
-								table.insert(cmd_args, params.args)
-							end
-
-							local components = { "default" }
-							if params.watch then
-								-- This component tells Overseer to restart the task on save
-								table.insert(components, { "on_save_reload", delay = 500 })
-							end
-
-							return {
-								cmd = { "task" },
-								args = cmd_args,
-								components = components,
-							}
-						end,
-					}, { name = task.name })
-				)
-			end
-			cb(tasks)
-		end)
-	end,
-})
-
-utils.setup_plugin("lualine", {
-	sections = {
-		lualine_x = {
-			{
-				"overseer",
-				label = "Tasks: ", -- Prefix for the section
-				unique = true, -- Only show one representative icon per state
-			},
-		},
-	},
-})
-
-overseer.register_template({
-	name = "Taskfile with Diagnostics",
-	generator = function(opts, cb)
-		local taskfile = vim.fs.find({ "Taskfile.yml", "Taskfile.yaml" }, { upward = true, path = opts.dir })[1]
-		if not taskfile then
-			return cb({})
-		end
-
-		vim.system({ "task", "--list-all", "--json" }, { text = true }, function(obj)
-			if obj.code ~= 0 then
-				return cb({})
-			end
-			local data = vim.json.decode(obj.stdout)
-			local tasks = {}
-
-			for _, task in ipairs(data.tasks or {}) do
-				table.insert(
-					tasks,
-					overseer.wrap_template({
-						name = task.name,
-						params = {
-							watch = { type = "boolean", name = "Watch files?", default = false },
-						},
-						builder = function(params)
-							local components = { "default" }
-							if params.watch then
-								table.insert(components, { "on_save_reload", delay = 500 })
-							end
-
-							-- ADDED: This component parses the output into diagnostics
-							table.insert(components, {
-								"on_result_diagnostics",
-								remove_on_restart = true,
-								-- Standard Python error format (adjust as needed)
-								errorformat = [[%f:%l:%c: %t%*[^ ] %m,%f:%l: %t%*[^ ] %m]],
-							})
-
-							return {
-								cmd = { "task" },
-								args = { task.name },
-								components = components,
-							}
-						end,
-					}, { name = task.name })
-				)
-			end
-			cb(tasks)
-		end)
-	end,
-})
-
--- OverseerRun
--- OverseerToggle
-
-local function taskfile_picker()
-	vim.cmd.packadd("telescope")
-	local pickers = require("telescope.pickers")
-	local finders = require("telescope.finders")
-	local conf = require("telescope.config").values
-	local actions = require("telescope.actions")
-	local action_state = require("telescope.actions.state")
-
-	-- Get tasks from Taskfile
-	local handle = io.popen("task --list-all --summary")
-	local result = handle:read("*a")
-	handle:close()
-
-	local tasks = {}
-	for line in result:gmatch("[^\r\n]+") do
-		local name = line:match("^%* ([%w%-_]+):")
-		if name then
-			table.insert(tasks, name)
-		end
-	end
-
-	pickers
-		.new({}, {
-			prompt_title = "Taskfile Tasks",
-			finder = finders.new_table({ results = tasks }),
-			sorter = conf.generic_sorter({}),
-			attach_mappings = function(prompt_bufnr, map)
-				actions.select_default:replace(function()
-					actions.close(prompt_bufnr)
-					local selection = action_state.get_selected_entry()
-					-- Execute in a terminal
-					vim.cmd("split | term task " .. selection[1])
-				end)
-				return true
-			end,
-		})
-		:find()
-end
-
-vim.keymap.set("n", "<leader>tk", taskfile_picker, { desc = "Pick Taskfile task" })
-
--- common formats for
--- Python (Ruff/Flake8):** `%f:%l:%c: %m`
--- Go (golangci-lint):** `%f:%l:%c: %m`
--- Generic (File:Line:Msg):** `%f:%l: %m`
 
 -- xpcall example
 if false then
@@ -1145,6 +394,7 @@ if false then
 		return -- Silently exit if plugin isn't installed
 	end
 end
+
 
 -- symlinking
 if false then
@@ -1188,7 +438,183 @@ if false then
 	print("Symbolic links created!")
 end
 
--- LSP
+-- LSP ========================================================================================
+
+old_lsp = true
+if old_lsp then
+	vim.lsp.config["rust-analyzer"] = {
+		cmd = { "rust-analyzer" },
+		filetypes = { "rust" },
+		root_markers = { { "Cargo.toml", "cargo.lock" }, ".git" },
+		settings = {},
+	}
+
+	vim.lsp.config["nixd"] = {
+		cmd = { "nixd" },
+		filetypes = { "nix" },
+		root_markers = { "flake.nix", ".git" },
+		settings = {},
+	}
+
+	vim.lsp.config["luals"] = {
+		-- Command and arguments to start the server.
+		cmd = { "lua-language-server" },
+		-- Filetypes to automatically attach to.
+		filetypes = { "lua" },
+		-- Sets the "workspace" to the directory where any of these files is found.
+		-- Files that share a root directory will reuse the LSP server connection.
+		-- Nested lists indicate equal priority, see |vim.lsp.Config|.
+		root_markers = { { ".luarc.json", ".luarc.jsonc" }, ".git" },
+		-- Specific settings to send to the server. The schema is server-defined.
+		-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
+		settings = {
+			Lua = {
+				runtime = {
+					version = "LuaJIT",
+				},
+				workspace = {
+					library = vim.api.nvim_get_runtime_file("", true),
+				},
+				diagnostics = {
+					globals = {
+						"vim",
+					},
+				},
+			},
+		},
+	}
+
+	vim.lsp.config["ruff"] = {
+		-- Command and arguments to start the server.
+		cmd = { "ruff", "server" },
+		-- Filetypes to automatically attach to.
+		filetypes = { "python" },
+		-- Sets the "workspace" to the directory where any of these files is found.
+		-- Files that share a root directory will reuse the LSP server connection.
+		-- Nested lists indicate equal priority, see |vim.lsp.Config|.
+		root_markers = { { ".ruff_cache", "pyproject.toml" }, ".git" },
+		-- Specific settings to send to the server. The schema is server-defined.
+		-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
+		settings = {},
+	}
+
+	vim.lsp.config["pyright"] = {
+		cmd = { "pyright-langserver", "--stdio" },
+		filetypes = { "python" },
+		root_markers = {
+			{ "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile" },
+			".git",
+		},
+		settings = {
+			python = {
+				analysis = {
+					autoSearchPaths = true,
+					useLibraryCodeForTypes = true,
+					typeCheckingMode = "basic", -- You can change this to "strict"
+				},
+			},
+		},
+	}
+
+	local diagnostic_modes = {
+		{
+			name = "End of Line (Virtual Text)",
+			config = {
+				virtual_text = {
+					prefix = "●", -- Could be '■', '▎', 'x'
+					spacing = 4,
+					source = "if_many",
+				},
+				virtual_lines = false,
+				signs = true,
+				underline = true,
+				update_in_insert = false,
+			},
+		},
+		{
+			name = "Under Line (Virtual Lines)",
+			config = {
+				virtual_text = false,
+				-- 'virtual_lines' is now a built-in handler in Nvim 0.10/0.11+
+				virtual_lines = {
+					only_current_line = true, -- Only show for current line to reduce clutter
+					highlight_whole_line = false,
+				},
+				signs = true,
+				underline = true,
+				update_in_insert = false,
+			},
+		},
+		{
+			name = "Gutter Only (Signs)",
+			config = {
+				virtual_text = false,
+				virtual_lines = false,
+				signs = {
+					-- Custom mapping for signs if you want specific characters
+					text = {
+						[vim.diagnostic.severity.ERROR] = "E",
+						[vim.diagnostic.severity.WARN] = "W",
+						[vim.diagnostic.severity.HINT] = "H",
+						[vim.diagnostic.severity.INFO] = "I",
+					},
+				},
+				underline = false, -- Often cleaner to disable underline in "minimal" mode
+				update_in_insert = false,
+			},
+		},
+	}
+
+	-- State tracking
+	local current_mode_index = 1
+	local diagnostics_active = false
+
+	-- 2. Function to set the configuration
+	local function set_diagnostics_mode()
+		if not diagnostics_active then
+			vim.diagnostic.enable(false)
+			-- print("LSP Diagnostics: OFF")
+			return
+		end
+
+		vim.diagnostic.enable(true)
+		local mode = diagnostic_modes[current_mode_index]
+		vim.diagnostic.config(mode.config)
+		print("LSP Mode: " .. mode.name)
+	end
+
+	-- 3. Keybind: Toggle On/Off
+	vim.keymap.set("n", "<leader>dt", function()
+		diagnostics_active = not diagnostics_active
+		set_diagnostics_mode()
+	end, { desc = "Toggle LSP Diagnostics" })
+
+	-- 4. Keybind: Cycle Modes
+	vim.keymap.set("n", "<leader>dm", function()
+		-- Only cycle if active; otherwise turn on and reset to 1
+		if not diagnostics_active then
+			diagnostics_active = true
+			current_mode_index = 1
+		else
+			current_mode_index = current_mode_index + 1
+			if current_mode_index > #diagnostic_modes then
+				current_mode_index = 1
+			end
+		end
+		set_diagnostics_mode()
+	end, { desc = "Cycle LSP Diagnostic Modes" })
+
+	-- Initialize on startup
+	set_diagnostics_mode()
+
+	vim.lsp.enable("luals")
+	vim.lsp.enable("ruff")
+	vim.lsp.enable("pyright")
+	vim.lsp.enable("nixd")
+end
+
+vim.diagnostic.config({ virtual_text = false, virtual_lines = { current_line = true } })
+
 
 -- lua/lsp/python.lua
 -- Neovim 0.12+ native LSP for Python: Ruff + mypy + conform.nvim format-on-save
@@ -1582,135 +1008,745 @@ vim.api.nvim_create_autocmd("LspAttach", {
 -- pip install "python-lsp-server[all]" pylsp-mypy
 -- [Modern Neovim LSP Setup Guide](https://www.youtube.com/watch?v=lljs_7xB7Ps)
 
--- WEZTERM SCRATCH
+-- TELESCOPE =================================================================================================
 
-if WEZTERM then
-	-- https://github.com/ianhomer/wezterm.nvim/blob/main/lua/wezterm.lua --------------------------------------------------
-	local wez = {}
 
-	local directions = {
-		h = "Left",
-		l = "Right",
-		j = "Down",
-		k = "Up",
-	}
+local telescope = utils.setup_plugin_default("telescope", function(telescope)
+	telescope.setup({
+		extensions = {
+			fzf = {
+				fuzzy = true, -- false will only do exact matching
+				override_generic_sorter = true, -- override the generic sorter
+				override_file_sorter = true, -- override the file sorter
+				case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+				-- the default case_mode is "smart_case"
+			},
+		},
+	})
+	telescope.load_extension("fzf")
+	print("loaded telescope with fzf-native")
+end)
 
-	local arrows = {
-		h = "left",
-		l = "right",
-		j = "down",
-		k = "up",
-	}
+-- TREESITTER =================================================================================================
 
-	local function command(args)
-		os.execute("wezterm cli " .. args)
-	end
 
-	function wez.navigate(direction)
-		command("activate-pane-direction " .. directions[direction])
-	end
+vim.opt.indentexpr = "v:lua.vim.treesitter.indent()"
+-- vim.opt.foldmethod = "expr" + foldexpr
+-- vim.treesitter.query.add(lang, name, str) -- TODO
+-- vim.treesitter.language.register() -- TODO
 
-	function wez.go_direction(direction)
-		local current_window = vim.fn.win_getid()
-		vim.api.nvim_command("wincmd " .. direction)
-		local at_edge = current_window == vim.fn.win_getid()
-		if at_edge then
-			wez.navigate(direction)
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.indentexpr = "v:lua.vim.treesitter.indent()"
+
+-- Register filetype aliases
+vim.treesitter.language.register("cpp", "cuda")
+vim.treesitter.language.register("javascript", "jsx")
+vim.treesitter.language.register("typescript", "tsx")
+
+-- Optional: Auto-install parsers on first run (custom helper)
+-- local parsers_to_ensure = { "c", "lua", "python", "javascript", "typescript", "bash", "json" }
+-- for _, lang in ipairs(parsers_to_ensure) do
+-- 	if not vim.treesitter.language.is_installed(lang) then  TODO
+-- 		vim.cmd.TSInstall(lang)
+-- 	end
+-- end
+
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.indentexpr = "v:lua.vim.treesitter.indent()"
+
+-- vim.g.treesitter_filetype_exclude = { "markdown", "txt" }
+
+-- TODO: treesitter queries in RTP/queries/<lang>/
+
+vim.treesitter.query.add_predicate(
+	"python",
+	"highlights",
+	[[
+  (function_definition
+    name: (identifier) @function.def)
+]]
+)
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = { "rust", "go", "python" }, -- add languages
+	callback = function()
+		if not vim.treesitter.language.get_lang(vim.bo.filetype) then
+			-- Or use a plugin/helper for installation
+			print("No Treesitter parser for " .. vim.bo.filetype)
 		end
-	end
+	end,
+})
 
-	function wez.keys()
-		local keys = {}
-		for key, _ in pairs(directions) do
-			table.insert(keys, {
-				"<c-" .. key .. ">",
-				function()
-					wez.go_direction(key)
-				end,
-				mode = { "n" },
-				desc = "Navigate " .. arrows[key],
-			})
-		end
+pcall(vim.api.nvim_del_user_command, "TSInstall")
+pcall(vim.api.nvim_del_user_command, "TSInstallSync") -- if it exists
+pcall(vim.api.nvim_del_user_command, "TSInstallFromGrammar")
 
-		return keys
-	end
-
-	function wez.setup(opts)
-		for key, _ in pairs(directions) do
-			vim.keymap.set("", "<c-" .. key .. ">", function()
-				wez.go_direction(key)
-			end)
-			-- support ctrl arrow keys in normal an insert mode
-			vim.keymap.set({ "i", "n", "v", "x", "c" }, "<c-" .. arrows[key] .. ">", function()
-				print("D" .. key)
-				M.go_direction(key)
-			end)
-		end
-	end
-
-	-- return wez
-	--
-	-- https://github.com/letieu/wezterm-move.nvim/blob/master/lua/wezterm-move/init.lua ----------------------------------
-	local WM = {}
-
-	local wezterm_directions = { h = "Left", j = "Down", k = "Up", l = "Right" }
-
-	-- @param direction: string (h, j, k, l)
-	local function at_edge(direction)
-		return vim.fn.winnr() == vim.fn.winnr(direction)
-	end
-
-	local function wezterm_exec(cmd)
-		local command = vim.deepcopy(cmd)
-		if vim.fn.executable("wezterm.exe") == 1 then
-			table.insert(command, 1, "wezterm.exe")
-		else
-			table.insert(command, 1, "wezterm")
-		end
-		table.insert(command, 2, "cli")
-		return vim.fn.system(command)
-	end
-
-	-- @param direction: string (h, j, k, l)
-	local function send_key_to_wezterm(direction)
-		wezterm_exec({ "activate-pane-direction", wezterm_directions[direction] })
-	end
-
-	-- @param direction: string (h, j, k, l)
-	WM.move = function(direction)
-		if at_edge(direction) then
-			send_key_to_wezterm(direction)
-		else
-			vim.cmd("wincmd " .. direction)
-		end
-	end
+-- OR:
+for _, cmd in ipairs({ "TSInstall", "TSInstallSync", "TSInstallFromGrammar" }) do
+	pcall(vim.api.nvim_del_user_command, cmd)
 end
 
--- DAP
+-- OR:
+vim.api.nvim_create_user_command("TSInstall", function()
+	vim.notify("TSInstall is disabled. Manage parsers externally.", vim.log.levels.WARN)
+end, {
+	nargs = "*",
+	complete = function()
+		return {}
+	end,
+})
 
-setup_plugin("dap-python", function()
-	local dap_python = get_plugin("dap-python")
-	dap_python.setup("debugpy-adapter")
-	dap_python.test_runner = "pytest"
-	vim.keymap.set("n", "<leader>tt", function()
-		print("Leader is working!")
-	end)
-	vim.keymap.set("n", "<leader>pp", function()
-		print("This works")
-	end)
-	vim.keymap.set("n", "<leader>dn", function()
-		get_plugin("dap-python").test_method()
-	end)
-	vim.keymap.set("n", "<leader>df", function()
-		get_plugin("dap-python").test_class()
-	end)
-	vim.keymap.set("v", "<leader>ds", function()
-		get_plugin("dap-python").debug_selection()
-	end)
+-- To manually toggle highlighting at runtime:
+-- ```vim
+-- :TSEnable highlight
+-- :TSDisable highlight
+-- ```
+
+-- print(vim.o.runtimepath:find(vim.env.VIMRUNTIME) ~= nil)
+
+-- print(vim.inspect(vim.opt.runtimepath))
+
+-- setup_plugin("nvim-treesitter", function(treesitter)
+-- 	local TS_LANGUAGES = {
+-- 		"haskell",
+-- 		"javascript",
+-- 		"json",
+-- 		"lua",
+-- 		"markdown",
+-- 		"nix",
+-- 		"python",
+-- 		"rust",
+-- 		"toml",
+-- 		"typescript",
+-- 		"yaml",
+-- 		"zig",
+-- 	}
+
+-- 	utils.printbv("Setting up treesitter.")
+-- 	local my_install_dir = (not HAS_NIX) and ((vim.fn.stdpath("data")) .. "/site") or DERIVATION_DIR
+-- 	utils.printv(my_install_dir)
+-- 	local my_parser_install_dir = (not HAS_NIX) and (vim.fn.stdpath("data")) .. "/site/parsers" or nil
+-- 	utils.printv(my_parser_install_dir)
+-- 	local my_ensure_installed = HAS_NIX and {} or TS_LANGUAGES
+-- 	utils.printv(vim.inspect(my_ensure_installed))
+
+-- 	utils.printbv("Treesitter exists")
+-- 	(treesitter.setup)({
+-- 		install_dir = my_install_dir,
+-- 		parser_install_dir = my_parser_install_dir,
+-- 		ensure_installed = my_ensure_installed,
+-- 		highlight = { enable = true },
+-- 		indent = { enable = true },
+-- 	})
+-- end)
+
+local my_install_dir = (not HAS_NIX) and ((vim.fn.stdpath("data")) .. "/site") or DERIVATION_DIR
+
+local my_parser_install_dir = my_install_dir .. "/parser"
+-- (not HAS_NIX) and (vim.fn.stdpath("data")) .. "/site/parsers" or DERIVATION_DIR ..
+
+local my_ensure_installed = HAS_NIX and {} or TS_LANGUAGES
+
+utils.printbv("Setting up treesitter.")
+utils.printb("my_install_dir:        " .. my_install_dir)
+utils.printb("my_parser_install_dir: " .. my_parser_install_dir)
+utils.printb("my_ensure_installed:   " .. vim.inspect(my_ensure_installed))
+
+-- vim.treesitter.setup(
+--     {
+-- 		install_dir = my_install_dir,
+-- 		parser_install_dir = my_parser_install_dir,
+-- 		ensure_installed = my_ensure_installed,
+-- 		highlight = { enable = true },
+-- 		indent = { enable = true },
+-- 	}
+-- )
+
+parser_root = vim.fn.fnamemodify(OPT_DIR, ":h:h:h")
+vim.opt.runtimepath:prepend(PARSER_DIR)
+
+
+vim.treesitter.language.register("py", "python")
+
+vim.filetype.add({
+	extension = { xit = "xit" },
+})
+vim.treesitter.language.register("xit", "xit")
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "xit",
+	callback = function(ev)
+		print("executing xit callback")
+		vim.treesitter.language.add("xit", { path = PARSER_DIR .. "/xit.so" })
+		vim.treesitter.start(ev.buf, "xit")
+	end,
+})
+
+-- v_an, v_in, v_]n, v_[n now provide incremental selection of treesitter nodes
+
+-- put in ftplugin/<filetype>.lua ?
+
+-- config/
+-- ├── ftdetect/
+-- │   └── xit.lua
+-- ├── ftplugin/
+-- │   └── xit.lua       ← here
+-- ├── syntax/
+-- │   └── xit.lua
+-- └── init.lua
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "lua",
+	callback = function()
+		vim.treesitter.start()
+	end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+	callback = function()
+		pcall(vim.treesitter.start) -- pcall: silently skips if no parser
+	end,
+})
+
+
+-- OVERSEER =================================================================================================
+
+local overseer = utils.setup_plugin("overseer", function(overseer)
+	overseer.setup({ templates = { "builtin", "my_custom_just_provider" } })
 end)
-setup_plugin("dapui")
-setup_plugin("nvim-dap-virtual-text")
-setup_plugin("dap")
+
+local overseer = utils.get_plugin("overseer")
+-- print(overseer)
+
+-- sky.nvim?
+-- just.nvim
+-- Task.nvim
+-- resession.nvim
+-- toggleterm.nvim
+
+local function run_just_task()
+	local opts = {}
+	-- Use vim.system to get just tasks as a table
+	local obj = vim.system({ "just", "--summary" }, { text = true }):wait()
+	local tasks = vim.split(obj.stdout, " ")
+
+	vim.ui.select(tasks, { prompt = "Run Just Task:" }, function(choice)
+		if choice then
+			-- Run in a floating terminal (using toggleterm or built-in)
+			vim.cmd("TermExec cmd='just " .. choice .. "'")
+		end
+	end)
+end
+
+-- local overseer = require("overseer")
+
+overseer.register_template({
+	name = "Taskfile Runner",
+	generator = function(opts, cb)
+		-- 1. Check for Taskfile
+		local taskfile = vim.fs.find({ "Taskfile.yml", "Taskfile.yaml" }, { upward = true, path = opts.dir })[1]
+		if not taskfile then
+			cb({})
+			return
+		end
+
+		-- 2. Fetch tasks via CLI
+		vim.system({ "task", "--list-all", "--json" }, { text = true }, function(obj)
+			if obj.code ~= 0 then
+				cb({})
+				return
+			end
+
+			local data = vim.json.decode(obj.stdout)
+			local tasks = {}
+
+			-- 3. Map JSON tasks to Overseer format
+			for _, task in ipairs(data.tasks or {}) do
+				table.insert(
+					tasks,
+					overseer.wrap_template({
+						name = task.name,
+						desc = task.desc or "Taskfile task",
+						params = {},
+						builder = function()
+							return {
+								cmd = { "task" },
+								args = { task.name },
+								components = { "default", "on_result_diagnostics" },
+							}
+						end,
+					}, { name = task.name })
+				)
+			end
+
+			cb(tasks)
+		end)
+	end,
+	condition = {
+		callback = function(opts)
+			return vim.fs.find({ "Taskfile.yml", "Taskfile.yaml" }, { upward = true, path = opts.dir })[1] ~= nil
+		end,
+	},
+})
+
+overseer.register_template({
+	name = "Taskfile (with Params)",
+	generator = function(opts, cb)
+		local taskfile = vim.fs.find({ "Taskfile.yml", "Taskfile.yaml" }, { upward = true, path = opts.dir })[1]
+		if not taskfile then
+			return cb({})
+		end
+
+		vim.system({ "task", "--list-all", "--json" }, { text = true }, function(obj)
+			if obj.code ~= 0 then
+				return cb({})
+			end
+			local data = vim.json.decode(obj.stdout)
+			local tasks = {}
+
+			for _, task in ipairs(data.tasks or {}) do
+				table.insert(
+					tasks,
+					overseer.wrap_template({
+						name = task.name,
+						desc = task.desc,
+						-- Define parameters here
+						params = {
+							args = {
+								type = "string",
+								name = "Extra Arguments",
+								desc = "Vars to pass (e.g. VERSION=1.0)",
+								optional = true,
+							},
+						},
+						builder = function(params)
+							local cmd_args = { task.name }
+							if params.args and params.args ~= "" then
+								table.insert(cmd_args, params.args)
+							end
+
+							return {
+								cmd = { "task" },
+								args = cmd_args,
+								components = {
+									"default",
+									{ "display_duration", detail_level = 2 },
+									"on_output_summarize",
+									"on_exit_set_status",
+								},
+							}
+						end,
+					}, { name = task.name })
+				)
+			end
+			cb(tasks)
+		end)
+	end,
+})
+
+local function run_task_with_ui()
+	vim.system({ "task", "--list-all", "--summary" }, { text = true }, function(obj)
+		local tasks = {}
+		for line in obj.stdout:gmatch("[^\r\n]+") do
+			local name = line:match("^%* ([%w%-_]+):")
+			if name then
+				table.insert(tasks, name)
+			end
+		end
+
+		vim.schedule(function()
+			vim.ui.select(tasks, { prompt = "Execute Task:" }, function(choice)
+				if not choice then
+					return
+				end
+				-- Run in a background job or terminal
+				vim.cmd("vsplit | term task " .. choice)
+			end)
+		end)
+	end)
+end
+
+-- with watcher
+overseer.register_template({
+	name = "Taskfile (with Watcher)",
+	generator = function(opts, cb)
+		local taskfile = vim.fs.find({ "Taskfile.yml", "Taskfile.yaml" }, { upward = true, path = opts.dir })[1]
+		if not taskfile then
+			return cb({})
+		end
+
+		vim.system({ "task", "--list-all", "--json" }, { text = true }, function(obj)
+			if obj.code ~= 0 then
+				return cb({})
+			end
+			local data = vim.json.decode(obj.stdout)
+			local tasks = {}
+
+			for _, task in ipairs(data.tasks or {}) do
+				table.insert(
+					tasks,
+					overseer.wrap_template({
+						name = task.name,
+						desc = task.desc,
+						params = {
+							args = { type = "string", name = "Vars", optional = true },
+							watch = { type = "boolean", name = "Watch files?", default = false },
+						},
+						builder = function(params)
+							local cmd_args = { task.name }
+							if params.args and params.args ~= "" then
+								table.insert(cmd_args, params.args)
+							end
+
+							local components = { "default" }
+							if params.watch then
+								-- This component tells Overseer to restart the task on save
+								table.insert(components, { "on_save_reload", delay = 500 })
+							end
+
+							return {
+								cmd = { "task" },
+								args = cmd_args,
+								components = components,
+							}
+						end,
+					}, { name = task.name })
+				)
+			end
+			cb(tasks)
+		end)
+	end,
+})
+
+utils.setup_plugin("lualine", {
+	sections = {
+		lualine_x = {
+			{
+				"overseer",
+				label = "Tasks: ", -- Prefix for the section
+				unique = true, -- Only show one representative icon per state
+			},
+		},
+	},
+})
+
+overseer.register_template({
+	name = "Taskfile with Diagnostics",
+	generator = function(opts, cb)
+		local taskfile = vim.fs.find({ "Taskfile.yml", "Taskfile.yaml" }, { upward = true, path = opts.dir })[1]
+		if not taskfile then
+			return cb({})
+		end
+
+		vim.system({ "task", "--list-all", "--json" }, { text = true }, function(obj)
+			if obj.code ~= 0 then
+				return cb({})
+			end
+			local data = vim.json.decode(obj.stdout)
+			local tasks = {}
+
+			for _, task in ipairs(data.tasks or {}) do
+				table.insert(
+					tasks,
+					overseer.wrap_template({
+						name = task.name,
+						params = {
+							watch = { type = "boolean", name = "Watch files?", default = false },
+						},
+						builder = function(params)
+							local components = { "default" }
+							if params.watch then
+								table.insert(components, { "on_save_reload", delay = 500 })
+							end
+
+							-- ADDED: This component parses the output into diagnostics
+							table.insert(components, {
+								"on_result_diagnostics",
+								remove_on_restart = true,
+								-- Standard Python error format (adjust as needed)
+								errorformat = [[%f:%l:%c: %t%*[^ ] %m,%f:%l: %t%*[^ ] %m]],
+							})
+
+							return {
+								cmd = { "task" },
+								args = { task.name },
+								components = components,
+							}
+						end,
+					}, { name = task.name })
+				)
+			end
+			cb(tasks)
+		end)
+	end,
+})
+
+-- OverseerRun
+-- OverseerToggle
+
+local function taskfile_picker()
+	vim.cmd.packadd("telescope")
+	local pickers = require("telescope.pickers")
+	local finders = require("telescope.finders")
+	local conf = require("telescope.config").values
+	local actions = require("telescope.actions")
+	local action_state = require("telescope.actions.state")
+
+	-- Get tasks from Taskfile
+	local handle = io.popen("task --list-all --summary")
+	local result = handle:read("*a")
+	handle:close()
+
+	local tasks = {}
+	for line in result:gmatch("[^\r\n]+") do
+		local name = line:match("^%* ([%w%-_]+):")
+		if name then
+			table.insert(tasks, name)
+		end
+	end
+
+	pickers
+		.new({}, {
+			prompt_title = "Taskfile Tasks",
+			finder = finders.new_table({ results = tasks }),
+			sorter = conf.generic_sorter({}),
+			attach_mappings = function(prompt_bufnr, map)
+				actions.select_default:replace(function()
+					actions.close(prompt_bufnr)
+					local selection = action_state.get_selected_entry()
+					-- Execute in a terminal
+					vim.cmd("split | term task " .. selection[1])
+				end)
+				return true
+			end,
+		})
+		:find()
+end
+
+vim.keymap.set("n", "<leader>tk", taskfile_picker, { desc = "Pick Taskfile task" })
+
+-- common formats for
+-- Python (Ruff/Flake8):** `%f:%l:%c: %m`
+-- Go (golangci-lint):** `%f:%l:%c: %m`
+-- Generic (File:Line:Msg):** `%f:%l: %m`
+
+
+-- UNSORTED =================================================================================================
+
+utils.setup_plugin("xit")
+
+-- from recent init.lua
+if false then --=============
+	setup_plugin("plenary")
+	setup_plugin("nio")
+	setup_plugin("nvim-web-devicons")
+
+	setup_plugin("zen-mode")
+	setup_plugin("lualine")
+	setup_plugin("nvim-navic")
+	setup_plugin("bufferline")
+	setup_plugin("statuscol")
+
+	setup_plugin("treesitter-modules")
+	setup_plugin("dropbar")
+	utils.packadd("nvim-navbuddy")
+	setup_plugin("aerial")
+
+	setup_plugin("oil")
+	setup_plugin("yazi")
+	setup_plugin("neo-tree")
+	setup_plugin("nvim-tree")
+
+	setup_plugin("pickme")
+	-- setup_plugin("telescope") MOVED
+
+	setup_plugin("fzf-lua")
+	setup_plugin("deck")
+
+	setup_plugin("mini.indent")
+	setup_plugin("mini.keymap")
+	setup_plugin("mini.sessions")
+
+	setup_plugin("snacks")
+	setup_plugin("blink")
+
+	setup_plugin("hlslens")
+	setup_plugin("hlsearch")
+
+	setup_plugin("grug-far")
+	setup_plugin("spectre")
+
+	setup_plugin("flybuf")
+	setup_plugin("stickybuf")
+	setup_plugin("swm", function(swm)
+		map("n", "<C-w>h", swm.h)
+		map("n", "<C-w>j", swm.j)
+		map("n", "<C-w>k", swm.k)
+		map("n", "<C-w>l", swm.l)
+	end)
+
+	setup_plugin("smart-splits")
+
+	setup_plugin("ufo")
+
+	setup_plugin("NeoComposer")
+	setup_plugin("nvim-macros", {
+		json_file_path = "./macros.json",
+		default_macro_register = "a",
+		json_formatter = "jq",
+	})
+	setup_plugin("recorder")
+
+	utils.packadd("vim-visual-multi")
+
+	setup_plugin("leap")
+	setup_plugin("flash")
+	setup_plugin("hop")
+
+	setup_plugin("rainbow-delimiters")
+	setup_plugin("nvim-autopairs")
+
+	utils.packadd("vim-sandwich")
+
+	setup_plugin("nvim-surround")
+
+	utils.packadd("vim-mundo")
+
+	setup_plugin("mini.keymap")
+	setup_plugin("hydra")
+	setup_plugin("insx")
+	setup_plugin("which-key")
+
+	setup_plugin("indentmini")
+	utils.packadd("indent-blankline")
+	setup_plugin("nvim-anydent")
+	setup_plugin("mini.align")
+	utils.packadd("tabular")
+
+	setup_plugin("nvim-treesitter-textobjects")
+	utils.packadd("nvim-various-textobjs")
+
+	setup_plugin("Comment")
+	setup_plugin("todo-comments")
+	utils.packadd("vim-commentary")
+
+	setup_plugin("treesj")
+	setup_plugin("dial")
+	setup_plugin("harpoon-core")
+	setup_plugin("marks")
+	setup_plugin("markit")
+
+	setup_plugin("nvim-pasta")
+
+	setup_plugin("beam")
+
+	setup_plugin("blink.cmp")
+	setup_plugin("nvim-cmp")
+
+	setup_plugin("friendly-snippets")
+	setup_plugin("ultisnips")
+	setup_plugin("LuaSnip")
+
+	setup_plugin("cmp-nvim-lsp")
+	setup_plugin("cmp-buffer")
+	setup_plugin("cmp-path")
+	setup_plugin("cmp-cmdline")
+
+	setup_plugin("lsp-format")
+	setup_plugin("lspkind")
+
+	setup_plugin("lspsaga")
+
+	setup_plugin("lazydev")
+	setup_plugin("rustaceanvim")
+	setup_plugin("crates")
+	setup_plugin("haskell-tools")
+
+	setup_plugin("none-ls")
+
+	setup_plugin("guard")
+	setup_plugin("conform")
+
+	setup_plugin("asyncrun")
+	setup_plugin("neotest-haskell")
+	setup_plugin("neotest-python")
+	setup_plugin("neotest")
+	setup_plugin("dap-python", function(dap_python)
+		(dap_python.setup)("debugpy-adapter")
+		dap_python.test_runner = "pytest"
+		map("n", "<leader>tt", function()
+			print("Leader is working!")
+		end)
+		map("n", "<leader>pp", function()
+			print("This works")
+		end)
+		map("n", "<leader>dn", dap_python.test_method)
+		map("n", "<leader>df", dap_python.test_class)
+		map("v", "<leader>ds", dap_python.debug_selection)
+	end)
+	setup_plugin("dapui")
+	setup_plugin("nvim-dap-virtual-text")
+	setup_plugin("dap")
+	setup_plugin("mypy")
+	setup_plugin("nvim-lint")
+
+	setup_plugin("trouble.nvim")
+	setup_plugin("quicker")
+	setup_plugin("nvim-bqf")
+
+	setup_plugin("vim-floaterm")
+	setup_plugin("toggleterm")
+
+	setup_plugin("overseer")
+
+	setup_plugin("refactoring")
+
+	setup_plugin("project")
+	setup_plugin("telescope-project")
+
+	setup_plugin("jj")
+	setup_plugin("jujutsu")
+	setup_plugin("lazygit")
+	setup_plugin("git-conflict")
+	setup_plugin("neogit")
+	setup_plugin("jiejie")
+	setup_plugin("diffview")
+	setup_plugin("gitsigns")
+	setup_plugin("vim-fugitive")
+
+	setup_plugin("octo")
+	setup_plugin("gitlab-nvim")
+	setup_plugin("gitlab")
+
+	setup_plugin("dashboard-nvim")
+	setup_plugin("dashboard")
+	setup_plugin("noice")
+	setup_plugin("modes")
+
+	setup_plugin("fidget")
+	setup_plugin("nvim-notify")
+	setup_plugin("headlines")
+
+	setup_plugin("auto-session")
+	setup_plugin("persistence")
+
+	utils.packadd("vimtex", function()
+		vim.g.vimtex_view_method = "zathura"
+	end)
+	setup_plugin("texmagic")
+	setup_plugin("schemastore")
+	setup_plugin("firenvim")
+	setup_plugin("render-markdown")
+	setup_plugin("jupytext")
+	setup_plugin("quarto")
+	setup_plugin("markdown-preview")
+
+	setup_plugin("structlog")
+	setup_plugin("neorepl")
+end
+
+setup_plugin("dial")
 
 local scratch = false
 if scratch then
@@ -1818,51 +1854,51 @@ if init_from_stable then
 	-- brew install haskell-language-server
 
 	--[[ DESIRED MAPPINGS/ACTIONS
-------------------
---- NAVIGATION ---
-------------------
-- windows: up down left right, fzf menu, menu navigation (up down), move/rearrange
-- tabs: up down left right, fzf menu, menu navigation (up down), move/rearrange
-- buffers: up down left right, fzf menu, menu navigation (up down), move/rearrange
+	------------------
+	--- NAVIGATION ---
+	------------------
+	- windows: up down left right, fzf menu, menu navigation (up down), move/rearrange
+	- tabs: up down left right, fzf menu, menu navigation (up down), move/rearrange
+	- buffers: up down left right, fzf menu, menu navigation (up down), move/rearrange
 
-------------
---- SORT ---
-------------
-- open quickfix window
-- open floating terminal
-- copy selection to new file
-- jump to reference (next, previous)
-- jump to definition
-- open search and replace (with preview)
-- fold block
-- fold/unfold all of given level
-- toggle value under cursor
-- rename everywhere (optionally with preview)
-- search pattern/regex in given files -> save results list & use it to navigate
-- show keybinds available
-- add/view/edit comment/annotation pointing to given location
-- view/navigate TODOs and comments
-- insert snippet
-- format code (optionally only under selection)
-- edit selection in new buffer
-- dull colors outside of selection
-- edit filesystem as a buffer (oil.nvim?)
-- get autocomplete suggestion
-- check spelling in file (ONLY on command!)
-- view diff (with saved, last commit, etc.)
-- file tree view
-- navigate between search results
-- toggle to light colors (or even lighten/darken colors, increase contrast -> write plugin?)
-- jump to next syntactic object
-- command to run changed tests (use testmon or analogous)
-- get LLM feedback
-- unified preview_+accept/reject framework
-- multi-line / multi-location edits
+	------------
+	--- SORT ---
+	------------
+	- open quickfix window
+	- open floating terminal
+	- copy selection to new file
+	- jump to reference (next, previous)
+	- jump to definition
+	- open search and replace (with preview)
+	- fold block
+	- fold/unfold all of given level
+	- toggle value under cursor
+	- rename everywhere (optionally with preview)
+	- search pattern/regex in given files -> save results list & use it to navigate
+	- show keybinds available
+	- add/view/edit comment/annotation pointing to given location
+	- view/navigate TODOs and comments
+	- insert snippet
+	- format code (optionally only under selection)
+	- edit selection in new buffer
+	- dull colors outside of selection
+	- edit filesystem as a buffer (oil.nvim?)
+	- get autocomplete suggestion
+	- check spelling in file (ONLY on command!)
+	- view diff (with saved, last commit, etc.)
+	- file tree view
+	- navigate between search results
+	- toggle to light colors (or even lighten/darken colors, increase contrast -> write plugin?)
+	- jump to next syntactic object
+	- command to run changed tests (use testmon or analogous)
+	- get LLM feedback
+	- unified preview_+accept/reject framework
+	- multi-line / multi-location edits
 
-AUTOMATIC/TOGGLABLE FUNCTIONALITIES
---> dull colors everywhere except in active block (via treesitter?)
---> custom syntax highlighting for my special formats (from consilium-notes: jn, ...)
---]]
+	AUTOMATIC/TOGGLABLE FUNCTIONALITIES
+	--> dull colors everywhere except in active block (via treesitter?)
+	--> custom syntax highlighting for my special formats (from consilium-notes: jn, ...)
+	--]]
 	-------------------------------------------------------------------------------------------------------------- VARIABLES
 	-- local o = vim.opt
 	-- local g = vim.g
@@ -2341,23 +2377,23 @@ AUTOMATIC/TOGGLABLE FUNCTIONALITIES
 
 	-- See https://github.com/neovim/neovim/pull/7406
 	--[[
-vim.g.terminal_color_0 = "$color.terminalColor00$"
-vim.g.terminal_color_1 = "$color.terminalColor01$"
-vim.g.terminal_color_2 = "$color.terminalColor02$"
-vim.g.terminal_color_3 = "$color.terminalColor03$"
-vim.g.terminal_color_4 = "$color.terminalColor04$"
-vim.g.terminal_color_5 = "$color.terminalColor05$"
-vim.g.terminal_color_6 = "$color.terminalColor06$"
-vim.g.terminal_color_7 = "$color.terminalColor07$"
-vim.g.terminal_color_8 = "$color.terminalColor08$"
-vim.g.terminal_color_9 = "$color.terminalColor09$"
-vim.g.terminal_color_10 = "$color.terminalColor0A$"
-vim.g.terminal_color_11 = "$color.terminalColor0B$"
-vim.g.terminal_color_12 = "$color.terminalColor0C$"
-vim.g.terminal_color_13 = "$color.terminalColor0D$"
-vim.g.terminal_color_14 = "$color.terminalColor0E$"
-vim.g.terminal_color_15 = "$color.terminalColor0F$"
---]]
+	vim.g.terminal_color_0 = "$color.terminalColor00$"
+	vim.g.terminal_color_1 = "$color.terminalColor01$"
+	vim.g.terminal_color_2 = "$color.terminalColor02$"
+	vim.g.terminal_color_3 = "$color.terminalColor03$"
+	vim.g.terminal_color_4 = "$color.terminalColor04$"
+	vim.g.terminal_color_5 = "$color.terminalColor05$"
+	vim.g.terminal_color_6 = "$color.terminalColor06$"
+	vim.g.terminal_color_7 = "$color.terminalColor07$"
+	vim.g.terminal_color_8 = "$color.terminalColor08$"
+	vim.g.terminal_color_9 = "$color.terminalColor09$"
+	vim.g.terminal_color_10 = "$color.terminalColor0A$"
+	vim.g.terminal_color_11 = "$color.terminalColor0B$"
+	vim.g.terminal_color_12 = "$color.terminalColor0C$"
+	vim.g.terminal_color_13 = "$color.terminalColor0D$"
+	vim.g.terminal_color_14 = "$color.terminalColor0E$"
+	vim.g.terminal_color_15 = "$color.terminalColor0F$"
+	--]]
 	local enable_font_variants = true
 	--vim.g.melange_enable_font_variants == nil or vim.g.melange_enable_font_variants
 
@@ -2762,7 +2798,7 @@ vim.g.terminal_color_15 = "$color.terminalColor0F$"
 	--     "saadparwaiz1/cmp_luasnip",
 	-- }
 	--[[
-local old_setup_nvim_cmp = function()
+    local old_setup_nvim_cmp = function()
 	vim.lsp.config("*", { capabilities = require("cmp_nvim_lsp").default_capabilities() })
 	vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 	local cmp = require("cmp")
@@ -2856,8 +2892,8 @@ local old_setup_nvim_cmp = function()
 		},
 		sorting = defaults.sorting,
 	}
-end
-]]
+	end
+	]]
 
 	printv("CHECKPOINT AC")
 	setup_plugin({ ----------------------------------------------------------------------------------------------- mini.nvim
@@ -3988,44 +4024,44 @@ end
 
 if mappings_lua then
 	--[[
-DESIRED MAPPINGS/ACTIONS
+	DESIRED MAPPINGS/ACTIONS
 
-- open quickfix window
-- open floating terminal
-- copy selection to new file
-- jump to reference (next, previous)
-- jump to definition
-- open search and replace (with preview)
-- fold block
-- fold/unfold all of given level
-- toggle value under cursor
-- rename everywhere (optionally with preview)
-- search pattern/regex in given files -> save results list & use it to navigate
-- show keybinds available
-- add/view/edit comment/annotation pointing to given location
-- view/navigate TODOs and comments
-- insert snippet
-- format code (optionally only under selection)
-- edit selection in new buffer
-- dull colors outside of selection
-- edit filesystem as a buffer (oil.nvim?)
-- get autocomplete suggestion
-- check spelling in file (ONLY on command!)
-- view diff (with saved, last commit, etc.)
-- file tree view
-- navigate between search results
-- toggle to light colors (or even lighten/darken colors, increase contrast -> write plugin?)
-- jump to next syntactic object ( 
-- command to run changed tests (use testmon or analogous)
-- get LLM feedback
-- unified preview_+accept/reject framework
-- multi-line / multi-location edits
+	- open quickfix window
+	- open floating terminal
+	- copy selection to new file
+	- jump to reference (next, previous)
+	- jump to definition
+	- open search and replace (with preview)
+	- fold block
+	- fold/unfold all of given level
+	- toggle value under cursor
+	- rename everywhere (optionally with preview)
+	- search pattern/regex in given files -> save results list & use it to navigate
+	- show keybinds available
+	- add/view/edit comment/annotation pointing to given location
+	- view/navigate TODOs and comments
+	- insert snippet
+	- format code (optionally only under selection)
+	- edit selection in new buffer
+	- dull colors outside of selection
+	- edit filesystem as a buffer (oil.nvim?)
+	- get autocomplete suggestion
+	- check spelling in file (ONLY on command!)
+	- view diff (with saved, last commit, etc.)
+	- file tree view
+	- navigate between search results
+	- toggle to light colors (or even lighten/darken colors, increase contrast -> write plugin?)
+	- jump to next syntactic object ( 
+	- command to run changed tests (use testmon or analogous)
+	- get LLM feedback
+	- unified preview_+accept/reject framework
+	- multi-line / multi-location edits
 
-AUTOMATIC/TOGGLABLE FUNCTIONALITIES
---> dull colors everywhere except in active block (via treesitter?)
---> custom syntax highlighting for my special formats (from consilium-notes: jn, ...)
+	AUTOMATIC/TOGGLABLE FUNCTIONALITIES
+	--> dull colors everywhere except in active block (via treesitter?)
+	--> custom syntax highlighting for my special formats (from consilium-notes: jn, ...)
 
---]]
+	--]]
 
 	-- Set up a local map function for convenience
 	local map = vim.keymap.set
