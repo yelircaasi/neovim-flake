@@ -14,6 +14,7 @@ vim.opt.packpath:prepend(DERIVATION_DIR)
 local NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string
 global VERBOSE: boolean = false
 global SAFE: boolean = true
+global LAYERS: {number}|nil = nil
 dofile(NVIM_HOME .. "/before_init.lua")
 
 -- GLOBAL OPTIONS ======================================================================================================
@@ -60,7 +61,7 @@ global utils = require("lua.utils").setup({
 	verbose = VERBOSE,
 	safe = SAFE,
 	prepend_safe = prepend_safe,
-	layers = {0, 1,},
+	layers = LAYERS,
 	plugin_paths = plugin_paths,
 	dependencies = dofile(CONFIG_DIR .. "/meta/dependencies.lua") as {string:{string}},
 	plugins_by_layer = dofile(CONFIG_DIR .. "/meta/plugin_layers.lua") as {number:{number:{string}}},

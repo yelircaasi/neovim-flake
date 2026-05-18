@@ -6,11 +6,14 @@
 -- print(vim.o.runtimepath:find(vim.env.VIMRUNTIME) ~= nil)
 -- -- vim.o.runtimepath:prepend(vim.env.VIMRUNTIME)
 -- print(vim.o.runtimepath:find(vim.env.VIMRUNTIME) ~= nil)
--- VERBOSE = false
--- SAFE = true
+
 -- print(vim.env.VIMRUNTIME)
 -- vim.opt.runtimepath:prepend(vim.env.VIMRUNTIME)
 -- print(vim.o.runtimepath:find(vim.env.VIMRUNTIME, 1, true) ~= nil)
 
 -- print(vim.inspect(vim.opt.runtimepath))
 -- print(vim.inspect(vim.opt.packpath))
+
+VERBOSE = false
+SAFE = true
+LAYERS = nil

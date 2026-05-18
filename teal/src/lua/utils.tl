@@ -3,7 +3,7 @@ local function setup(config: UtilsConfig): Utils
 	local prepend_safe = config.prepend_safe
 	local PLUGIN_PATHS = config.plugin_paths
 	local DEPENDENCIES = config.dependencies
-	local LAYERS = config.layers
+	local LAYERS = config.layers and config.layers or {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	local PLUGINS_BY_LAYER = config.plugins_by_layer
 
 	local M: Utils = {}
@@ -113,7 +113,7 @@ local function setup(config: UtilsConfig): Utils
 	    end
 	end
 
-	M.setup_plugin_safe = function(plugin_name: string, config_or_function?: PluginConfig | function(Plugin)): nil
+	M.setup_plugin_safe = function(plugin_name: string, config_or_function?: PluginConfig | function(Plugin)): Plugin
 	    if not M.is_included(plugin_name) then return end
 	    local result, plugin = pcall(M.get_plugin, plugin_name) as (boolean, Plugin)
 	    if not result then
@@ -121,7 +121,7 @@ local function setup(config: UtilsConfig): Utils
 		   print(plugin as string)
 		   return
 	    end
-	    if not config_or_function then return end
+	    if not config_or_function then return plugin end
 
 	    if config_or_function is PluginConfig then
 			local plugin_with_setup = plugin as PluginWithSetup
@@ -129,19 +129,20 @@ local function setup(config: UtilsConfig): Utils
 	    elseif config_or_function is function then
 			M.call_safe(config_or_function, plugin, "ERROR: custom setup function failed for " .. plugin_name)
 	    end
+		return plugin
 	end
 
-	M.setup_plugin_default = function(plugin_name: string, config_or_function?: PluginConfig | function(Plugin)): nil
+	M.setup_plugin_default = function(plugin_name: string, config_or_function?: PluginConfig | function(Plugin)): Plugin
 	    if not M.is_included(plugin_name) then return end
 	    local plugin = M.get_plugin(plugin_name)
-	    if not config_or_function then return end
+	    if not config_or_function then return plugin end
 
 	    if config_or_function is PluginConfig then
 			local plugin_with_setup = plugin as PluginWithSetup
-			plugin_with_setup.setup(config_or_function) return
+			plugin_with_setup.setup(config_or_function) return plugin
 	   end
 	   if config_or_function is function then
-			config_or_function(plugin) return
+			config_or_function(plugin) return plugin
 	    end
 	end
 

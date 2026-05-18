@@ -25,5 +25,7 @@ pkgs.stdenv.mkDerivation {
         --prune
 
     stylua $out/config
+
+    echo 'Transpiled .tl config into .lua.'
   '';
 }

@@ -27,7 +27,7 @@ https://github.com/calops/nix/tree/main/modules/home/programs/neovim
 [ ] https://github.com/jordanisaacs/neovim-flake
 [ ] https://github.com/wiltaylor/neovim-flake
 [ ] https://github.com/cwfryer/neovim-flake/
-[ ] 
+[ ] https://github.com/rockerBOO/awesome-neovim?tab=readme-ov-file#plugin-template
 
 ## Data Flow
 

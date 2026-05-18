@@ -8,7 +8,7 @@ global record PluginWithSetup
 	setup: function(PluginConfig)
 end
 
-global type SetupFunction = function(string, ? PluginConfig | function(Plugin)): nil
+global type SetupFunction = function(string, ? PluginConfig | function(Plugin)): Plugin|nil
 
 global type CustomSetupFunction = function(Plugin)
 
@@ -28,12 +28,12 @@ global record Utils
 	print_status: function(integer, string, string, string)
 	is_included: function(string): boolean
 	get_plugin: function(string): Plugin
-	packadd: function(string, ? function())
 	setup_plugin: SetupFunction
-	packadd_default: function(string, ? function())
 	setup_plugin_default: SetupFunction
-	packadd_safe: function(string, ? function())
 	setup_plugin_safe: SetupFunction
+	packadd: function(string, ? function())
+	packadd_default: function(string, ? function())
+	packadd_safe: function(string, ? function())
 	map: MapFunction
 end
 
