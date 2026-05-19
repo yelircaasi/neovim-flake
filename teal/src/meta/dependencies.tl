@@ -2,6 +2,6 @@ local M: {string: {string}} = {
 	["nvim-navbuddy"] = { "nui" },
 	["yazi"]          = { "plenary" },
 	["telescope"]     = { "plenary", "telescope-fzf-native" },
-	["LuaSnip"]       = { "friendly-snippets", }
+	["LuaSnip"]       = { "friendly-snippets", },
 }
 return M
