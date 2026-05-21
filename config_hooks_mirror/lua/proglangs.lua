@@ -1,0 +1,5 @@
+setup_plugin("lazydev")
+setup_plugin("rustaceanvim")
+setup_plugin("crates")
+setup_plugin("haskell-tools")
+setup_plugin("xit")

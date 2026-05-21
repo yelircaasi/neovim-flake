@@ -1,0 +1,17 @@
+setup_plugin("octo")
+setup_plugin("gitlab-nvim")
+setup_plugin("gitlab")
+
+setup_plugin("gitsigns", function(gitsigns)
+	vim.api.create_autocommand({ "BufReadPre", "BufNewFile" }, function()
+		gitsigns.setup({})
+	end)
+end)
+
+setup_plugin("jj")
+setup_plugin("jujutsu")
+setup_plugin("lazygit")
+setup_plugin("git-conflict")
+setup_plugin("neogit")
+setup_plugin("jiejie")
+setup_plugin("vim-fugitive")

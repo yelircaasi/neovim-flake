@@ -1,0 +1,6 @@
+setup_plugin("fidget")
+setup_plugin("nvim-notify")
+setup_plugin("headlines")
+setup_plugin("dropbar")
+utils.packadd("nvim-navbuddy")
+setup_plugin("aerial")
