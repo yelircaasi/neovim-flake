@@ -1011,30 +1011,32 @@ if willothy_wezterm then
 end
 
 -- DAP ========================================================================================
-
-setup_plugin("dap-python", function()
-	local dap_python = get_plugin("dap-python")
-	dap_python.setup("debugpy-adapter")
-	dap_python.test_runner = "pytest"
-	vim.keymap.set("n", "<leader>tt", function()
-		print("Leader is working!")
+local include_dap = false
+if include_dap then
+	setup_plugin("dap-python", function()
+		local dap_python = get_plugin("dap-python")
+		dap_python.setup("debugpy-adapter")
+		dap_python.test_runner = "pytest"
+		vim.keymap.set("n", "<leader>tt", function()
+			print("Leader is working!")
+		end)
+		vim.keymap.set("n", "<leader>pp", function()
+			print("This works")
+		end)
+		vim.keymap.set("n", "<leader>dn", function()
+			get_plugin("dap-python").test_method()
+		end)
+		vim.keymap.set("n", "<leader>df", function()
+			get_plugin("dap-python").test_class()
+		end)
+		vim.keymap.set("v", "<leader>ds", function()
+			get_plugin("dap-python").debug_selection()
+		end)
 	end)
-	vim.keymap.set("n", "<leader>pp", function()
-		print("This works")
-	end)
-	vim.keymap.set("n", "<leader>dn", function()
-		get_plugin("dap-python").test_method()
-	end)
-	vim.keymap.set("n", "<leader>df", function()
-		get_plugin("dap-python").test_class()
-	end)
-	vim.keymap.set("v", "<leader>ds", function()
-		get_plugin("dap-python").debug_selection()
-	end)
-end)
-setup_plugin("dapui")
-setup_plugin("nvim-dap-virtual-text")
-setup_plugin("dap")
+	setup_plugin("dapui")
+	setup_plugin("nvim-dap-virtual-text")
+	setup_plugin("dap")
+end
 
 -- PATH MANAGEMENT ========================================================================================
 
@@ -1097,6 +1099,7 @@ vim.filetype.add({
 
 -- MAPPINGS ========================================================================================
 
+local map = vim.keymap.set
 if mappings_lua then
 	--[[
 	DESIRED MAPPINGS/ACTIONS
@@ -1139,7 +1142,6 @@ if mappings_lua then
 	--]]
 
 	-- Set up a local map function for convenience
-	local map = vim.keymap.set
 
 	-- telescope ----------------------------------------------------------------------------------------------------------
 	map("n", "<leader>ff", function()
@@ -1200,6 +1202,17 @@ if mappings_lua then
 		end,
 	})
 
+	-- other LSP maps
+
+	local lsp_map_opts = { buffer = bufnr, silent = true }
+	vim.keymap.set("n", "gd", vim.lsp.buf.definition, lsp_map_opts)
+	vim.keymap.set("n", "K", vim.lsp.buf.hover, lsp_map_opts)
+	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, lsp_map_opts)
+	vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, lsp_map_opts)
+	vim.keymap.set("n", "<leader>cf", function()
+		conform.format({ bufnr = bufnr })
+	end, lsp_map_opts)
+
 	-- quickfix -----------------------------------------------------------------------------------------------------------
 	vim.keymap.set("i", "kj", "<escape>")
 	vim.keymap.set("n", "<leader>wq", function()
@@ -1214,35 +1227,9 @@ if mappings_lua then
 		vim.cmd("copen")
 	end, { desc = "Open Quickfix with diagnostics" })
 
-	--- dial---------------------------------------------------------------------------------------------------------------
-	vim.keymap.set("n", "<C-a>", function()
-		require("dial.map").manipulate("increment", "normal")
-	end)
-	vim.keymap.set("n", "<C-x>", function()
-		require("dial.map").manipulate("decrement", "normal")
-	end)
-	vim.keymap.set("n", "g<C-a>", function()
-		require("dial.map").manipulate("increment", "gnormal")
-	end)
-	vim.keymap.set("n", "g<C-x>", function()
-		require("dial.map").manipulate("decrement", "gnormal")
-	end)
-	vim.keymap.set("x", "<C-a>", function()
-		require("dial.map").manipulate("increment", "visual")
-	end)
-	vim.keymap.set("x", "<C-x>", function()
-		require("dial.map").manipulate("decrement", "visual")
-	end)
-	vim.keymap.set("x", "g<C-a>", function()
-		require("dial.map").manipulate("increment", "gvisual")
-	end)
-	vim.keymap.set("x", "g<C-x>", function()
-		require("dial.map").manipulate("decrement", "gvisual")
-	end)
-
 	--- zen-mode ----------------------------------------------------------------------------------------------------------
 
-	vim.keymap.set("n", "<leader>zm", function()
+	map("n", "<leader>zm", function()
 		require("zen-mode").toggle({
 			window = {
 				width = 0.85, -- width will be 85% of the editor width
@@ -1624,6 +1611,15 @@ if other_mappings then
 end
 
 -- AUTOCOMMANDS =================================================================================================
+
+vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
+
+	pattern = { "*.c", "*.h" },
+
+	callback = function(ev)
+		print(string.format("event fired: %s", vim.inspect(ev)))
+	end,
+})
 
 -- COLORS ========================================================================================
 
@@ -2063,499 +2059,292 @@ end
 
 -- LSP ========================================================================================
 
-local lsp = true
-if lsp then
-	vim.lsp.enable("lua_ls")
-	vim.lsp.enable("ruff")
-	vim.lsp.enable("tinymist")
-	vim.lsp.config("lua_ls", {
-		settings = {
-			Lua = {
-				workspace = { library = vim.api.nvim_get_runtime_file("", true) },
-			},
-		},
-	})
-	vim.lsp.config("ruff", {}) -- TODO
-	vim.lsp.config("tinymist", {}) -- TODO
-	vim.lsp.config("rust-analyzer", {}) -- TODO
-	vim.lsp.config("haskell-ls", {}) -- TODO
+-- Mypy integration
+-- Option 1: Via nvim-lint (recommended for live diagnostics)
+-- Option 2: Use conform for on-save mypy checks (slower but thorough)
 
-	vim.api.nvim_create_autocmd("LspAttach", {
-		callback = function(ev)
-			local client = vim.lsp.get_client_by_id(ev.data.client_id)
-			if client:supports_method("textDocument/completion") then
-				vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-			end
-		end,
-	})
-	vim.cmd("set completeopt+=noselect")
-	printv("CHECKPOINT A")
-	setup_plugin({ -------------------------------------------------------------------------------------------- conform.nvim
-		name = "conform",
-		setup_fn = function()
-			require("conform").setup({
-				formatters_by_ft = {
-					python = {
-						-- To fix auto-fixable lint errors.
-						"ruff_fix",
-						-- To run the Ruff formatter.
-						"ruff_format",
-						-- To organize the imports.
-						"ruff_organize_imports",
-					},
-					nix = {
-						"alejandra",
-					},
-					lua = {
-						"stylua",
-					},
-					haskell = {
-						"fourmolu",
-					},
-					rust = {
-						"rustfmt",
-					},
-					go = {
-						"gofmt",
-					},
-				},
-			})
+-- pip install "python-lsp-server[all]" pylsp-mypy
+-- [Modern Neovim LSP Setup Guide](https://www.youtube.com/watch?v=lljs_7xB7Ps)
 
-			-- Optional: format on save
-			vim.api.nvim_create_autocmd("BufWritePre", {
-				callback = function(args)
-					require("conform").format({ bufnr = args.buf })
-				end,
-			})
-		end,
-	})
-end
+-- new LSP config, compiled from old ones
 
-local lsp_with_diagnostics = false
-if lsp_with_diagnostics then
-	local diagnostic_modes = {
-		{
-			name = "End of Line (Virtual Text)",
-			config = {
-				virtual_text = {
-					prefix = "●", -- Could be '■', '▎', 'x'
-					spacing = 4,
-					source = "if_many",
-				},
-				virtual_lines = false,
-				signs = true,
-				underline = true,
-				update_in_insert = false,
-			},
-		},
-		{
-			name = "Under Line (Virtual Lines)",
-			config = {
-				virtual_text = false,
-				-- 'virtual_lines' is now a built-in handler in Nvim 0.10/0.11+
-				virtual_lines = {
-					only_current_line = true, -- Only show for current line to reduce clutter
-					highlight_whole_line = false,
-				},
-				signs = true,
-				underline = true,
-				update_in_insert = false,
-			},
-		},
-		{
-			name = "Gutter Only (Signs)",
-			config = {
-				virtual_text = false,
-				virtual_lines = false,
-				signs = {
-					-- Custom mapping for signs if you want specific characters
-					text = {
-						[vim.diagnostic.severity.ERROR] = "E",
-						[vim.diagnostic.severity.WARN] = "W",
-						[vim.diagnostic.severity.HINT] = "H",
-						[vim.diagnostic.severity.INFO] = "I",
-					},
-				},
-				underline = false, -- Often cleaner to disable underline in "minimal" mode
-				update_in_insert = false,
-			},
-		},
-	}
+vim.cmd("set completeopt+=noselect")
 
-	local function set_diagnostics_mode()
-		if not diagnostics_active then
-			vim.diagnostic.enable(false)
-			printv("LSP Diagnostics: OFF")
-			return
-		end
+-- CONFIGS ------------------------------------------------------------------------------------
 
-		vim.diagnostic.enable(true)
-		local mode = diagnostic_modes[current_mode_index]
-		vim.diagnostic.config(mode.config)
-		printv("LSP Mode: " .. mode.name)
-	end
-
-	set_diagnostics_mode()
-
-	vim.lsp.config["haskell-language-server"] =
-		{ ------------------------------------------------------------------ HASKELL
-			cmd = { "haskell-language-server" },
-			filetypes = { "haskell" },
-			root_markers = { { "*.cabal" }, ".git" },
-			settings = {},
-		}
-	vim.lsp.config["luals"] =
-		{ ---------------------------------------------------------------------------------------- LUA
-			-- Command and arguments to start the server.
-			cmd = { "lua-language-server" },
-			-- Filetypes to automatically attach to.
-			filetypes = { "lua" },
-			-- Sets the "workspace" to the directory where any of these files is found.
-			-- Files that share a root directory will reuse the LSP server connection.
-			-- Nested lists indicate equal priority, see |vim.lsp.Config|.
-			root_markers = { { ".luarc.json", ".luarc.jsonc" }, ".git" },
-			-- Specific settings to send to the server. The schema is server-defined.
-			-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
-			settings = {
-				Lua = {
-					runtime = {
-						version = "LuaJIT",
-					},
-					workspace = {
-						library = vim.api.nvim_get_runtime_file("", true),
-					},
-					diagnostics = {
-						globals = {
-							"vim",
-						},
-					},
-				},
-			},
-		}
-	vim.lsp.config["ruff"] =
-		{ -------------------------------------------------------------------------------------- PYTHON
-			cmd = { "ruff", "server" },
-			filetypes = { "python" },
-			-- Sets the "workspace" to the directory where any of these files is found.
-			-- Files that share a root directory will reuse the LSP server connection.
-			-- Nested lists indicate equal priority, see |vim.lsp.Config|.
-			root_markers = { { ".ruff_cache", "pyproject.toml" }, ".git" },
-			settings = {},
-		}
-	vim.lsp.config["pyright"] = {
-		cmd = { "pyright-langserver", "--stdio" },
-		filetypes = { "python" },
-		root_markers = {
-			{ "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile" },
-			".git",
-		},
-		settings = {
-			python = {
-				analysis = {
-					autoSearchPaths = true,
-					useLibraryCodeForTypes = true,
-					typeCheckingMode = "basic", -- alternative: "strict"
-				},
-			},
-		},
-	}
-	vim.lsp.config["nixd"] =
-		{ ----------------------------------------------------------------------------------------- NIX
-			cmd = { "nixd" },
-			filetypes = { "nix" },
-			root_markers = { "flake.nix", ".git" },
-			settings = {},
-		}
-	vim.lsp.config["rust-analyzer"] =
-		{ ------------------------------------------------------------------------------- RUST
-			cmd = { "rust-analyzer" },
-			filetypes = { "rust" },
-			root_markers = { { "Cargo.toml", "cargo.lock" }, ".git" },
-			settings = {},
-		}
-end
-
-local old_lsp = true
-if old_lsp then
-	vim.lsp.config["rust-analyzer"] = {
-		cmd = { "rust-analyzer" },
-		filetypes = { "rust" },
-		root_markers = { { "Cargo.toml", "cargo.lock" }, ".git" },
-		settings = {},
-	}
-
-	vim.lsp.config["nixd"] = {
-		cmd = { "nixd" },
-		filetypes = { "nix" },
-		root_markers = { "flake.nix", ".git" },
-		settings = {},
-	}
-
-	vim.lsp.config["luals"] = {
-		-- Command and arguments to start the server.
-		cmd = { "lua-language-server" },
-		-- Filetypes to automatically attach to.
-		filetypes = { "lua" },
-		-- Sets the "workspace" to the directory where any of these files is found.
-		-- Files that share a root directory will reuse the LSP server connection.
-		-- Nested lists indicate equal priority, see |vim.lsp.Config|.
-		root_markers = { { ".luarc.json", ".luarc.jsonc" }, ".git" },
-		-- Specific settings to send to the server. The schema is server-defined.
-		-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
-		settings = {
-			Lua = {
-				runtime = {
-					version = "LuaJIT",
-				},
-				workspace = {
-					library = vim.api.nvim_get_runtime_file("", true),
-				},
-				diagnostics = {
-					globals = {
-						"vim",
-					},
-				},
-			},
-		},
-	}
-
-	vim.lsp.config["ruff"] = {
-		-- Command and arguments to start the server.
-		cmd = { "ruff", "server" },
-		-- Filetypes to automatically attach to.
-		filetypes = { "python" },
-		-- Sets the "workspace" to the directory where any of these files is found.
-		-- Files that share a root directory will reuse the LSP server connection.
-		-- Nested lists indicate equal priority, see |vim.lsp.Config|.
-		root_markers = { { ".ruff_cache", "pyproject.toml" }, ".git" },
-		-- Specific settings to send to the server. The schema is server-defined.
-		-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
-		settings = {},
-	}
-
-	vim.lsp.config["pyright"] = {
-		cmd = { "pyright-langserver", "--stdio" },
-		filetypes = { "python" },
-		root_markers = {
-			{ "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile" },
-			".git",
-		},
-		settings = {
-			python = {
-				analysis = {
-					autoSearchPaths = true,
-					useLibraryCodeForTypes = true,
-					typeCheckingMode = "basic", -- You can change this to "strict"
-				},
-			},
-		},
-	}
-
-	local diagnostic_modes = {
-		{
-			name = "End of Line (Virtual Text)",
-			config = {
-				virtual_text = {
-					prefix = "●", -- Could be '■', '▎', 'x'
-					spacing = 4,
-					source = "if_many",
-				},
-				virtual_lines = false,
-				signs = true,
-				underline = true,
-				update_in_insert = false,
-			},
-		},
-		{
-			name = "Under Line (Virtual Lines)",
-			config = {
-				virtual_text = false,
-				-- 'virtual_lines' is now a built-in handler in Nvim 0.10/0.11+
-				virtual_lines = {
-					only_current_line = true, -- Only show for current line to reduce clutter
-					highlight_whole_line = false,
-				},
-				signs = true,
-				underline = true,
-				update_in_insert = false,
-			},
-		},
-		{
-			name = "Gutter Only (Signs)",
-			config = {
-				virtual_text = false,
-				virtual_lines = false,
-				signs = {
-					-- Custom mapping for signs if you want specific characters
-					text = {
-						[vim.diagnostic.severity.ERROR] = "E",
-						[vim.diagnostic.severity.WARN] = "W",
-						[vim.diagnostic.severity.HINT] = "H",
-						[vim.diagnostic.severity.INFO] = "I",
-					},
-				},
-				underline = false, -- Often cleaner to disable underline in "minimal" mode
-				update_in_insert = false,
-			},
-		},
-	}
-
-	-- State tracking
-	local current_mode_index = 1
-	local diagnostics_active = false
-
-	-- 2. Function to set the configuration
-	local function set_diagnostics_mode()
-		if not diagnostics_active then
-			vim.diagnostic.enable(false)
-			-- print("LSP Diagnostics: OFF")
-			return
-		end
-
-		vim.diagnostic.enable(true)
-		local mode = diagnostic_modes[current_mode_index]
-		vim.diagnostic.config(mode.config)
-		print("LSP Mode: " .. mode.name)
-	end
-
-	-- 3. Keybind: Toggle On/Off
-	vim.keymap.set("n", "<leader>dt", function()
-		diagnostics_active = not diagnostics_active
-		set_diagnostics_mode()
-	end, { desc = "Toggle LSP Diagnostics" })
-
-	-- 4. Keybind: Cycle Modes
-	vim.keymap.set("n", "<leader>dm", function()
-		-- Only cycle if active; otherwise turn on and reset to 1
-		if not diagnostics_active then
-			diagnostics_active = true
-			current_mode_index = 1
-		else
-			current_mode_index = current_mode_index + 1
-			if current_mode_index > #diagnostic_modes then
-				current_mode_index = 1
-			end
-		end
-		set_diagnostics_mode()
-	end, { desc = "Cycle LSP Diagnostic Modes" })
-
-	-- Initialize on startup
-	set_diagnostics_mode()
-
-	vim.lsp.enable("luals")
-	vim.lsp.enable("ruff")
-	vim.lsp.enable("pyright")
-	vim.lsp.enable("nixd")
-end
-
-local lsp3 = false
-if lsp3 then
-	vim.diagnostic.config({ virtual_text = false, virtual_lines = { current_line = true } })
-
-	-- lua/lsp/python.lua
-	-- Neovim 0.12+ native LSP for Python: Ruff + mypy + conform.nvim format-on-save
-	-- Best practices as of May 2026
-
-	local conform = utils.get_plugin("conform")
-
-	local function on_attach(client, bufnr)
-		-- Disable Ruff hover if you add another server like pyright/basedpyright later
-		if client.name == "ruff" then
-			client.server_capabilities.hoverProvider = false
-		end
-
-		-- Common keymaps (adjust as needed)
-		local opts = { buffer = bufnr, silent = true }
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-		vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-		vim.keymap.set("n", "<leader>cf", function()
-			conform.format({ bufnr = bufnr })
-		end, opts)
-	end
-
-	-- Ruff LSP (fast linting, formatting, import organization, etc.)
-	-- Place this in after/lsp/ruff.lua or define inline
-	vim.lsp.config("ruff", {
-		cmd = { "ruff", "server" },
-		filetypes = { "python" },
-		root_markers = {
-			"pyproject.toml",
-			"ruff.toml",
-			".ruff.toml",
-			"setup.py",
-			"setup.cfg",
-			"requirements.txt",
-			".git",
-		},
-		on_attach = on_attach,
-		init_options = {
-			settings = {
-				-- Ruff server settings (see Ruff docs)
-				logLevel = "info", -- or "debug" for troubleshooting
-				-- Example: enable specific rules or configure line length
-				-- lint = { select = { "ALL" }, ignore = {} },
-				-- format = { preview = true },
-			},
-		},
-	})
-
-	-- Enable Ruff
-	vim.lsp.enable("ruff")
-
-	-- Optional: Add pyright/basedpyright for richer completion & type checking
-	-- (Uncomment if desired; it complements Ruff well)
-	--[[
-	vim.lsp.config("pyright", {
-	cmd = { "pyright-langserver", "--stdio" },
-	filetypes = { "python" },
-	root_markers = { "pyproject.toml", "setup.py", ... },
-	on_attach = on_attach,
+vim.lsp.config["tinymist"] = {} -- TODO (?)
+vim.lsp.config["haskell-ls"] = {} -- TODO (?)
+vim.lsp.config["lua_ls"] = { -- TODO (?)
 	settings = {
-		pyright = {
-		disableOrganizeImports = true, -- Let Ruff handle imports
-		},
-		python = {
-		analysis = {
-			typeCheckingMode = "basic", -- or "strict"
-			diagnosticMode = "workspace",
-		},
+		Lua = {
+			workspace = { library = vim.api.nvim_get_runtime_file("", true) },
 		},
 	},
-	})
-	vim.lsp.enable("pyright")
-	--]]
+}
+vim.lsp.config["haskell-language-server"] = { ------------------------------------------------------------------ HASKELL
+	cmd = { "haskell-language-server" },
+	filetypes = { "haskell" },
+	root_markers = { { "*.cabal" }, ".git" },
+	settings = {},
+}
+vim.lsp.config["luals"] = { ---------------------------------------------------------------------------------------- LUA
+	-- Command and arguments to start the server.
+	cmd = { "lua-language-server" },
+	-- Filetypes to automatically attach to.
+	filetypes = { "lua" },
+	-- Sets the "workspace" to the directory where any of these files is found.
+	-- Files that share a root directory will reuse the LSP server connection.
+	-- Nested lists indicate equal priority, see |vim.lsp.Config|.
+	root_markers = { { ".luarc.json", ".luarc.jsonc" }, ".git" },
+	-- Specific settings to send to the server. The schema is server-defined.
+	-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
+	settings = {
+		Lua = {
+			runtime = {
+				version = "LuaJIT",
+			},
+			workspace = {
+				library = vim.api.nvim_get_runtime_file("", true),
+			},
+			diagnostics = {
+				globals = {
+					"vim",
+				},
+			},
+		},
+	},
+}
+vim.lsp.config["ruff"] = { -------------------------------------------------------------------------------------- PYTHON
+	cmd = { "ruff", "server" },
+	filetypes = { "python" },
+	root_markers = { { ".ruff_cache", "pyproject.toml" }, ".git" },
+	-- {
+	-- 	 "pyproject.toml",
+	--   "ruff.toml",
+	-- 	 ".ruff.toml",
+	-- 	 "setup.py",
+	-- 	 "setup.cfg",
+	-- 	 "requirements.txt",
+	--   ".git",
+	-- }
+	-- example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
+	settings = {},
+}
+vim.lsp.config["pyright"] = {
+	cmd = { "pyright-langserver", "--stdio" },
+	filetypes = { "python" },
+	root_markers = {
+		{ "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile" },
+		".git",
+	},
+	settings = {
+		python = {
+			analysis = {
+				autoSearchPaths = true,
+				useLibraryCodeForTypes = true,
+				typeCheckingMode = "basic", -- alternative: "strict"
+			},
+		},
+	},
+}
+vim.lsp.config["nixd"] = {
+	cmd = { "nixd" },
+	filetypes = { "nix" },
+	root_markers = { "flake.nix", ".git" },
+	settings = {},
+}
+vim.lsp.config["rust-analyzer"] = { ------------------------------------------------------------------------------- RUST
+	cmd = { "rust-analyzer" },
+	filetypes = { "rust" },
+	root_markers = { { "Cargo.toml", "cargo.lock" }, ".git" },
+	settings = {},
+}
 
-	-- Mypy integration
-	-- Option 1: Via nvim-lint (recommended for live diagnostics)
-	-- Option 2: Use conform for on-save mypy checks (slower but thorough)
+-- AUTOCOMMANDS -------------------------------------------------------------------------------
+vim.api.nvim_create_autocmd("LspAttach", {
+	callback = function(ev)
+		local client = vim.lsp.get_client_by_id(ev.data.client_id)
+		if client:supports_method("textDocument/completion") then
+			vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
+		end
+	end,
+})
 
-	-- Diagnostics config (best practices)
-	vim.diagnostic.config({
-		virtual_text = { prefix = "●", spacing = 2 },
-		signs = true,
-		underline = true,
-		update_in_insert = false,
-		severity_sort = true,
-		float = { border = "rounded", source = "always" },
-	})
+local function on_attach(client, bufnr)
+	-- Disable Ruff hover if you add another server like pyright/basedpyright later
+	if client.name == "ruff" then
+		client.server_capabilities.hoverProvider = false
+	end
 
-	-- Conform.nvim setup for formatting on save (Ruff + optional mypy)
+	-- Common keymaps (adjust as needed)
+end
+
+local function on_attach(client, bufnr)
+	-- Disable Ruff hover if you add another server like pyright/basedpyright later
+	if client.name == "ruff" then
+		client.server_capabilities.hoverProvider = false
+	end
+
+	-- Common keymaps (adjust as needed)
+	local opts = { buffer = bufnr, silent = true }
+	vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+	vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
+	vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
+	vim.keymap.set("n", "<leader>cf", function()
+		require("conform").format({ bufnr = bufnr })
+	end, opts)
+end
+
+vim.api.nvim_create_autocmd("LspAttach", {
+	callback = function(args)
+		local opts = { buffer = args.buf }
+		-- Note: 'grn' (rename), 'gra' (code action), and 'grr' (references)
+		-- are now built-in defaults in 0.12.
+		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
+		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+		vim.keymap.set("n", "<leader>cl", vim.lsp.codelens.run, opts)
+	end,
+})
+
+-- ENABLE -------------------------------------------------------------------------------------
+vim.lsp.enable("lua_ls")
+vim.lsp.enable("luals")
+vim.lsp.enable("nixd")
+vim.lsp.enable("pylsp")
+vim.lsp.enable("pyright")
+vim.lsp.enable("ruff")
+vim.lsp.enable("ruff")
+vim.lsp.enable("tinymist")
+
+-- LSP UI ------------------------------------------------------------------------------------------------
+
+-- ALTERNATIVE
+vim.diagnostic.config({
+	virtual_text = { prefix = "●", spacing = 2 },
+	signs = true,
+	underline = true,
+	update_in_insert = false,
+	severity_sort = true,
+	float = { border = "rounded", source = "always" },
+})
+
+-- CURRENT
+local diagnostic_modes = {
+	{
+		name = "End of Line (Virtual Text)",
+		config = {
+			virtual_text = {
+				prefix = "●", -- Could be '■', '▎', 'x'
+				spacing = 4,
+				source = "if_many",
+			},
+			virtual_lines = false,
+			signs = true,
+			underline = true,
+			update_in_insert = false,
+		},
+	},
+	{
+		name = "Under Line (Virtual Lines)",
+		config = {
+			virtual_text = false,
+			-- 'virtual_lines' is now a built-in handler in Nvim 0.10/0.11+
+			virtual_lines = {
+				only_current_line = true, -- Only show for current line to reduce clutter
+				highlight_whole_line = false,
+			},
+			signs = true,
+			underline = true,
+			update_in_insert = false,
+		},
+	},
+	{
+		name = "Gutter Only (Signs)",
+		config = {
+			virtual_text = false,
+			virtual_lines = false,
+			signs = {
+				-- Custom mapping for signs if you want specific characters
+				text = {
+					[vim.diagnostic.severity.ERROR] = "E",
+					[vim.diagnostic.severity.WARN] = "W",
+					[vim.diagnostic.severity.HINT] = "H",
+					[vim.diagnostic.severity.INFO] = "I",
+				},
+			},
+			underline = false, -- Often cleaner to disable underline in "minimal" mode
+			update_in_insert = false,
+		},
+	},
+}
+
+local function set_diagnostics_mode()
+	if not diagnostics_active then
+		vim.diagnostic.enable(false)
+		printv("LSP Diagnostics: OFF")
+		return
+	end
+
+	vim.diagnostic.enable(true)
+	local mode = diagnostic_modes[current_mode_index]
+	vim.diagnostic.config(mode.config)
+	printv("LSP Mode: " .. mode.name)
+end
+
+vim.keymap.set("n", "<leader>dt", function()
+	diagnostics_active = not diagnostics_active
+	set_diagnostics_mode()
+end, { desc = "Toggle LSP Diagnostics" })
+
+vim.keymap.set("n", "<leader>dm", function()
+	if not diagnostics_active then
+		diagnostics_active = true
+		current_mode_index = 1
+	else
+		current_mode_index = current_mode_index + 1
+		if current_mode_index > #diagnostic_modes then
+			current_mode_index = 1
+		end
+	end
+	set_diagnostics_mode()
+end, { desc = "Cycle LSP Diagnostic Modes" })
+
+-- OLD:
+-- vim.diagnostic.config({ virtual_text = false, virtual_lines = { current_line = true } })
+
+set_diagnostics_mode()
+
+-- CONFORM --------------------------------------------------------------------------------------------
+setup_plugin("conform", function(conform)
 	conform.setup({
 		formatters_by_ft = {
 			python = {
-				"ruff_fix", -- Auto-fix lint errors
-				"ruff_format", -- Ruff formatter (replaces Black)
+				"ruff_fix",
+				"ruff_format",
 				"ruff_organize_imports",
-				-- "mypy"             -- Uncomment for type checking on save (slow; better in CI)
+				-- "mypy",
+			},
+			nix = {
+				"alejandra",
+			},
+			lua = {
+				"stylua",
+			},
+			haskell = {
+				"fourmolu",
+			},
+			rust = {
+				"rustfmt",
+			},
+			go = {
+				"gofmt",
 			},
 		},
 		format_on_save = {
 			timeout_ms = 1000,
 			lsp_format = "fallback", -- Use LSP formatting if available
 		},
-		-- Custom mypy formatter (runs mypy and reports errors)
 		formatters = {
 			mypy = {
 				command = "mypy",
@@ -2567,7 +2356,6 @@ if lsp3 then
 		},
 	})
 
-	-- Auto-format on save via autocmd (fallback / extra control)
 	vim.api.nvim_create_autocmd("BufWritePre", {
 		pattern = "*.py",
 		callback = function(args)
@@ -2575,309 +2363,25 @@ if lsp3 then
 		end,
 		desc = "Format Python on save with conform",
 	})
+end)
 
-	-- Optional: nvim-lint for mypy + ruff linting (faster live feedback)
-	-- Add `mfussenegger/nvim-lint` plugin if you want this
-	--[[
-	require("lint").linters_by_ft = {
-	python = { "ruff", "mypy" },
-	}
-	vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
-	callback = function()
-		require("lint").try_lint()
-	end,
-	})
-	--]]
+-- TELESCOPE =================================================================================================
 
-	-- alternative
-
-	vim.lsp.config("ruff", {
-		cmd = { "ruff", "server" },
-		filetypes = { "python" },
-		root_markers = { "pyproject.toml", "ruff.toml", ".git" },
-		settings = {
-			-- Any specific ruff settings go here
-		},
-	})
-
-	-- PyLSP: Specifically configured for Mypy type checking
-	vim.lsp.config("pylsp", {
-		cmd = { "pylsp" },
-		filetypes = { "python" },
-		settings = {
-			pylsp = {
-				plugins = {
-					-- Disable standard lints/formatters provided by Ruff
-					pyflakes = { enabled = false },
-					pycodestyle = { enabled = false },
-					mccabe = { enabled = false },
-					-- Enable Mypy
-					pylsp_mypy = {
-						enabled = true,
-						live_mode = true, -- Provides type-checking as you type
-						strict = true,
-					},
-				},
+local telescope = utils.setup_plugin_default("telescope", function(telescope)
+	telescope.setup({
+		extensions = {
+			fzf = {
+				fuzzy = true, -- false will only do exact matching
+				override_generic_sorter = true, -- override the generic sorter
+				override_file_sorter = true, -- override the file sorter
+				case_mode = "smart_case", -- or "ignore_case" or "respect_case"
+				-- the default case_mode is "smart_case"
 			},
 		},
 	})
-
-	-- Enable both servers
-	vim.lsp.enable("ruff")
-	vim.lsp.enable("pylsp")
-
-	-- 2. FORMATTING (Conform.nvim)
-	-- Using conform for "Format on Save" with Ruff
-	conform.setup({
-		formatters_by_ft = {
-			python = { "ruff_format", "ruff_organize_imports" },
-		},
-		format_on_save = {
-			timeout_ms = 500,
-			lsp_format = "fallback",
-		},
-	})
-
-	-- 3. MODERN LSP KEYMAPS (Neovim 0.12 Defaults)
-	-- Neovim 0.12 provides better defaults, but here are the standard 2026 mappings:
-	vim.api.nvim_create_autocmd("LspAttach", {
-		callback = function(args)
-			local opts = { buffer = args.buf }
-			-- Note: 'grn' (rename), 'gra' (code action), and 'grr' (references)
-			-- are now built-in defaults in 0.12.
-			vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-			vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-			vim.keymap.set("n", "<leader>cl", vim.lsp.codelens.run, opts)
-		end,
-	})
-
-	-- use Nix to install:
-	-- pip install "python-lsp-server[all]" pylsp-mypy
-
-	-- OLD JUNK BELOW HERE
-
-	-- lua/lsp/python.lua
-	-- Neovim 0.12+ native LSP for Python: Ruff + mypy + conform.nvim format-on-save
-	-- Best practices as of May 2026
-
-	local function on_attach(client, bufnr)
-		-- Disable Ruff hover if you add another server like pyright/basedpyright later
-		if client.name == "ruff" then
-			client.server_capabilities.hoverProvider = false
-		end
-
-		-- Common keymaps (adjust as needed)
-		local opts = { buffer = bufnr, silent = true }
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-		vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-		vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-		vim.keymap.set("n", "<leader>cf", function()
-			require("conform").format({ bufnr = bufnr })
-		end, opts)
-	end
-
-	-- Ruff LSP (fast linting, formatting, import organization, etc.)
-	-- Place this in after/lsp/ruff.lua or define inline
-	vim.lsp.config("ruff", {
-		cmd = { "ruff", "server" },
-		filetypes = { "python" },
-		root_markers = {
-			"pyproject.toml",
-			"ruff.toml",
-			".ruff.toml",
-			"setup.py",
-			"setup.cfg",
-			"requirements.txt",
-			".git",
-		},
-		on_attach = on_attach,
-		init_options = {
-			settings = {
-				-- Ruff server settings (see Ruff docs)
-				logLevel = "info", -- or "debug" for troubleshooting
-				-- Example: enable specific rules or configure line length
-				-- lint = { select = { "ALL" }, ignore = {} },
-				-- format = { preview = true },
-			},
-		},
-	})
-
-	-- Enable Ruff
-	vim.lsp.enable("ruff")
-
-	-- Optional: Add pyright/basedpyright for richer completion & type checking
-	-- (Uncomment if desired; it complements Ruff well)
-	--[[
-	vim.lsp.config("pyright", {
-	cmd = { "pyright-langserver", "--stdio" },
-	filetypes = { "python" },
-	root_markers = { "pyproject.toml", "setup.py", ... },
-	on_attach = on_attach,
-	settings = {
-		pyright = {
-		disableOrganizeImports = true, -- Let Ruff handle imports
-		},
-		python = {
-		analysis = {
-			typeCheckingMode = "basic", -- or "strict"
-			diagnosticMode = "workspace",
-		},
-		},
-	},
-	})
-	vim.lsp.enable("pyright")
-	--]]
-
-	-- Mypy integration
-	-- Option 1: Via nvim-lint (recommended for live diagnostics)
-	-- Option 2: Use conform for on-save mypy checks (slower but thorough)
-
-	-- Diagnostics config (best practices)
-	vim.diagnostic.config({
-		virtual_text = { prefix = "●", spacing = 2 },
-		signs = true,
-		underline = true,
-		update_in_insert = false,
-		severity_sort = true,
-		float = { border = "rounded", source = "always" },
-	})
-
-	-- Conform.nvim setup for formatting on save (Ruff + optional mypy)
-	require("conform").setup({
-		formatters_by_ft = {
-			python = {
-				"ruff_fix", -- Auto-fix lint errors
-				"ruff_format", -- Ruff formatter (replaces Black)
-				"ruff_organize_imports",
-				-- "mypy"             -- Uncomment for type checking on save (slow; better in CI)
-			},
-		},
-		format_on_save = {
-			timeout_ms = 1000,
-			lsp_format = "fallback", -- Use LSP formatting if available
-		},
-		-- Custom mypy formatter (runs mypy and reports errors)
-		formatters = {
-			mypy = {
-				command = "mypy",
-				args = { "--no-error-summary", "--show-column-numbers", "--no-color-output", "$FILENAME" },
-				stdin = false,
-				-- Ignore exit code so it doesn't block save; use for diagnostics instead
-				ignore_exitcode = true,
-			},
-		},
-	})
-
-	-- Auto-format on save via autocmd (fallback / extra control)
-	vim.api.nvim_create_autocmd("BufWritePre", {
-		pattern = "*.py",
-		callback = function(args)
-			require("conform").format({ bufnr = args.buf })
-		end,
-		desc = "Format Python on save with conform",
-	})
-
-	-- Optional: nvim-lint for mypy + ruff linting (faster live feedback)
-	-- Add `mfussenegger/nvim-lint` plugin if you want this
-	--[[
-	require("lint").linters_by_ft = {
-	python = { "ruff", "mypy" },
-	}
-	vim.api.nvim_create_autocmd({ "BufWritePost", "BufReadPost", "InsertLeave" }, {
-	callback = function()
-		require("lint").try_lint()
-	end,
-	})
-	--]]
-
-	-- ALTERNATIVE
-
-	-- 1. LSP CONFIGURATION (Native Neovim 0.12+ API)
-	-- We define configs using vim.lsp.config and activate them with vim.lsp.enable
-
-	-- Ruff: Handles linting and primary formatting
-	vim.lsp.config("ruff", {
-		cmd = { "ruff", "server" },
-		filetypes = { "python" },
-		root_markers = { "pyproject.toml", "ruff.toml", ".git" },
-		settings = {
-			-- Any specific ruff settings go here
-		},
-	})
-
-	-- PyLSP: Specifically configured for Mypy type checking
-	vim.lsp.config("pylsp", {
-		cmd = { "pylsp" },
-		filetypes = { "python" },
-		settings = {
-			pylsp = {
-				plugins = {
-					-- Disable standard lints/formatters provided by Ruff
-					pyflakes = { enabled = false },
-					pycodestyle = { enabled = false },
-					mccabe = { enabled = false },
-					-- Enable Mypy
-					pylsp_mypy = {
-						enabled = true,
-						live_mode = true, -- Provides type-checking as you type
-						strict = true,
-					},
-				},
-			},
-		},
-	})
-
-	-- Enable both servers
-	vim.lsp.enable("ruff")
-	vim.lsp.enable("pylsp")
-
-	-- 2. FORMATTING (Conform.nvim)
-	-- Using conform for "Format on Save" with Ruff
-	require("conform").setup({
-		formatters_by_ft = {
-			python = { "ruff_format", "ruff_organize_imports" },
-		},
-		format_on_save = {
-			timeout_ms = 500,
-			lsp_format = "fallback",
-		},
-	})
-
-	-- 3. MODERN LSP KEYMAPS (Neovim 0.12 Defaults)
-	-- Neovim 0.12 provides better defaults, but here are the standard 2026 mappings:
-	vim.api.nvim_create_autocmd("LspAttach", {
-		callback = function(args)
-			local opts = { buffer = args.buf }
-			-- Note: 'grn' (rename), 'gra' (code action), and 'grr' (references)
-			-- are now built-in defaults in 0.12.
-			vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-			vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-			vim.keymap.set("n", "<leader>cl", vim.lsp.codelens.run, opts)
-		end,
-	})
-
-	-- pip install "python-lsp-server[all]" pylsp-mypy
-	-- [Modern Neovim LSP Setup Guide](https://www.youtube.com/watch?v=lljs_7xB7Ps)
-
-	-- TELESCOPE =================================================================================================
-
-	local telescope = utils.setup_plugin_default("telescope", function(telescope)
-		telescope.setup({
-			extensions = {
-				fzf = {
-					fuzzy = true, -- false will only do exact matching
-					override_generic_sorter = true, -- override the generic sorter
-					override_file_sorter = true, -- override the file sorter
-					case_mode = "smart_case", -- or "ignore_case" or "respect_case"
-					-- the default case_mode is "smart_case"
-				},
-			},
-		})
-		telescope.load_extension("fzf")
-		print("loaded telescope with fzf-native")
-	end)
-end
+	telescope.load_extension("fzf")
+	print("loaded telescope with fzf-native")
+end)
 
 -- TREESITTER =================================================================================================
 
@@ -3677,6 +3181,7 @@ if recent_init then --=============
 	setup_plugin("treesj")
 	setup_plugin("dial", function(dial)
 		local augend = require("dial.augend")
+		local manipulate = require("dial.map")
 		require("dial.config").augends:register_group({
 			default = {
 				augend.integer.alias.decimal,
@@ -3686,6 +3191,30 @@ if recent_init then --=============
 				augend.constant.alias.bool,
 			},
 		})
+		map("n", "<C-a>", function()
+			manipulate("increment", "normal")
+		end)
+		map("n", "<C-x>", function()
+			manipulate("decrement", "normal")
+		end)
+		map("n", "g<C-a>", function()
+			manipulate("increment", "gnormal")
+		end)
+		map("n", "g<C-x>", function()
+			manipulate("decrement", "gnormal")
+		end)
+		map("x", "<C-a>", function()
+			manipulate("increment", "visual")
+		end)
+		map("x", "<C-x>", function()
+			manipulate("decrement", "visual")
+		end)
+		map("x", "g<C-a>", function()
+			manipulate("increment", "gvisual")
+		end)
+		map("x", "g<C-x>", function()
+			manipulate("decrement", "gvisual")
+		end)
 	end)
 	setup_plugin("harpoon-core")
 	setup_plugin("marks", {
