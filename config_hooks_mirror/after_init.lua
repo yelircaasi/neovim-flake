@@ -76,7 +76,6 @@ utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
 
 local setup_plugin = utils.setup_plugin
 local packadd = utils.packadd
-local map = utils.map
 
 -- utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
 
@@ -143,10 +142,6 @@ local function list_loaded_vars()
 end
 
 -- list_loaded_vars()
-
-local function map(spec)
-	vim.keymap.set(spec.mode, spec.sequence or spec.lhs, spec.action or spec.rhs, spec.opts)
-end
 
 local function cd_config_dir()
 	vim.cmd.cd(config_dir)
@@ -1032,6 +1027,18 @@ if include_dap then
 		vim.keymap.set("v", "<leader>ds", function()
 			get_plugin("dap-python").debug_selection()
 		end)
+		-- OTHER
+		dap_python.setup("debugpy-adapter")
+		dap_python.test_runner = "pytest"
+		map("n", "<leader>tt", function()
+			print("Leader is working!")
+		end)
+		map("n", "<leader>pp", function()
+			print("This works")
+		end)
+		map("n", "<leader>dn", dap_python.test_method)
+		map("n", "<leader>df", dap_python.test_class)
+		map("v", "<leader>ds", dap_python.debug_selection)
 	end)
 	setup_plugin("dapui")
 	setup_plugin("nvim-dap-virtual-text")
@@ -1091,6 +1098,8 @@ local function set_options()
 end
 
 set_options()
+
+vim.g.loaded_netrwPlugin = 1 -- for yazi
 -- FILETYPES ========================================================================================
 
 vim.filetype.add({
@@ -1099,7 +1108,12 @@ vim.filetype.add({
 
 -- MAPPINGS ========================================================================================
 
-local map = vim.keymap.set
+local function map_explicit(spec)
+	vim.keymap.set(spec.mode, spec.sequence or spec.lhs, spec.action or spec.rhs, spec.opts)
+end
+local map = utils.map
+-- WAS:
+-- local map = vim.keymap.set
 if mappings_lua then
 	--[[
 	DESIRED MAPPINGS/ACTIONS
@@ -1142,23 +1156,6 @@ if mappings_lua then
 	--]]
 
 	-- Set up a local map function for convenience
-
-	-- telescope ----------------------------------------------------------------------------------------------------------
-	map("n", "<leader>ff", function()
-		require("telescope.builtin").find_files()
-	end, { desc = "Find Files" })
-	map("n", "<leader>gf", function()
-		require("telescope.builtin").git_files()
-	end, { desc = "Find Git Files" })
-	map("n", "<leader>fg", function()
-		require("telescope.builtin").live_grep()
-	end, { desc = "Live Grep" })
-	map("n", "<leader>fb", function()
-		require("telescope.builtin").buffers()
-	end, { desc = "Find Buffers" })
-	map("n", "<leader>fh", function()
-		require("telescope.builtin").help_tags()
-	end, { desc = "Find Help Tags" })
 
 	-- floaterm -----------------------------------------------------------------------------------------------------------
 	vim.keymap.set("n", "<leader>ft", "<Cmd>FloatermToggle<CR>", { desc = "Toggle floaterm" })
@@ -1241,89 +1238,89 @@ end
 if other_mappings then
 	---------------------------------------------------------------------------------------------------------------- KEYMAPS
 	local nvx = { "n", "v", "x" }
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>o",
 		action = ":update<CR> :source<CR>",
 		opts = {},
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>ww",
 		action = ":write<CR>",
 		opts = {},
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>qq",
 		action = ":quit<CR>",
 		opts = {},
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>wq",
 		action = ":wq<CR>",
 		opts = {},
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>f",
 		action = ":Pick files<CR>",
 		opts = {},
 	})
-	map({
+	map_explicit({
 		mode = "t",
 		sequence = "<Esc>",
 		action = [[<C-\><C-n>]],
 		opts = { desc = "Exit terminal mode" },
 	})
-	map({
+	map_explicit({
 		mode = "t",
 		sequence = "kj",
 		action = [[<C-\><C-n>]],
 		opts = { desc = "Exit terminal mode" },
 	})
-	map({
+	map_explicit({
 		mode = "t",
 		sequence = "<C-o>",
 		action = [[<C-\><C-o>]],
 		opts = { desc = "Temporary normal mode" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>lf",
 		action = vim.lsp.buf.format,
 		opts = { desc = "" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>h",
 		action = ":Pick help",
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>e",
 		action = ":Oil<CR>",
 	})
-	map({
+	map_explicit({
 		mode = nvx,
 		sequence = "<leader>y",
 		action = "+y<CR>",
 		opts = { desc = "Yank to system clipboard" },
 	})
-	map({
+	map_explicit({
 		mode = nvx,
 		sequence = "<leader>d",
 		action = "+d<CR>",
 		opts = { desc = "Paste from system clipboard" },
 	})
-	-- map({
+	-- map_explicit({
 	--     mode = "",
 	--     sequence = "",\
 	--     action = [[]],
 	--     opts = { desc = "" }
 	-- })
-	-- map({
+	-- map_explicit({
 	--     mode = "",
 	--     sequence = "",
 	--     action = [[]],
@@ -1331,13 +1328,13 @@ if other_mappings then
 	-- })
 	-- map('t', '^[', "^\^N")
 	-- map('t', '^O', '^\^O')
-	map({
+	map_explicit({
 		mode = "x",
 		sequence = "<leader>mf",
 		action = ":'<,'>lua move_selection_to_new_file()<CR>",
 		opts = { desc = "Move selection to new file (split)" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>lu",
 		action = function()
@@ -1352,12 +1349,12 @@ if other_mappings then
 		end,
 		opts = { desc = "Open Lua Scratchpad" },
 	})
-	map({
+	map_explicit({
 		mode = "v",
 		sequence = "<leader>ms",
 		action = move_selection_to_new_file,
 	})
-	map({ ------------------------------------------------------------------------------------------------------ diagnostics
+	map_explicit({ ------------------------------------------------------------------------------------------------------ diagnostics
 		mode = "n",
 		sequence = "<leader>dt",
 		action = function()
@@ -1366,7 +1363,7 @@ if other_mappings then
 		end,
 		opts = { desc = "Toggle LSP Diagnostics" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>dm",
 		action = function()
@@ -1384,7 +1381,7 @@ if other_mappings then
 		end,
 		opts = { desc = "Cycle LSP Diagnostic Modes" },
 	})
-	map({ -------------------------------------------------------------------------------------------------------- telescope
+	map_explicit({ -------------------------------------------------------------------------------------------------------- telescope
 		mode = "n",
 		sequence = "<leader>ff",
 		action = make_setup_function(function()
@@ -1392,7 +1389,7 @@ if other_mappings then
 		end),
 		opts = { desc = "Find Files" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>gf",
 		action = function()
@@ -1400,7 +1397,7 @@ if other_mappings then
 		end,
 		opts = { desc = "Find Git Files" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>fg",
 		action = function()
@@ -1408,7 +1405,7 @@ if other_mappings then
 		end,
 		opts = { desc = "Live Grep" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>fb",
 		action = function()
@@ -1416,7 +1413,7 @@ if other_mappings then
 		end,
 		opts = { desc = "Find Buffers" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>fh",
 		action = function()
@@ -1424,13 +1421,13 @@ if other_mappings then
 		end,
 		opts = { desc = "Find Help Tags" },
 	})
-	map({ --------------------------------------------------------------------------------------------------------- floaterm
+	map_explicit({ --------------------------------------------------------------------------------------------------------- floaterm
 		mode = "n",
 		sequence = "<leader>ft",
 		action = "<Cmd>FloatermToggle<CR>",
 		opts = { desc = "Toggle floaterm" },
 	})
-	map({
+	map_explicit({
 		mode = "t",
 		sequence = "<leader>ft",
 		action = "<C-\\><C-n><Cmd>FloatermToggle<CR>",
@@ -1444,7 +1441,7 @@ if other_mappings then
 		group = lsp_keymaps_group,
 		callback = function(ev)
 			local lsp_map = function(keys, func, desc)
-				map({
+				map_explicit({
 					mode = "n",
 					sequence = keys,
 					action = func,
@@ -1478,26 +1475,26 @@ if other_mappings then
 			local bufopts = { noremap = true, silent = true, buffer = bufnr }
 		end,
 	})
-	map({ --------------------------------------------------------------------------------------------------------- quickfix
+	map_explicit({ --------------------------------------------------------------------------------------------------------- quickfix
 		mode = { "i" },
 		sequence = "kj",
 		action = "<escape>",
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>wq",
 		action = function()
 			vim.cmd("wq")
 		end,
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>ww",
 		action = function()
 			vim.cmd("w")
 		end,
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<leader>q",
 		action = function()
@@ -1507,7 +1504,7 @@ if other_mappings then
 		end,
 		opts = { desc = "Open Quickfix with diagnostics" },
 	})
-	map({ ------------------------------------------------------------------------------------------------------------- dial
+	map_explicit({ ------------------------------------------------------------------------------------------------------------- dial
 		mode = "n",
 		sequence = "<C-a>",
 		action = function()
@@ -1515,7 +1512,7 @@ if other_mappings then
 		end,
 		opts = { desc = "" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "<C-x>",
 		action = function()
@@ -1523,7 +1520,7 @@ if other_mappings then
 		end,
 		opts = { desc = "" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "g<C-a>",
 		action = function()
@@ -1531,7 +1528,7 @@ if other_mappings then
 		end,
 		opts = { desc = "" },
 	})
-	map({
+	map_explicit({
 		mode = "n",
 		sequence = "g<C-x>",
 		action = function()
@@ -1539,7 +1536,7 @@ if other_mappings then
 		end,
 		opts = { desc = "" },
 	})
-	map({
+	map_explicit({
 		mode = "x",
 		sequence = "<C-a>",
 		action = function()
@@ -1547,7 +1544,7 @@ if other_mappings then
 		end,
 		opts = { desc = "" },
 	})
-	map({
+	map_explicit({
 		mode = "x",
 		sequence = "<C-x>",
 		action = function()
@@ -1555,7 +1552,7 @@ if other_mappings then
 		end,
 		opts = { desc = "" },
 	})
-	map({
+	map_explicit({
 		mode = "x",
 		sequence = "g<C-a>",
 		action = function()
@@ -1563,7 +1560,7 @@ if other_mappings then
 		end,
 		opts = { desc = "" },
 	})
-	map({
+	map_explicit({
 		mode = "x",
 		sequence = "g<C-x>",
 		action = function()
@@ -1571,7 +1568,7 @@ if other_mappings then
 		end,
 		opts = { desc = "" },
 	})
-	map({ --------------------------------------------------------------------------------------------------------- zen-mode
+	map_explicit({ --------------------------------------------------------------------------------------------------------- zen-mode
 		mode = "n",
 		sequence = "<leader>zm",
 		action = function()
@@ -1581,7 +1578,7 @@ if other_mappings then
 		opts = { desc = "" },
 	})
 
-	map({
+	map_explicit({
 		mode = { "n", "v" },
 		sequence = "<leader>-",
 		action = function()
@@ -1590,7 +1587,7 @@ if other_mappings then
 		end,
 		opts = { desc = "Open yazi at the current file." },
 	})
-	map({
+	map_explicit({
 		mode = { "n", "v" },
 		sequence = "<leader>cw",
 		action = function()
@@ -1599,7 +1596,7 @@ if other_mappings then
 		end,
 		opts = { desc = "Open the file manager in nvim's working directory." },
 	})
-	map({
+	map_explicit({
 		mode = { "n", "v" },
 		sequence = "<c-up>",
 		action = function()
@@ -1973,22 +1970,6 @@ if other_colors then
 end
 
 -- MISC ========================================================================================
-
-utils.setup_plugin("xit")
-
--- ADDED: Initialize which-key
-utils.setup_plugin("which-key", {
-	"folke/which-key.nvim",
-	event = "VeryLazy",
-	init = function()
-		vim.o.timeout = true
-		vim.o.timeoutlen = 300
-	end,
-	opts = {
-		-- your configuration comes here
-		-- or leave it empty to use the default settings
-	},
-})
 
 -- debug.getinfo(2, "S").source:sub(2):match("(.*/)") or "./"
 
@@ -2381,198 +2362,164 @@ local telescope = utils.setup_plugin_default("telescope", function(telescope)
 	})
 	telescope.load_extension("fzf")
 	print("loaded telescope with fzf-native")
+
+	local telescope_builtin = require("telescope.builtin") --[[ TODO: uncomment
+	map("n", "<leader>ff", function() telescope_builtin.find_files() end, { desc = "Find Files"     })
+	map("n", "<leader>gf", function() telescope_builtin.git_files()  end, { desc = "Find Git Files" })
+	map("n", "<leader>fg", function() telescope_builtin.live_grep()  end, { desc = "Live Grep"      })
+	map("n", "<leader>fb", function() telescope_builtin.buffers()    end, { desc = "Find Buffers"   })
+	map("n", "<leader>fh", function() telescope_builtin.help_tags()  end, { desc = "Find Help Tags" })
+	--]]
 end)
 
 -- TREESITTER =================================================================================================
 
-local include_treesitter = false
-if include_treesitter then
-	local old_config = {
-		-- directory to install parsers and queries to (prepended to `runtimepath` to have priority)
-		install_dir = (not HAS_NIX) and vim.fn.stdpath("data") .. "/site" or nil,
-		parser_install_dir = (not HAS_NIX) and vim.fn.stdpath("data") .. "/parsers" or nil,
-		ensure_installed = HAS_NIX and {} or TS_LANGUAGES,
-		highlight = { enable = true },
-		indent = { enable = true },
-	}
-	vim.opt.indentexpr = "v:lua.vim.treesitter.indent()"
-	-- vim.opt.foldmethod = "expr" + foldexpr
-	-- vim.treesitter.query.add(lang, name, str) -- TODO
-	-- vim.treesitter.language.register() -- TODO
+-- v_an, v_in, v_]n, v_[n now provide incremental selection of treesitter nodes
 
-	vim.opt.foldmethod = "expr"
-	vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-	vim.opt.indentexpr = "v:lua.vim.treesitter.indent()"
+-- TODO: treesitter queries in RTP/queries/<lang>/
 
-	-- Register filetype aliases
-	vim.treesitter.language.register("cpp", "cuda")
-	vim.treesitter.language.register("javascript", "jsx")
-	vim.treesitter.language.register("typescript", "tsx")
+-- FILETYPES: put in ftplugin/<filetype>.lua ?
 
-	-- Optional: Auto-install parsers on first run (custom helper)
-	-- local parsers_to_ensure = { "c", "lua", "python", "javascript", "typescript", "bash", "json" }
-	-- for _, lang in ipairs(parsers_to_ensure) do
-	-- 	if not vim.treesitter.language.is_installed(lang) then  TODO
-	-- 		vim.cmd.TSInstall(lang)
-	-- 	end
-	-- end
+-- config/
+-- ├── ftdetect/
+-- │   └── xit.lua
+-- ├── ftplugin/
+-- │   └── xit.lua       ← here
+-- ├── syntax/
+-- │   └── xit.lua
+-- └── init.lua
 
-	vim.opt.foldmethod = "expr"
-	vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
-	vim.opt.indentexpr = "v:lua.vim.treesitter.indent()"
+-- To manually toggle highlighting at runtime:
+-- ```vim
+-- :TSEnable highlight
+-- :TSDisable highlight
+-- ```
 
-	-- vim.g.treesitter_filetype_exclude = { "markdown", "txt" }
+-- local TS_LANGUAGES = {
+-- 		"haskell",
+-- 		"javascript",
+-- 		"json",
+-- 		"lua",
+-- 		"markdown",
+-- 		"nix",
+-- 		"python",
+-- 		"rust",
+-- 		"toml",
+-- 		"typescript",
+-- 		"yaml",
+-- 		"zig",
+-- 	}
 
-	-- TODO: treesitter queries in RTP/queries/<lang>/
+-- NEW TREESITTER CONFIG COMPILED FROM OLD
 
-	vim.treesitter.query.add_predicate(
-		"python",
-		"highlights",
-		[[
-  (function_definition
-    name: (identifier) @function.def)
-    ]]
-	)
+-- PREAMBLE / VARS ----------------------------------------------
 
-	vim.api.nvim_create_autocmd("FileType", {
-		pattern = { "rust", "go", "python" }, -- add languages
-		callback = function()
-			if not vim.treesitter.language.get_lang(vim.bo.filetype) then
-				-- Or use a plugin/helper for installation
-				print("No Treesitter parser for " .. vim.bo.filetype)
-			end
-		end,
-	})
+-- PATHS
+-- print(vim.o.runtimepath:find(vim.env.VIMRUNTIME) ~= nil)
+-- print(vim.inspect(vim.opt.runtimepath))
 
-	pcall(vim.api.nvim_del_user_command, "TSInstall")
-	pcall(vim.api.nvim_del_user_command, "TSInstallSync") -- if it exists
-	pcall(vim.api.nvim_del_user_command, "TSInstallFromGrammar")
+parser_root = vim.fn.fnamemodify(OPT_DIR, ":h:h:h")
+vim.opt.runtimepath:prepend(PARSER_DIR)
+-- -----
+local my_install_dir = (not HAS_NIX) and ((vim.fn.stdpath("data")) .. "/site") or DERIVATION_DIR
 
-	-- OR:
-	for _, cmd in ipairs({ "TSInstall", "TSInstallSync", "TSInstallFromGrammar" }) do
-		pcall(vim.api.nvim_del_user_command, cmd)
+local my_parser_install_dir = my_install_dir .. "/parser"
+-- (not HAS_NIX) and (vim.fn.stdpath("data")) .. "/site/parsers" or DERIVATION_DIR ..
+local my_ensure_installed = HAS_NIX and {} or TS_LANGUAGES
+
+utils.printb("Setting up treesitter.")
+utils.printb("my_install_dir:        " .. my_install_dir)
+utils.printb("my_parser_install_dir: " .. my_parser_install_dir)
+utils.printb("my_ensure_installed:   " .. vim.inspect(my_ensure_installed))
+
+local old_config = {
+	-- directory to install parsers and queries to (prepended to `runtimepath` to have priority)
+	install_dir = (not HAS_NIX) and vim.fn.stdpath("data") .. "/site" or nil,
+	parser_install_dir = (not HAS_NIX) and vim.fn.stdpath("data") .. "/parsers" or nil,
+	ensure_installed = HAS_NIX and {} or TS_LANGUAGES,
+	highlight = { enable = true },
+	indent = { enable = true },
+}
+
+-- SETUP / CHECKS
+local parsers_to_ensure = { "c", "lua", "python", "javascript", "typescript", "bash", "json" }
+for _, lang in ipairs(parsers_to_ensure) do
+	if not vim.treesitter.language.is_installed(lang) then
+		print("Treesitter parser not installed: " .. lang)
 	end
-
-	-- OR:
-	vim.api.nvim_create_user_command("TSInstall", function()
-		vim.notify("TSInstall is disabled. Manage parsers externally.", vim.log.levels.WARN)
-	end, {
-		nargs = "*",
-		complete = function()
-			return {}
-		end,
-	})
-
-	-- To manually toggle highlighting at runtime:
-	-- ```vim
-	-- :TSEnable highlight
-	-- :TSDisable highlight
-	-- ```
-
-	-- print(vim.o.runtimepath:find(vim.env.VIMRUNTIME) ~= nil)
-
-	-- print(vim.inspect(vim.opt.runtimepath))
-
-	-- setup_plugin("nvim-treesitter", function(treesitter)
-	-- 	local TS_LANGUAGES = {
-	-- 		"haskell",
-	-- 		"javascript",
-	-- 		"json",
-	-- 		"lua",
-	-- 		"markdown",
-	-- 		"nix",
-	-- 		"python",
-	-- 		"rust",
-	-- 		"toml",
-	-- 		"typescript",
-	-- 		"yaml",
-	-- 		"zig",
-	-- 	}
-
-	-- 	utils.printbv("Setting up treesitter.")
-	-- 	local my_install_dir = (not HAS_NIX) and ((vim.fn.stdpath("data")) .. "/site") or DERIVATION_DIR
-	-- 	utils.printv(my_install_dir)
-	-- 	local my_parser_install_dir = (not HAS_NIX) and (vim.fn.stdpath("data")) .. "/site/parsers" or nil
-	-- 	utils.printv(my_parser_install_dir)
-	-- 	local my_ensure_installed = HAS_NIX and {} or TS_LANGUAGES
-	-- 	utils.printv(vim.inspect(my_ensure_installed))
-
-	-- 	utils.printbv("Treesitter exists")
-	-- 	(treesitter.setup)({
-	-- 		install_dir = my_install_dir,
-	-- 		parser_install_dir = my_parser_install_dir,
-	-- 		ensure_installed = my_ensure_installed,
-	-- 		highlight = { enable = true },
-	-- 		indent = { enable = true },
-	-- 	})
-	-- end)
-
-	local my_install_dir = (not HAS_NIX) and ((vim.fn.stdpath("data")) .. "/site") or DERIVATION_DIR
-
-	local my_parser_install_dir = my_install_dir .. "/parser"
-	-- (not HAS_NIX) and (vim.fn.stdpath("data")) .. "/site/parsers" or DERIVATION_DIR ..
-
-	local my_ensure_installed = HAS_NIX and {} or TS_LANGUAGES
-
-	utils.printbv("Setting up treesitter.")
-	utils.printb("my_install_dir:        " .. my_install_dir)
-	utils.printb("my_parser_install_dir: " .. my_parser_install_dir)
-	utils.printb("my_ensure_installed:   " .. vim.inspect(my_ensure_installed))
-
-	-- vim.treesitter.setup(
-	--     {
-	-- 		install_dir = my_install_dir,
-	-- 		parser_install_dir = my_parser_install_dir,
-	-- 		ensure_installed = my_ensure_installed,
-	-- 		highlight = { enable = true },
-	-- 		indent = { enable = true },
-	-- 	}
-	-- )
-
-	parser_root = vim.fn.fnamemodify(OPT_DIR, ":h:h:h")
-	vim.opt.runtimepath:prepend(PARSER_DIR)
-
-	vim.treesitter.language.register("py", "python")
-
-	vim.filetype.add({
-		extension = { xit = "xit" },
-	})
-	vim.treesitter.language.register("xit", "xit")
-	vim.api.nvim_create_autocmd("FileType", {
-		pattern = "xit",
-		callback = function(ev)
-			print("executing xit callback")
-			vim.treesitter.language.add("xit", { path = PARSER_DIR .. "/xit.so" })
-			vim.treesitter.start(ev.buf, "xit")
-		end,
-	})
-
-	-- v_an, v_in, v_]n, v_[n now provide incremental selection of treesitter nodes
-
-	-- put in ftplugin/<filetype>.lua ?
-
-	-- config/
-	-- ├── ftdetect/
-	-- │   └── xit.lua
-	-- ├── ftplugin/
-	-- │   └── xit.lua       ← here
-	-- ├── syntax/
-	-- │   └── xit.lua
-	-- └── init.lua
-
-	vim.api.nvim_create_autocmd("FileType", {
-		pattern = "lua",
-		callback = function()
-			vim.treesitter.start()
-		end,
-	})
-
-	vim.api.nvim_create_autocmd("FileType", {
-		callback = function()
-			pcall(vim.treesitter.start) -- pcall: silently skips if no parser
-		end,
-	})
 end
+
+-- FILETYPES
+vim.filetype.add({
+	extension = { xit = "xit" },
+})
+
+-- vim.opt.foldmethod = "expr" + foldexpr
+vim.opt.foldmethod = "expr"
+vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
+vim.opt.indentexpr = "v:lua.vim.treesitter.indent()"
+vim.g.treesitter_filetype_exclude = { "markdown", "txt" }
+
+-- FILETYPE ALIASES
+vim.treesitter.language.register("cpp", "cuda")
+vim.treesitter.language.register("javascript", "jsx")
+vim.treesitter.language.register("typescript", "tsx")
+
+-- QUERIES
+vim.treesitter.query.add_predicate("python", "highlights", [[(function_definition name: (identifier) @function.def)]])
+
+-- AUTOCOMMANDS
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = { "rust", "go", "python" }, -- add languages
+	callback = function()
+		if not vim.treesitter.language.get_lang(vim.bo.filetype) then
+			-- Or use a plugin/helper for installation
+			print("No Treesitter parser for " .. vim.bo.filetype)
+		end
+	end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "lua",
+	callback = function()
+		vim.treesitter.start()
+	end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+	callback = function()
+		pcall(vim.treesitter.start) -- pcall: silently skips if no parser
+	end,
+})
+
+-- COMMANDS
+
+for _, cmd in ipairs({ "TSInstall", "TSInstallSync", "TSInstallFromGrammar" }) do
+	pcall(vim.api.nvim_del_user_command, cmd)
+end
+
+-- OR:
+vim.api.nvim_create_user_command("TSInstall", function()
+	vim.notify("TSInstall is disabled. Manage parsers externally.", vim.log.levels.WARN)
+end, {
+	nargs = "*",
+	complete = function()
+		return {}
+	end,
+})
+
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "xit",
+	callback = function(ev)
+		print("executing xit callback")
+		vim.treesitter.language.add("xit", { path = PARSER_DIR .. "/xit.so" })
+		vim.treesitter.start(ev.buf, "xit")
+	end,
+})
+
+-- REGISTER LANGUAGES
+vim.treesitter.language.register("py", "python")
+vim.treesitter.language.register("xit", "xit")
 
 -- OVERSEER =================================================================================================
 
@@ -2900,476 +2847,485 @@ end
 
 -- UNSORTED =================================================================================================
 
+setup_plugin("xit")
+
+setup_plugin("which-key", function(which_key)
+	vim.o.timeout = true
+	vim.o.timeoutlen = 300
+	which_key.setup({})
+end)
+setup_plugin("plenary")
+setup_plugin("nio")
+setup_plugin("nvim-web-devicons")
+
+setup_plugin("mini.indent")
+setup_plugin("mini.keymap")
+setup_plugin("mini.sessions")
+setup_plugin("mini.pick")
+setup_plugin("mini.pairs")
+setup_plugin("mini.icons")
+setup_plugin("mini.surround")
+setup_plugin("mini.comment", {})
+setup_plugin("mini.hipatterns")
+setup_plugin("mini.indentscope")
+setup_plugin("mini.marks")
+setup_plugin("mini.fold")
+setup_plugin("mini.terminal")
+
+setup_plugin("zen-mode", {
+	wezterm = {
+		enabled = false,
+		-- can be either an absolute font size or the number of incremental steps
+		font = "+4", -- (10% increase per step)
+	},
+})
+setup_plugin("lualine", {})
+
+setup_plugin("nvim-navic")
+setup_plugin("bufferline")
+setup_plugin("statuscol")
+
+setup_plugin("treesitter-modules")
+setup_plugin("dropbar")
+utils.packadd("nvim-navbuddy")
+setup_plugin("aerial")
 -- from recent init.lua
-recent_init = true
-if recent_init then --=============
-	setup_plugin("plenary")
-	setup_plugin("nio")
-	setup_plugin("nvim-web-devicons")
 
-	setup_plugin("zen-mode", {
-		"folke/zen-mode.nvim",
-		opts = {
-			wezterm = {
-				enabled = false,
-				-- can be either an absolute font size or the number of incremental steps
-				font = "+4", -- (10% increase per step)
-			},
-		},
-	})
-	setup_plugin("lualine", {
-		"nvim-lualine/lualine.nvim",
-		lazy = false,
+setup_plugin("oil", function(oil)
+	utils.packadd("mini.icons")
+	-- OR: utils.packadd("nvim-web-devicons")
 
-		config = function()
-			require("lualine").setup()
-		end,
-	})
-	setup_plugin("nvim-navic")
-	setup_plugin("bufferline")
-	setup_plugin("statuscol")
+	---@module 'oil'
+	---@type oil.SetupOpts
+	oil.setup({})
+	-- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
+end)
 
-	setup_plugin("treesitter-modules")
-	setup_plugin("dropbar")
-	utils.packadd("nvim-navbuddy")
-	setup_plugin("aerial")
-
-	setup_plugin("oil", {
-		"stevearc/oil.nvim",
-		---@module 'oil'
-		---@type oil.SetupOpts
-		opts = {},
-		-- Optional dependencies
-		dependencies = { { "nvim-mini/mini.icons", opts = {} } },
-		-- dependencies = { "nvim-tree/nvim-web-devicons" }, -- use if you prefer nvim-web-devicons
-		-- Lazy loading is not recommended because it is very tricky to make it work correctly in all situations.
-		lazy = false,
-	})
-	setup_plugin(
-		"yazi", --TODO: port from lazy
-		{
-			"mikavilpas/yazi.nvim",
-			version = "*", -- use the latest stable version
-			event = "VeryLazy",
-			dependencies = {
-				{ "nvim-lua/plenary.nvim", lazy = true },
-			},
-			keys = {
-				{
-					"<leader>-",
-					mode = { "n", "v" },
-					"<cmd>Yazi<cr>",
-					desc = "Open yazi at the current file",
-				},
-				{
-					-- Open in the current working directory
-					"<leader>cw",
-					"<cmd>Yazi cwd<cr>",
-					desc = "Open the file manager in nvim's working directory",
-				},
-				{
-					"<c-up>",
-					"<cmd>Yazi toggle<cr>",
-					desc = "Resume the last yazi session",
-				},
-			},
-			---@type YaziConfig | {}
-			opts = {
-				-- if you want to open yazi instead of netrw, see below for more info
-				open_for_directories = true,
-				keymaps = {
-					show_help = "<f1>",
-				},
-			},
-			init = function()
-				-- mark netrw as loaded so it's not loaded at all.
-				-- More details: https://github.com/mikavilpas/yazi.nvim/issues/802
-				vim.g.loaded_netrwPlugin = 1
-			end,
-		}
-	)
-	-- TODO: old
-	local load_yazi = setup_plugin("yazi", {
+local load_yazi = function()
+	setup_plugin("yazi", {
 		open_for_directories = true,
 		keymaps = { show_help = "<f1>" },
 	})
-	setup_plugin("neo-tree")
-	setup_plugin("nvim-tree", {
-		"nvim-tree/nvim-tree.lua",
-		dependencies = { "nvim-tree/nvim-web-devicons" }, -- optional icons
-		config = function()
-			require("nvim-tree").setup({})
-		end,
-	})
+end
 
-	setup_plugin("pickme", {
-		"2KAbhishek/pickme.nvim",
-		cmd = "PickMe",
-		event = "VeryLazy",
-		dependencies = {
-			-- Include at least one of these pickers:
-			"folke/snacks.nvim", -- For snacks.picker
-			-- 'nvim-telescope/telescope.nvim', -- For telescope
-			-- 'ibhagwan/fzf-lua', -- For fzf-lua
-		},
-		opts = {
+setup_plugin("yazi", function(yazi)
+	utils.packadd("plenary")
+	yazi.setup({
+		open_for_directories = true,
+		keymaps = { show_help = "<f1>" },
+	})
+	map_explicit({
+		"<leader>-",
+		mode = { "n", "v" },
+		"<cmd>Yazi<cr>",
+		desc = "Open yazi at the current file",
+	})
+	map_explicit({
+		-- Open in the current working directory
+		"<leader>cw",
+		"<cmd>Yazi cwd<cr>",
+		desc = "Open the file manager in nvim's working directory",
+	})
+	map_explicit({
+		"<c-up>",
+		"<cmd>Yazi toggle<cr>",
+		desc = "Resume the last yazi session",
+	})
+end)
+
+setup_plugin("blink.cmp", { ------------------------------------------------------------------------------------- blink
+	fuzzy = { implementation = "lua" }, -- TODO: change to Rust
+	keymap = {
+		-- 'default' for vim-like (C-y to accept)
+		-- 'super-tab' for vscode-like (Tab to accept/jump)
+		-- 'enter' for enter to accept
+		preset = "super-tab",
+
+		["<C-k>"] = { "select_prev", "fallback" },
+		["<C-j>"] = { "select_next", "fallback" },
+
+		["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+		["<C-e>"] = { "hide", "fallback" },
+		["<CR>"] = { "accept", "fallback" },
+
+		["<Tab>"] = { "snippet_forward", "fallback" },
+		["<S-Tab>"] = { "snippet_backward", "fallback" },
+
+		["<C-b>"] = { "scroll_documentation_up", "fallback" },
+		["<C-f>"] = { "scroll_documentation_down", "fallback" },
+	},
+})
+
+setup_plugin("friendly-snippets")
+setup_plugin("ultisnips")
+vim.api.nvim_create_autocmd("InsertEnter", function()
+	setup_plugin("LuaSnip", function(luasnip)
+		-- TODO: rewrite from lazy.nvim config
+		utils.packadd("friendly-snippets") -- Optional: for pre-made snippets
+		-- build = "make install_jsregexp" -- For regex snippets -- TODO: check build in Nix
+	end)
+end)
+
+setup_plugin("cmp-nvim-lsp")
+setup_plugin("cmp-buffer")
+setup_plugin("cmp-path")
+setup_plugin("cmp-cmdline")
+
+setup_plugin("lsp-format")
+setup_plugin("lspkind")
+
+setup_plugin("lspsaga")
+
+vim.api.create_user_command("PickMe", function()
+	setup_plugin("pickme", function(pickme)
+		-- Include at least one of these pickers:
+		utils.packadd("snacks") -- For snacks.picker
+		utils.packadd("telescope") -- For telescope
+		utils.packadd("fzf-lua") -- For fzf-lua
+		pickme.setup({
 			picker_provider = "snacks", -- Default provider
-		},
-	})
-	-- setup_plugin("telescope") MOVED
-
-	setup_plugin("fzf-lua")
-	setup_plugin("deck")
-
-	setup_plugin("mini.indent")
-	setup_plugin("mini.keymap")
-	setup_plugin("mini.sessions")
-	setup_plugin("mini.pick")
-	setup_plugin("mini.pairs")
-	setup_plugin("mini.icons")
-	setup_plugin("mini.surround")
-	setup_plugin("mini.comment", {})
-	setup_plugin("mini.hipatterns")
-	setup_plugin("mini.indentscope")
-	setup_plugin("mini.marks")
-	setup_plugin("mini.fold")
-	setup_plugin("mini.terminal")
-
-	setup_plugin("snacks")
-	setup_plugin("blink", function()
-		-- TODO: port from lazy
-		-- -@module 'blink.cmp'
-		-- -@type blink.cmp.Config
-		opts = {
-			-- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
-			-- 'super-tab' for mappings similar to vscode (tab to accept)
-			-- 'enter' for enter to accept
-			-- 'none' for no mappings
-			--
-			-- All presets have the following mappings:
-			-- C-space: Open menu or open docs if already open
-			-- C-n/C-p or Up/Down: Select next/previous item
-			-- C-e: Hide menu
-			-- C-k: Toggle signature help (if signature.enabled = true)
-			--
-			-- See :h blink-cmp-config-keymap for defining your own keymap
-			keymap = { preset = "default" },
-
-			appearance = {
-				-- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-				-- Adjusts spacing to ensure icons are aligned
-				nerd_font_variant = "mono",
-			},
-
-			-- (Default) Only show the documentation popup when manually triggered
-			completion = { documentation = { auto_show = false } },
-
-			-- Default list of enabled providers defined so that you can extend it
-			-- elsewhere in your config, without redefining it, due to `opts_extend`
-			sources = {
-				default = { "lsp", "path", "snippets", "buffer" },
-			},
-
-			-- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
-			-- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
-			-- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
-			--
-			-- See the fuzzy documentation for more information
-			fuzzy = { implementation = "prefer_rust_with_warning" },
-		}
-		opts_extend = { "sources.default" }
-	end)
-
-	setup_plugin("hlslens")
-	setup_plugin("hlsearch")
-
-	setup_plugin("grug-far")
-	setup_plugin("spectre")
-
-	setup_plugin("flybuf")
-	setup_plugin("stickybuf")
-	setup_plugin("swm", function(swm)
-		map("n", "<C-w>h", swm.h)
-		map("n", "<C-w>j", swm.j)
-		map("n", "<C-w>k", swm.k)
-		map("n", "<C-w>l", swm.l)
-	end)
-
-	setup_plugin("smart-splits")
-
-	setup_plugin("ufo")
-
-	setup_plugin("NeoComposer")
-	setup_plugin("nvim-macros", {
-		json_file_path = "./macros.json",
-		default_macro_register = "a",
-		json_formatter = "jq",
-	})
-	setup_plugin("recorder")
-
-	utils.packadd("vim-visual-multi", function()
-		vim.g.VM_default_mappings = true
-	end)
-
-	setup_plugin("leap")
-	setup_plugin("flash")
-	setup_plugin("hop")
-
-	setup_plugin("rainbow-delimiters")
-	setup_plugin("nvim-autopairs")
-
-	utils.packadd("vim-sandwich")
-
-	setup_plugin("nvim-surround")
-
-	utils.packadd("vim-mundo")
-
-	setup_plugin("mini.keymap")
-	setup_plugin("hydra")
-	setup_plugin("insx")
-	setup_plugin("which-key")
-
-	setup_plugin("indentmini")
-	utils.packadd("indent-blankline")
-	setup_plugin("nvim-anydent")
-	setup_plugin("mini.align")
-	utils.packadd("tabular")
-
-	setup_plugin("nvim-treesitter-textobjects", {
-		select = {
-			-- Automatically jump forward to textobj, similar to targets.vim
-			lookahead = true,
-			-- You can choose the select mode (default is charwise 'v')
-			--
-			-- Can also be a function which gets passed a table with the keys
-			-- * query_string: eg '@function.inner'
-			-- * method: eg 'v' or 'o'
-			-- and should return the mode ('v', 'V', or '<c-v>') or a table
-			-- mapping query_strings to modes.
-			selection_modes = {
-				["@parameter.outer"] = "v", -- charwise
-				["@function.outer"] = "V", -- linewise
-				-- ['@class.outer'] = '<c-v>', -- blockwise
-			},
-			-- If you set this to `true` (default is `false`) then any textobject is
-			-- extended to include preceding or succeeding whitespace. Succeeding
-			-- whitespace has priority in order to act similarly to eg the built-in
-			-- `ap`.
-			--
-			-- Can also be a function which gets passed a table with the keys
-			-- * query_string: eg '@function.inner'
-			-- * selection_mode: eg 'v'
-			-- and should return true of false
-			include_surrounding_whitespace = false,
-		},
-	})
-	utils.packadd("nvim-various-textobjs")
-
-	setup_plugin("Comment")
-	setup_plugin("todo-comments", {
-		"folke/todo-comments.nvim",
-		event = { "BufReadPre", "BufNewFile" }, -- Load on file read
-		dependencies = { "nvim-lua/plenary.nvim" },
-		config = function()
-			require("todo-comments").setup({
-				-- No options needed for basic setup
-			})
-		end,
-	})
-	utils.packadd("vim-commentary")
-
-	setup_plugin("treesj")
-	setup_plugin("dial", function(dial)
-		local augend = require("dial.augend")
-		local manipulate = require("dial.map")
-		require("dial.config").augends:register_group({
-			default = {
-				augend.integer.alias.decimal,
-				augend.integer.alias.hex,
-				augend.date.alias["%Y/%m/%d"],
-				augend.constant.alias.Bool,
-				augend.constant.alias.bool,
-			},
 		})
-		map("n", "<C-a>", function()
-			manipulate("increment", "normal")
-		end)
-		map("n", "<C-x>", function()
-			manipulate("decrement", "normal")
-		end)
-		map("n", "g<C-a>", function()
-			manipulate("increment", "gnormal")
-		end)
-		map("n", "g<C-x>", function()
-			manipulate("decrement", "gnormal")
-		end)
-		map("x", "<C-a>", function()
-			manipulate("increment", "visual")
-		end)
-		map("x", "<C-x>", function()
-			manipulate("decrement", "visual")
-		end)
-		map("x", "g<C-a>", function()
-			manipulate("increment", "gvisual")
-		end)
-		map("x", "g<C-x>", function()
-			manipulate("decrement", "gvisual")
-		end)
 	end)
-	setup_plugin("harpoon-core")
-	setup_plugin("marks", {
-		"chentoast/marks.nvim",
-		event = "VeryLazy",
-		opts = {},
-	})
-	setup_plugin("markit", {
-		"2kabhishek/markit.nvim",
-		dependencies = { "2kabhishek/pickme.nvim" },
-		config = {}, -- load_config('tools.marks'),
-		event = { "BufReadPre", "BufNewFile" },
-	})
+end)
 
-	setup_plugin("nvim-pasta")
+setup_plugin("fzf-lua")
+setup_plugin("deck")
 
-	setup_plugin("beam")
+setup_plugin("snacks")
 
-	setup_plugin(
-		"blink.cmp",
-		{ ------------------------------------------------------------------------------------- blink
-			fuzzy = { implementation = "lua" }, -- TODO: change to Rust
-			keymap = {
-				-- 'default' for vim-like (C-y to accept)
-				-- 'super-tab' for vscode-like (Tab to accept/jump)
-				-- 'enter' for enter to accept
-				preset = "super-tab",
+setup_plugin("hlslens")
+setup_plugin("hlsearch")
 
-				["<C-k>"] = { "select_prev", "fallback" },
-				["<C-j>"] = { "select_next", "fallback" },
+setup_plugin("grug-far")
+setup_plugin("spectre")
 
-				["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
-				["<C-e>"] = { "hide", "fallback" },
-				["<CR>"] = { "accept", "fallback" },
+setup_plugin("flybuf")
+setup_plugin("stickybuf")
+setup_plugin("swm", function(swm)
+	map("n", "<C-w>h", swm.h)
+	map("n", "<C-w>j", swm.j)
+	map("n", "<C-w>k", swm.k)
+	map("n", "<C-w>l", swm.l)
+end)
 
-				["<Tab>"] = { "snippet_forward", "fallback" },
-				["<S-Tab>"] = { "snippet_backward", "fallback" },
+setup_plugin("smart-splits")
 
-				["<C-b>"] = { "scroll_documentation_up", "fallback" },
-				["<C-f>"] = { "scroll_documentation_down", "fallback" },
-			},
-		}
-	)
-	setup_plugin("nvim-cmp", { -- TODO: port from lazy
-		"hrsh7th/nvim-cmp",
-		event = "InsertEnter",
-		dependencies = {
-			"hrsh7th/cmp-nvim-lsp",
-			"hrsh7th/cmp-buffer",
-			"hrsh7th/cmp-path",
-			"saadparwaiz1/cmp_luasnip",
+setup_plugin("ufo")
+
+setup_plugin("NeoComposer")
+setup_plugin("nvim-macros", {
+	json_file_path = "./macros.json",
+	default_macro_register = "a",
+	json_formatter = "jq",
+})
+setup_plugin("recorder")
+
+utils.packadd("vim-visual-multi", function()
+	vim.g.VM_default_mappings = true
+end)
+
+setup_plugin("leap")
+setup_plugin("flash")
+setup_plugin("hop")
+
+setup_plugin("rainbow-delimiters")
+setup_plugin("nvim-autopairs")
+
+utils.packadd("vim-sandwich")
+
+setup_plugin("nvim-surround")
+
+utils.packadd("vim-mundo")
+
+setup_plugin("mini.keymap")
+setup_plugin("hydra")
+setup_plugin("insx")
+setup_plugin("which-key")
+
+setup_plugin("indentmini")
+utils.packadd("indent-blankline")
+setup_plugin("nvim-anydent")
+setup_plugin("mini.align")
+utils.packadd("tabular")
+
+setup_plugin("nvim-treesitter-textobjects", {
+	select = {
+		-- Automatically jump forward to textobj, similar to targets.vim
+		lookahead = true,
+		-- You can choose the select mode (default is charwise 'v')
+		--
+		-- Can also be a function which gets passed a table with the keys
+		-- * query_string: eg '@function.inner'
+		-- * method: eg 'v' or 'o'
+		-- and should return the mode ('v', 'V', or '<c-v>') or a table
+		-- mapping query_strings to modes.
+		selection_modes = {
+			["@parameter.outer"] = "v", -- charwise
+			["@function.outer"] = "V", -- linewise
+			-- ['@class.outer'] = '<c-v>', -- blockwise
 		},
-		config = function()
-			vim.lsp.config("*", { capabilities = require("cmp_nvim_lsp").default_capabilities() })
-			vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
-			local cmp = require("cmp")
-			local defaults = require("cmp.config.default")()
-			local auto_select = true
-			return {
-				snippet = {
-					-- REQUIRED for luasnip
-					expand = function(args)
-						luasnip.lsp_expand(args.body)
-					end,
-				},
-				auto_brackets = {},
-				completion = {
-					completeopt = "menu,menuone,noinsert" .. (auto_select and "" or ",noselect"),
-				},
-				preselect = auto_select and cmp.PreselectMode.Item or cmp.PreselectMode.None,
-				mapping = cmp.mapping.preset.insert({
-					["<C-b>"] = cmp.mapping.scroll_docs(-4),
-					["<C-f>"] = cmp.mapping.scroll_docs(4),
-					["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-					["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-					["<C-Space>"] = cmp.mapping.complete(),
-					["<C-e>"] = cmp.mapping.abort(),
-					["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept selected suggestion
-					--   ["<CR>"] = LazyVim.cmp.confirm({ select = auto_select }),
-					--   ["<C-y>"] = LazyVim.cmp.confirm({ select = true }),
-					--   ["<S-CR>"] = LazyVim.cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-					["<C-CR>"] = function(fallback)
-						cmp.abort()
-						fallback()
-					end,
+		-- If you set this to `true` (default is `false`) then any textobject is
+		-- extended to include preceding or succeeding whitespace. Succeeding
+		-- whitespace has priority in order to act similarly to eg the built-in
+		-- `ap`.
+		--
+		-- Can also be a function which gets passed a table with the keys
+		-- * query_string: eg '@function.inner'
+		-- * selection_mode: eg 'v'
+		-- and should return true of false
+		include_surrounding_whitespace = false,
+	},
+})
+utils.packadd("nvim-various-textobjs")
 
-					["<Tab>"] = cmp.mapping(function(fallback)
-						if cmp.visible() then
-							cmp.select_next_item()
-						elseif luasnip.expand_or_jumpable() then
-							luasnip.expand_or_jump()
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
+setup_plugin("Comment")
 
-					["<S-Tab>"] = cmp.mapping(function(fallback)
-						if cmp.visible() then
-							cmp.select_prev_item()
-						elseif luasnip.jumpable(-1) then
-							luasnip.jump(-1)
-						else
-							fallback()
-						end
-					end, { "i", "s" }),
-					--   ["<tab>"] = function(fallback)
-					-- 	return LazyVim.cmp.map({ "snippet_forward", "ai_nes", "ai_accept" }, fallback)()
-					--   end,
-				}),
-				sources = cmp.config.sources({
-					{ name = "nvim_lsp" },
-					{ name = "luasnip" },
-				}, {
-					{ name = "buffer" },
-					{ name = "path" },
-				}),
-				formatting = {
-					format = function(entry, item)
-						-- local icons = LazyVim.config.icons.kinds
-						-- if icons[item.kind] then
-						--   item.kind = icons[item.kind] .. item.kind
-						-- end
+utils.packadd("vim-commentary")
 
-						local widths = {
-							abbr = vim.g.cmp_widths and vim.g.cmp_widths.abbr or 40,
-							menu = vim.g.cmp_widths and vim.g.cmp_widths.menu or 30,
-						}
+setup_plugin("treesj")
+setup_plugin("dial", function(dial)
+	local augend = require("dial.augend")
+	local manipulate = require("dial.map")
+	require("dial.config").augends:register_group({
+		default = {
+			augend.integer.alias.decimal,
+			augend.integer.alias.hex,
+			augend.date.alias["%Y/%m/%d"],
+			augend.constant.alias.Bool,
+			augend.constant.alias.bool,
+		},
+	})
+	map("n", "<C-a>", function()
+		manipulate("increment", "normal")
+	end)
+	map("n", "<C-x>", function()
+		manipulate("decrement", "normal")
+	end)
+	map("n", "g<C-a>", function()
+		manipulate("increment", "gnormal")
+	end)
+	map("n", "g<C-x>", function()
+		manipulate("decrement", "gnormal")
+	end)
+	map("x", "<C-a>", function()
+		manipulate("increment", "visual")
+	end)
+	map("x", "<C-x>", function()
+		manipulate("decrement", "visual")
+	end)
+	map("x", "g<C-a>", function()
+		manipulate("increment", "gvisual")
+	end)
+	map("x", "g<C-x>", function()
+		manipulate("decrement", "gvisual")
+	end)
+end)
+setup_plugin("harpoon-core")
 
-						for key, width in pairs(widths) do
-							if item[key] and vim.fn.strdisplaywidth(item[key]) > width then
-								item[key] = vim.fn.strcharpart(item[key], 0, width - 1) .. "…"
-							end
-						end
+setup_plugin("marks", {})
 
-						return item
-					end,
-				},
-				experimental = {
-					-- only show ghost text when we show ai completions
-					ghost_text = vim.g.ai_cmp and {
-						hl_group = "CmpGhostText",
-					} or false,
-				},
-				sorting = defaults.sorting,
-			}
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, function()
+	setup_plugin("markit", function(markit)
+		utils.packadd("pickme")
+	end)
+end)
+
+setup_plugin("nvim-pasta")
+
+setup_plugin("beam")
+
+setup_plugin("neo-tree")
+setup_plugin("nvim-tree", function(nvimtree)
+	utils.packadd("nvim-web-devicons")
+	nvimtree.setup()
+end)
+
+setup_plugin("octo")
+setup_plugin("gitlab-nvim")
+setup_plugin("gitlab")
+
+setup_plugin("dashboard-nvim")
+setup_plugin("dashboard")
+setup_plugin("noice")
+setup_plugin("modes")
+
+setup_plugin("fidget")
+setup_plugin("nvim-notify")
+setup_plugin("headlines")
+
+setup_plugin("auto-session")
+setup_plugin("persistence")
+setup_plugin("gitsigns", function()
+	event =
+		{ "BufReadPre", "BufNewFile" }, -- Load on file read or new file TODO
+		require("gitsigns").setup({})
+end)
+setup_plugin("structlog")
+setup_plugin("neorepl")
+setup_plugin("copilot-lua", function(copilot)
+	local function setup_copilot()
+		copilot.setup({
+			suggestion = { enabled = true },
+			panel = { enabled = true },
+		})
+	end
+	vim.api.nvim_create_user_command("Copilot", setup_copilot)
+	vim.api.nvim_create_autocmd("InsertEnter", setup_copilot)
+end)
+utils.packadd("vimtex", function()
+	vim.g.vimtex_view_method = "zathura"
+end)
+setup_plugin("markdown-preview")
+setup_plugin("texmagic")
+setup_plugin("schemastore")
+setup_plugin("firenvim")
+setup_plugin("render-markdown")
+setup_plugin("jupytext")
+setup_plugin("quarto")
+
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, function()
+	setup_plugin("todo-comments", {})
+end)
+
+setup_plugin("lazydev")
+setup_plugin("rustaceanvim")
+setup_plugin("crates")
+setup_plugin("haskell-tools")
+
+setup_plugin("none-ls")
+
+setup_plugin("guard")
+setup_plugin("conform", function(conform)
+	require("conform").setup({
+		formatters_by_ft = {
+			python = {
+				-- To fix auto-fixable lint errors.
+				"ruff_fix",
+				-- To run the Ruff formatter.
+				"ruff_format",
+				-- To organize the imports.
+				"ruff_organize_imports",
+			},
+			lua = {
+				"stylua",
+			},
+		},
+	})
+
+	-- Optional: format on save
+	vim.api.nvim_create_autocmd("BufWritePre", {
+		callback = function(args)
+			require("conform").format({ bufnr = args.buf })
 		end,
 	})
-	-- dependencies = {
-	--     "hrsh7th/cmp-nvim-lsp",
-	--     "hrsh7th/cmp-buffer",
-	--     "hrsh7th/cmp-path",
-	--     "saadparwaiz1/cmp_luasnip",
-	-- }
-	--[[
-    local old_setup_nvim_cmp = function()
+end)
+
+setup_plugin("asyncrun")
+setup_plugin("neotest-haskell")
+setup_plugin("neotest-python")
+
+setup_plugin("mypy")
+setup_plugin("nvim-lint")
+
+setup_plugin("trouble.nvim")
+setup_plugin("quicker")
+setup_plugin("nvim-bqf", {
+	ft = "qf", -- Lazy load on opening the quickfix window
+	-- TODO should lazy load on opening the quickfix window -> ft = "qf"
+})
+
+setup_plugin("vim-floaterm", function()
+	utils.packadd("vim-floaterm")
+	-- Optional: Set global configurations for floaterm if needed
+	vim.g.floaterm_width = 0.8
+	vim.g.floaterm_height = 0.8
+
+	-- This is the crucial part for color integration
+	-- TODO
+end)
+setup_plugin("toggleterm", {
+	open_mapping = [[<c-\>]],
+	direction = "float",
+	-- this is the key to inheriting your colorscheme's background
+	highlights = {
+		Normal = {
+			link = "Normal",
+		},
+		NormalFloat = {
+			link = "NormalFloat",
+		},
+	},
+})
+
+setup_plugin("overseer")
+
+setup_plugin("refactoring")
+
+setup_plugin("project")
+setup_plugin("telescope-project")
+
+setup_plugin("jj")
+setup_plugin("jujutsu")
+setup_plugin("lazygit")
+setup_plugin("git-conflict")
+setup_plugin("neogit")
+setup_plugin("jiejie")
+setup_plugin("diffview", function()
+	-- TODO: port from lazy
+	cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" }
+	dependencies = { "plenary" }
+	require("diffview").setup({})
+end)
+
+setup_plugin("vim-fugitive")
+
+recent_init = true -- ==================================================================================
+
+-- FROM LAZY (?): opts_extend = { "sources.default" }
+setup_plugin("blink", {
+	-- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
+	-- 'super-tab' for mappings similar to vscode (tab to accept)
+	-- 'enter' for enter to accept
+	-- 'none' for no mappings
+	--
+	-- All presets have the following mappings:
+	-- C-space: Open menu or open docs if already open
+	-- C-n/C-p or Up/Down: Select next/previous item
+	-- C-e: Hide menu
+	-- C-k: Toggle signature help (if signature.enabled = true)
+	--
+	-- See :h blink-cmp-config-keymap for defining your own keymap
+	keymap = { preset = "default" },
+
+	appearance = {
+		-- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
+		-- Adjusts spacing to ensure icons are aligned
+		nerd_font_variant = "mono",
+	},
+
+	-- (Default) Only show the documentation popup when manually triggered
+	completion = { documentation = { auto_show = false } },
+
+	-- Default list of enabled providers defined so that you can extend it
+	-- elsewhere in your config, without redefining it, due to `opts_extend`
+	sources = {
+		default = { "lsp", "path", "snippets", "buffer" },
+	},
+
+	-- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
+	-- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
+	-- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
+	--
+	-- See the fuzzy documentation for more information
+	fuzzy = { implementation = "prefer_rust_with_warning" },
+})
+
+setup_plugin("nvim-cmp", function()
+	utils.packadd("cmp-nvim-lsp")
+	utils.packadd("cmp-buffer")
+	utils.packadd("cmp-path")
+	utils.packadd("cmp_luasnip")
+
 	vim.lsp.config("*", { capabilities = require("cmp_nvim_lsp").default_capabilities() })
 	vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
 	local cmp = require("cmp")
@@ -3397,7 +3353,7 @@ if recent_init then --=============
 			["<CR>"] = cmp.mapping.confirm({ select = true }), -- Accept selected suggestion
 			--   ["<CR>"] = LazyVim.cmp.confirm({ select = auto_select }),
 			--   ["<C-y>"] = LazyVim.cmp.confirm({ select = true }),
-			--   ["<S-CR>"] = LazyVim.cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace })
+			--   ["<S-CR>"] = LazyVim.cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
 			-- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
 			["<C-CR>"] = function(fallback)
 				cmp.abort()
@@ -3423,11 +3379,15 @@ if recent_init then --=============
 					fallback()
 				end
 			end, { "i", "s" }),
+
+			["<tab>"] = function(fallback) -- what goes here?
+			end,
 			--   ["<tab>"] = function(fallback)
-			--     return LazyVim.cmp.map({ "snippet_forward", "ai_nes", "ai_accept" }, fallback)()
+			-- 	return LazyVim.cmp.map_explicit({ "snippet_forward", "ai_nes", "ai_accept" }, fallback)()
 			--   end,
 		}),
 		sources = cmp.config.sources({
+			{ name = "lazydev" },
 			{ name = "nvim_lsp" },
 			{ name = "luasnip" },
 		}, {
@@ -3463,413 +3423,41 @@ if recent_init then --=============
 		},
 		sorting = defaults.sorting,
 	}
-	end
-	]]
+end)
 
-	-- {
-	-- 	"hrsh7th/nvim-cmp",
-	-- 	version = false, -- last release is way too old
-	-- 	event = "InsertEnter",
-	-- 	dependencies = {
-	-- 	  "hrsh7th/cmp-nvim-lsp",
-	-- 	  "hrsh7th/cmp-buffer",
-	-- 	  "hrsh7th/cmp-path",
-	-- 	},
-	-- 	-- Not all LSP servers add brackets when completing a function.
-	-- 	-- To better deal with this, LazyVim adds a custom option to cmp,
-	-- 	-- that you can configure. For example:
-	-- 	--
-	-- 	-- ```lua
-	-- 	-- opts = {
-	-- 	--   auto_brackets = { "python" }
-	-- 	-- }
-	-- 	-- ```
-	-- 	opts = function()
-	-- 	  -- Register nvim-cmp lsp capabilities
-	-- 	  vim.lsp.config("*", { capabilities = require("cmp_nvim_lsp").default_capabilities() })
-
-	-- 	  vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
-	-- 	  local cmp = require("cmp")
-	-- 	  local defaults = require("cmp.config.default")()
-	-- 	  local auto_select = true
-	-- 	  return {
-	-- 		auto_brackets = {}, -- configure any filetype to auto add brackets
-	-- 		completion = {
-	-- 		  completeopt = "menu,menuone,noinsert" .. (auto_select and "" or ",noselect"),
-	-- 		},
-	-- 		preselect = auto_select and cmp.PreselectMode.Item or cmp.PreselectMode.None,
-	-- 		mapping = cmp.mapping.preset.insert({
-	-- 		  ["<C-b>"] = cmp.mapping.scroll_docs(-4),
-	-- 		  ["<C-f>"] = cmp.mapping.scroll_docs(4),
-	-- 		  ["<C-n>"] = cmp.mapping.select_next_item({ behavior = cmp.SelectBehavior.Insert }),
-	-- 		  ["<C-p>"] = cmp.mapping.select_prev_item({ behavior = cmp.SelectBehavior.Insert }),
-	-- 		  ["<C-Space>"] = cmp.mapping.complete(),
-	-- 		  ["<CR>"] = LazyVim.cmp.confirm({ select = auto_select }),
-	-- 		  ["<C-y>"] = LazyVim.cmp.confirm({ select = true }),
-	-- 		  ["<S-CR>"] = LazyVim.cmp.confirm({ behavior = cmp.ConfirmBehavior.Replace }), -- Accept currently selected item. Set `select` to `false` to only confirm explicitly selected items.
-	-- 		  ["<C-CR>"] = function(fallback)
-	-- 			cmp.abort()
-	-- 			fallback()
-	-- 		  end,
-	-- 		  ["<tab>"] = function(fallback)
-	-- 			return LazyVim.cmp.map({ "snippet_forward", "ai_nes", "ai_accept" }, fallback)()
-	-- 		  end,
-	-- 		}),
-	-- 		sources = cmp.config.sources({
-	-- 		  { name = "lazydev" },
-	-- 		  { name = "nvim_lsp" },
-	-- 		  { name = "path" },
-	-- 		}, {
-	-- 		  { name = "buffer" },
-	-- 		}),
-	-- 		formatting = {
-	-- 		  format = function(entry, item)
-	-- 			local icons = LazyVim.config.icons.kinds
-	-- 			if icons[item.kind] then
-	-- 			  item.kind = icons[item.kind] .. item.kind
-	-- 			end
-
-	-- 			local widths = {
-	-- 			  abbr = vim.g.cmp_widths and vim.g.cmp_widths.abbr or 40,
-	-- 			  menu = vim.g.cmp_widths and vim.g.cmp_widths.menu or 30,
-	-- 			}
-
-	-- 			for key, width in pairs(widths) do
-	-- 			  if item[key] and vim.fn.strdisplaywidth(item[key]) > width then
-	-- 				item[key] = vim.fn.strcharpart(item[key], 0, width - 1) .. "…"
-	-- 			  end
-	-- 			end
-
-	-- 			return item
-	-- 		  end,
-	-- 		},
-	-- 		experimental = {
-	-- 		  -- only show ghost text when we show ai completions
-	-- 		  ghost_text = vim.g.ai_cmp and {
-	-- 			hl_group = "CmpGhostText",
-	-- 		  } or false,
-	-- 		},
-	-- 		sorting = defaults.sorting,
-	-- 	  }
-	-- 	end,
-	-- 	main = "lazyvim.util.cmp",
-	--   },
-
-	setup_plugin("friendly-snippets")
-	setup_plugin("ultisnips")
-	setup_plugin("LuaSnip", function(luasnip)
-		-- TODO: rewrite from lazy.nvim config
-		dependencies = { "rafamadriz/friendly-snippets" } -- Optional: for pre-made snippets
-		build = "make install_jsregexp" -- For regex snippets
-		event = "InsertEnter"
-	end)
-
-	setup_plugin("cmp-nvim-lsp")
-	setup_plugin("cmp-buffer")
-	setup_plugin("cmp-path")
-	setup_plugin("cmp-cmdline")
-
-	setup_plugin("lsp-format")
-	setup_plugin("lspkind")
-
-	setup_plugin("lspsaga")
-
-	setup_plugin("lazydev")
-	setup_plugin("rustaceanvim")
-	setup_plugin("crates")
-	setup_plugin("haskell-tools")
-
-	setup_plugin("none-ls")
-
-	setup_plugin("guard")
-	setup_plugin("conform", function(conform)
-		require("conform").setup({
-			formatters_by_ft = {
-				python = {
-					-- To fix auto-fixable lint errors.
-					"ruff_fix",
-					-- To run the Ruff formatter.
-					"ruff_format",
-					-- To organize the imports.
-					"ruff_organize_imports",
-				},
-				lua = {
-					"stylua",
-				},
-			},
-		})
-
-		-- Optional: format on save
-		vim.api.nvim_create_autocmd("BufWritePre", {
-			callback = function(args)
-				require("conform").format({ bufnr = args.buf })
-			end,
-		})
-	end)
-
-	setup_plugin("asyncrun")
-	setup_plugin("neotest-haskell")
-	setup_plugin("neotest-python")
-	setup_plugin(
-		"neotest", -- TODO: https://tamerlan.dev/setting-up-a-testing-environment-in-neovim/
-		{ -- TODO: port from lazy
-			"nvim-neotest/neotest",
-			dependencies = {
-				"nvim-lua/plenary.nvim",
-				"nvim-treesitter/nvim-treesitter",
-				"antoinemadec/FixCursorHold.nvim",
-				"nvim-neotest/nvim-nio",
-
-				"nvim-neotest/neotest-python",
-			},
-			config = function()
-				require("neotest").setup({
-					adapters = {
-						require("neotest-python")({
-							-- Extra arguments for nvim-dap configuration
-							-- See https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for values
-							dap = { justMyCode = false },
-							-- Command line arguments for runner
-							-- Can also be a function to return dynamic values
-							args = { "--log-level", "DEBUG" },
-							-- Runner to use. Will use pytest if available by default.
-							-- Can be a function to return dynamic value.
-							runner = "pytest",
-							-- Custom python path for the runner.
-							-- Can be a string or a list of strings.
-							-- Can also be a function to return dynamic value.
-							-- If not provided, the path will be inferred by checking for
-							-- virtual envs in the local directory and for Pipenev/Poetry configs
-							python = ".venv/bin/python",
-							-- Returns if a given file path is a test file.
-							-- NB: This function is called a lot so don't perform any heavy tasks within it.
-							-- is_test_file = function(file_path)
-							-- end,
-							-- !!EXPERIMENTAL!! Enable shelling out to `pytest` to discover test
-							-- instances for files containing a parametrize mark (default: false)
-							pytest_discover_instances = true,
-						}),
-					},
-				})
-			end,
-		}
-	)
-	setup_plugin("dap-python", function(dap_python)
-		(dap_python.setup)("debugpy-adapter")
-		dap_python.test_runner = "pytest"
-		map("n", "<leader>tt", function()
-			print("Leader is working!")
-		end)
-		map("n", "<leader>pp", function()
-			print("This works")
-		end)
-		map("n", "<leader>dn", dap_python.test_method)
-		map("n", "<leader>df", dap_python.test_class)
-		map("v", "<leader>ds", dap_python.debug_selection)
-	end)
-	setup_plugin("dapui")
-	setup_plugin("nvim-dap-virtual-text")
-	setup_plugin("dap")
-	setup_plugin("mypy")
-	setup_plugin("nvim-lint")
-
-	setup_plugin("trouble.nvim")
-	setup_plugin("quicker")
-	setup_plugin("nvim-bqf", {
-		ft = "qf", -- Lazy load on opening the quickfix window
-		-- TODO should lazy load on opening the quickfix window -> ft = "qf"
-	})
-
-	setup_plugin("vim-floaterm", {
-		"voldikss/vim-floaterm",
-		config = function()
-			-- Optional: Set global configurations for floaterm if needed
-			vim.g.floaterm_width = 0.8
-			vim.g.floaterm_height = 0.8
-
-			-- This is the crucial part for color integration
-		end,
-	})
-	setup_plugin("toggleterm", {
-		open_mapping = [[<c-\>]],
-		direction = "float",
-		-- this is the key to inheriting your colorscheme's background
-		highlights = {
-			Normal = {
-				link = "Normal",
-			},
-			NormalFloat = {
-				link = "NormalFloat",
-			},
+-- TODO: https://tamerlan.dev/setting-up-a-testing-environment-in-neovim/
+setup_plugin("neotest", function(neotest)
+	utils.packadd("plenary")
+	utils.packadd("FixCursorHold")
+	utils.packadd("nvim-nio")
+	utils.packadd("neotest-python")
+	-- DEPRECATE: utils.packadd("nvim-treesitter")
+	neotest.setup({
+		adapters = {
+			require("neotest-python")({
+				-- Extra arguments for nvim-dap configuration
+				-- See https://github.com/microsoft/debugpy/wiki/Debug-configuration-settings for values
+				dap = { justMyCode = false },
+				-- Command line arguments for runner
+				-- Can also be a function to return dynamic values
+				args = { "--log-level", "DEBUG" },
+				-- Runner to use. Will use pytest if available by default.
+				-- Can be a function to return dynamic value.
+				runner = "pytest",
+				-- Custom python path for the runner.
+				-- Can be a string or a list of strings.
+				-- Can also be a function to return dynamic value.
+				-- If not provided, the path will be inferred by checking for
+				-- virtual envs in the local directory and for Pipenev/Poetry configs
+				python = ".venv/bin/python",
+				-- Returns if a given file path is a test file.
+				-- NB: This function is called a lot so don't perform any heavy tasks within it.
+				-- is_test_file = function(file_path)
+				-- end,
+				-- !!EXPERIMENTAL!! Enable shelling out to `pytest` to discover test
+				-- instances for files containing a parametrize mark (default: false)
+				pytest_discover_instances = true,
+			}),
 		},
 	})
-	local old_crap = {
-		"akinsho/toggleterm.nvim",
-		version = "*",
-		opts = {
-			-- Your other toggleterm options here...
-			open_mapping = [[<c-\>]],
-			direction = "float",
-			-- This is the key to inheriting your colorscheme's background
-			highlights = {
-				Normal = {
-					link = "Normal",
-				},
-				NormalFloat = {
-					link = "NormalFloat",
-				},
-			},
-		},
-		config = function()
-			require("toggleterm").setup()
-		end,
-	}
-
-	setup_plugin("overseer")
-
-	setup_plugin("refactoring")
-
-	setup_plugin("project")
-	setup_plugin("telescope-project")
-
-	setup_plugin("jj")
-	setup_plugin("jujutsu")
-	setup_plugin("lazygit")
-	setup_plugin("git-conflict")
-	setup_plugin("neogit")
-	setup_plugin("jiejie")
-	setup_plugin("diffview", function()
-		-- TODO: port from lazy
-		cmd = { "DiffviewOpen", "DiffviewClose", "DiffviewToggleFiles", "DiffviewFocusFiles" }
-		dependencies = { "nvim-lua/plenary.nvim" }
-		require("diffview").setup({})
-	end)
-	setup_plugin("gitsigns", function()
-		event =
-			{ "BufReadPre", "BufNewFile" }, -- Load on file read or new file TODO
-			require("gitsigns").setup({})
-	end)
-	setup_plugin("vim-fugitive")
-
-	setup_plugin("octo")
-	setup_plugin("gitlab-nvim")
-	setup_plugin("gitlab")
-
-	setup_plugin("dashboard-nvim")
-	setup_plugin("dashboard")
-	setup_plugin("noice")
-	setup_plugin("modes")
-
-	setup_plugin("fidget")
-	setup_plugin("nvim-notify")
-	setup_plugin("headlines")
-
-	setup_plugin("auto-session")
-	setup_plugin("persistence")
-
-	utils.packadd("vimtex", function()
-		vim.g.vimtex_view_method = "zathura"
-	end)
-	setup_plugin("texmagic")
-	setup_plugin("schemastore")
-	setup_plugin("firenvim")
-	setup_plugin("render-markdown")
-	setup_plugin("jupytext")
-	setup_plugin("quarto")
-	setup_plugin("markdown-preview")
-
-	setup_plugin("structlog")
-	setup_plugin("neorepl")
-
-	setup_plugin("copilot-lua", function() -- TODO
-		cmd = "Copilot" -- TODO: port from lazy
-		event = "InsertEnter" -- TODO: port from lazy
-		require("copilot").setup({
-			suggestion = { enabled = true },
-			panel = { enabled = true },
-		})
-	end)
-end
-
-setup_plugin("dial")
-
-local scratch = false
-if scratch then
-	--------- old implementation
-
-	local has_nix, nix_plugins = pcall(require, "nix_plugins")
-
-	---@param id string The key in the nix_plugins table (e.g., "oil-nvim")
-	---@param github_src string Fallback GitHub URL
-	local function get_spec(id, github_src)
-		local dev_path = vim.fn.expand("~/repos/" .. id)
-		if vim.uv.fs_stat(dev_path) then
-			return { path = dev_path }
-		end
-
-		if has_nix and nix_plugins[id] then
-			return { path = nix_plugins[id] }
-		end
-
-		return { src = github_src }
-	end
-
-	--------- oldest sketch
-
-	local M = {}
-
-	-- Detect if we are on a Nix-managed system
-	-- We check for a specific environment variable or the /nix/store directory
-	M.is_nix = vim.uv.fs_stat("/nix/store") ~= nil
-
-	---@param name string The plugin folder name (e.g., "oil.nvim")
-	---@param repo string The GitHub shorthand (e.g., "stevearc/oil.nvim")
-	---@return table
-	function M.plug(name, repo)
-		if M.is_nix then
-			-- On Nix, we assume the plugin is already provided in the packpath
-			-- or available in a specific local directory managed by Nix.
-			-- Adjust "/etc/profiles/per-user/$USER/share/nvim/site/..." if needed.
-			local nix_path = vim.fn.expand("~/.nix-profile/share/nvim/site/pack/dist/start/" .. name)
-
-			if vim.uv.fs_stat(nix_path) then
-				return { path = nix_path }
-			end
-		end
-
-		-- Fallback for Git: use the remote URI
-		return { src = "https://github.com/" .. repo }
-	end
-
-	-- Example Usage:
-	vim.pack.add({
-		M.plug("oil.nvim", "stevearc/oil.nvim"),
-		M.plug("blink.cmp", "saghen/blink.cmp"),
-		M.plug("rustaceanvim", "mrcjkb/rustaceanvim"),
-	})
-
-	-- PLUGINS DIR (OLD)
-	local plugin_base_dir = vim.fn.expand("~/.local/share/nvim-plugins")
-
-	-- Get a list of all directories inside your custom folder
-	local handle = vim.uv.fs_scandir(plugin_base_dir)
-
-	if handle then
-		while true do
-			local name, type = vim.uv.fs_scandir_next(handle)
-			if not name then
-				break
-			end
-
-			-- Only process directories (skip READMEs, .DS_Store, etc.)
-			if type == "directory" and name == "yazi" or name == "plenary" then
-				local plugin_path = plugin_base_dir .. "/" .. name
-
-				-- Prepend to RTP so your manual plugins take priority over defaults
-				vim.opt.runtimepath:prepend(plugin_path)
-			end
-		end
-	else
-		print("Warning: Plugin directory not found: " .. plugin_base_dir)
-	end
-end
+end)
