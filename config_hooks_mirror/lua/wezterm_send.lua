@@ -60,17 +60,37 @@ end
 --- Works in both visual mode (live) and after leaving visual mode ('' mark pair).
 ---@return string
 local function get_visual_selection()
-	-- Save and restore unnamed register
-	local saved_reg = vim.fn.getreg('"')
-	local saved_regtype = vim.fn.getregtype('"')
+  local mode = vim.fn.mode()
+  local start_pos, end_pos
 
-	-- Re-select the last visual selection and yank it
-	vim.cmd("noau normal! `<v`>y")
+  if mode == "v" or mode == "V" or mode == "\22" then
+    -- Called via <Cmd> mapping: still in visual mode, marks not set yet.
+    -- 'v' is the anchor point, '.' is the cursor (either can be the "start").
+    start_pos = vim.fn.getpos("v")
+    end_pos   = vim.fn.getpos(".")
+    -- Normalise so start_pos is always the earlier position
+    if start_pos[2] > end_pos[2]
+      or (start_pos[2] == end_pos[2] and start_pos[3] > end_pos[3])
+    then
+      start_pos, end_pos = end_pos, start_pos
+    end
+  else
+    -- Called after visual mode was exited normally; marks are reliable.
+    start_pos = vim.fn.getpos("'<")
+    end_pos   = vim.fn.getpos("'>")
+    if start_pos[2] == 0 then return "" end
+  end
 
-	local text = vim.fn.getreg('"')
-	vim.fn.setreg('"', saved_reg, saved_regtype)
+  local start_line = start_pos[2] - 1
+  local start_col  = start_pos[3] - 1
+  local end_line   = end_pos[2] - 1
+  local end_col    = end_pos[3]
 
-	return text
+  local line_len = #vim.api.nvim_buf_get_lines(0, end_line, end_line + 1, true)[1]
+  end_col = math.min(end_col, line_len)
+
+  local lines = vim.api.nvim_buf_get_text(0, start_line, start_col, end_line, end_col, {})
+  return table.concat(lines, "\n")
 end
 
 --- Escape text so it is safe to pass as a single shell argument.
@@ -333,11 +353,13 @@ function M.setup(opts)
 	local wezmap = function(key)
 		local lhs = prefix .. key
 		local direction = directions[key]
+        local direction_lower = string.lower(direction)
 		local rhs = function()
+            print("Sending selection " .. direction_lower .. ".")
 			M.send_selection({ direction = direction })
 		end
-		local desc = "Send selection: WezTerm pane (" .. string.lower(direction) .. ")"
-		vim.keymap.set("v", lhs, rhs, { desc = desc, silent = true })
+		local desc = "Send selection: WezTerm pane (" .. direction_lower .. ")"
+		vim.keymap.set("v", lhs, rhs, { desc = desc }) --, silent = true })
 	end
 
 	for _, k in pairs({ "h", "j", "k", "l", "n", "p" }) do
@@ -347,7 +369,7 @@ function M.setup(opts)
 	vim.keymap.set(
 		"v",
 		prefix .. "w",
-		M.send_selection({ pick = true }),
+		function() M.send_selection({ pick = true }) end,
 		{ desc = "Send selection: pick WezTerm pane", silent = true }
 	)
 end

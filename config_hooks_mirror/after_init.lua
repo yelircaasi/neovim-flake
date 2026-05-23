@@ -69,28 +69,38 @@
 	--]]
 
 print("Entering after_init.lua.")
-vim.opt.runtimepath.prepend(CONFIG_DIR)
+--TODO: change after new build
+NVIM_HOME = vim.fn.expand("~/.config/nvim")
+print(NVIM_HOME)
+vim.opt.runtimepath:prepend(NVIM_HOME)
+-- print(utils)
 
-utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
-utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
-utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
+no_skip = false
+if no_skip then
+	utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
+	utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
+	utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
+
+	local CONFIG_DIR = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h")
+local PWD = vim.fn.getcwd()
+local NVIM_DIR = vim.fn.expand("~/.config/nvim")
+HAS_NIX, PLUGIN_LOCATIONS = pcall(dofile, NVIM_DIR .. "/nix_plugins.lua")
+BE_VERBOSE = false
+end
 
 local setup_plugin = utils.setup_plugin
 local packadd = utils.packadd
 
 -- utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
 
-local CONFIG_DIR = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h")
-local PWD = vim.fn.getcwd()
-local NVIM_DIR = vim.fn.expand("~/.config/nvim")
-HAS_NIX, PLUGIN_LOCATIONS = pcall(dofile, NVIM_DIR .. "/nix_plugins.lua")
-BE_VERBOSE = false
+
 
 local current_mode_index = 1
 local diagnostics_active = false
 
 -- PATH MANAGEMENT ========================================================================================
 
+if no_skip then
 local config_dir = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h")
 -- print(config_dir)
 vim.opt.runtimepath:prepend(config_dir)
@@ -103,7 +113,10 @@ package.path = config_dir .. "/lua/?.lua;" .. config_dir .. "/lua/?/init.lua;" .
 
 vim.opt.runtimepath:prepend("/nix/store/ydlwparyk4mxl6wzhlp3x54zl3nk82c5-pde")
 vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
-
+end 
 -- MODULES
 
+print("Set keybind")
+vim.g.mapleader = " "
+vim.keymap.set({"n", "v"}, "<leader>pp", function() print("This is working!") end)
 require("wezterm_send").setup()
