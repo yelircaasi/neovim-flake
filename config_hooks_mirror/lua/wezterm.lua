@@ -1,5 +1,86 @@
 -- WEZTERM ========================================================================================
 
+-- OWN COMPILATION
+local directions = {
+	h = "Left",
+	l = "Right",
+	j = "Down",
+	k = "Up",
+}
+
+local arrows = {
+	h = "left",
+	l = "right",
+	j = "down",
+	k = "up",
+}
+
+local function command(args)
+	os.execute("wezterm cli " .. args)
+end
+
+local function wezterm_exec(cmd)
+	local command = vim.deepcopy(cmd)
+	table.insert(command, 1, "wezterm")
+	table.insert(command, 2, "cli")
+	return vim.fn.system(command)
+end
+
+local function navigate(direction)
+	command("activate-pane-direction " .. directions[direction])
+end
+
+local function go_direction(direction)
+	local current_window = vim.fn.win_getid()
+	vim.api.nvim_command("wincmd " .. direction)
+	local at_edge = current_window == vim.fn.win_getid()
+	if at_edge then navigate(direction) end
+end
+
+local function make_keys()
+	local keys = {}
+	for key, _ in pairs(directions) do
+		table.insert(keys, {
+			"<c-" .. key .. ">",
+			function() wez.go_direction(key) end,
+			mode = { "n" },
+			desc = "Navigate " .. arrows[key],
+		})
+	end
+	return keys
+end
+
+function setup(opts)
+	for key, _ in pairs(directions) do
+		vim.keymap.set("", "<c-" .. key .. ">", function() go_direction(key) end)
+		-- support ctrl arrow keys in normal an insert mode
+		vim.keymap.set(
+		    { "i", "n", "v", "x", "c" },
+		    "<c-" .. arrows[key] .. ">",
+		    function() go_direction(key) end)
+	end
+end
+
+-- @param direction: string (h, j, k, l)
+local function at_edge(direction)
+	return vim.fn.winnr() == vim.fn.winnr(direction)
+end
+
+-- @param direction: string (h, j, k, l)
+local function send_key_to_wezterm(direction)
+	wezterm_exec({ "activate-pane-direction", directions[direction] })
+end
+
+-- @param direction: string (h, j, k, l)
+local move = function(direction)
+	if at_edge(direction) then
+		send_key_to_wezterm(direction)
+	else
+		vim.cmd("wincmd " .. direction)
+	end
+end
+
+
 -- ianhomer WEZTERM SCRATCH
 
 -- https://github.com/ianhomer/wezterm.nvim/blob/main/lua/wezterm.lua --------------------------------------------------
@@ -58,10 +139,14 @@ function wez.setup(opts)
 			wez.go_direction(key)
 		end)
 		-- support ctrl arrow keys in normal an insert mode
-		vim.keymap.set({ "i", "n", "v", "x", "c" }, "<c-" .. arrows[key] .. ">", function()
-			print("D" .. key)
+		vim.keymap.set(
+		    { "i", "n", "v", "x", "c" },
+		    "<c-" .. arrows[key] .. ">",
+		    function()
+			-- print("D" .. key)
 			M.go_direction(key)
-		end)
+		    end
+		)
 	end
 end
 
@@ -119,6 +204,7 @@ local did_setup = false
 ---@private
 local wezterm_executable
 
+-- utils  move?
 ---@private
 local function err(e)
 	vim.notify("Wezterm failed to " .. e, vim.log.levels.ERROR, {
@@ -149,6 +235,7 @@ local function find_wezterm()
 	return nil
 end
 
+-- move to utils module? plenary-style
 ---@private
 local function count_non_nil(...)
 	local n = 0

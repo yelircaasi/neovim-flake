@@ -385,13 +385,16 @@ setup_plugin("lspsaga")
 
 setup_plugin("trouble.nvim")
 setup_plugin("quicker")
-setup_plugin("nvim-bqf", {
-	ft = "qf", -- Lazy load on opening the quickfix window
-	-- TODO should lazy load on opening the quickfix window -> ft = "qf"
-})
+
+vim.api.nvim_create_autocmd("TODO", function()
+	setup_plugin("nvim-bqf", {
+		ft = "qf", -- Lazy load on opening the quickfix window
+		-- TODO should lazy load on opening the quickfix window -> ft = "qf"
+	})
+end)
 
 -- MISCELLANEOUS
-setup_plugin("none-ls")
+setup_plugin("none-ls") -- still necessary?
 setup_plugin("guard")
 setup_plugin("mypy")
 setup_plugin("nvim-lint")
