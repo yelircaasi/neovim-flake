@@ -120,3 +120,21 @@ print("Set keybind")
 vim.g.mapleader = " "
 vim.keymap.set({"n", "v"}, "<leader>pp", function() print("This is working!") end)
 require("wezterm_send").setup()
+
+vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
+local odenwald = require("odenwald")
+odenwald.setup()
+odenwald.load()
+
+-- setup_plugin("odenwald", function(odenwald)
+-- 	odenwald.setup({
+-- 		style = "multiplex",
+-- 		colors = {
+-- 			bg0 = "#020802",
+-- 		},
+-- 	});
+-- 	odenwald.load()
+-- 	utils.printbv("Set up odenwald")
+-- 	vim.cmd("colorscheme odenwald")
+-- 	vim.cmd(":hi statusline guibg=#081608")
+-- end)
