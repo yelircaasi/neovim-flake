@@ -2180,8 +2180,8 @@ in rec {
         description = "";
       };
     };
-    project = pkgs.vimUtils.buildVimPlugin {
-      pname = "project";
+    project_nvim = pkgs.vimUtils.buildVimPlugin {
+      pname = "project_nvim";
       version = "2024-05-26";
       src = pkgs.fetchFromGitHub {
         owner = "Zeioth";
@@ -2240,7 +2240,7 @@ in rec {
         description = "";
       };
     };
-    jujutsu = pkgs.vimUtils.buildVimPlugin {
+    jujutsu-nvim = pkgs.vimUtils.buildVimPlugin {
       pname = "jujutsu";
       version = "2026-03-25";
       src = pkgs.fetchFromGitHub {
@@ -3327,10 +3327,6 @@ in rec {
       path = nvim-FeMaco-lua;
     }
     {
-      name = "treesitter-modules";
-      path = treesitter-modules-nvim;
-    }
-    {
       name = "dropbar";
       path = dropbar-nvim;
     }
@@ -3679,7 +3675,7 @@ in rec {
       path = ultisnips;
     }
     {
-      name = "LuaSnip";
+      name = "luasnip";
       path = luasnip;
     }
     {
@@ -3879,10 +3875,6 @@ in rec {
       path = lazygit-nvim;
     }
     {
-      name = "git-conflict";
-      path = git-conflict-nvim;
-    }
-    {
       name = "neogit";
       path = neogit;
     }
@@ -3893,6 +3885,10 @@ in rec {
     {
       name = "gitsigns";
       path = gitsigns-nvim;
+    }
+    {
+      name = "git-conflict";
+      path = git-conflict-nvim;
     }
     {
       name = "vim-fugitive";

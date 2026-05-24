@@ -12,3 +12,11 @@ setup_plugin("harpoon-core")
 setup_plugin("marks", {})
 setup_plugin("nvim-pasta")
 setup_plugin("beam")
+
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+	callback = function()
+		setup_plugin("markit", function(markit)
+			-- utils.packadd("pickme")
+		end)
+	end,
+})

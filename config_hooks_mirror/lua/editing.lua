@@ -55,8 +55,13 @@ setup_plugin("nvim-surround")
 setup_plugin("mini.keymap")
 setup_plugin("hydra")
 setup_plugin("insx")
-setup_plugin("which-key")
 setup_plugin("indentmini")
 setup_plugin("nvim-anydent")
 setup_plugin("mini.align")
 setup_plugin("Comment")
+
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+	callback = function()
+		setup_plugin("todo-comments", {})
+	end,
+})

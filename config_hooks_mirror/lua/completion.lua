@@ -3,6 +3,7 @@ setup_plugin("nvim-cmp", function()
 	utils.packadd("cmp-buffer")
 	utils.packadd("cmp-path")
 	utils.packadd("cmp_luasnip")
+    utils.packadd("cmp-cmdline")
 
 	vim.lsp.config("*", { capabilities = require("cmp_nvim_lsp").default_capabilities() })
 	vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
@@ -165,17 +166,24 @@ setup_plugin("blink.cmp", { ----------------------------------------------------
 	},
 })
 
-setup_plugin("friendly-snippets")
-setup_plugin("ultisnips")
-vim.api.nvim_create_autocmd("InsertEnter", function()
-	setup_plugin("LuaSnip", function(luasnip)
-		-- TODO: rewrite from lazy.nvim config
-		utils.packadd("friendly-snippets") -- Optional: for pre-made snippets
-		-- build = "make install_jsregexp" -- For regex snippets -- TODO: check build in Nix
-	end)
-end)
+utils.packadd("friendly-snippets")
+utils.packadd("ultisnips")
 
-setup_plugin("cmp-nvim-lsp")
-setup_plugin("cmp-buffer")
-setup_plugin("cmp-path")
-setup_plugin("cmp-cmdline")
+vim.api.nvim_create_autocmd("InsertEnter", {
+	callback = function()
+		setup_plugin("luasnip", function(luasnip)
+			-- TODO: rewrite from lazy.nvim config
+			utils.packadd("friendly-snippets") -- Optional: for pre-made snippets
+			-- build = "make install_jsregexp" -- For regex snippets -- TODO: check build in Nix
+		end)
+	end,
+})
+
+-- used as sources above
+-- setup_plugin("cmp-nvim-lsp")
+-- setup_plugin("cmp-buffer")
+-- setup_plugin("cmp-path")
+-- setup_plugin("cmp-cmdline")
+
+setup_plugin("luasnip")
+

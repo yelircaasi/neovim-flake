@@ -1,14 +1,24 @@
-setup_plugin("markdown-preview")
+utils.packadd("markdown-preview")
 setup_plugin("texmagic")
 setup_plugin("schemastore")
 setup_plugin("firenvim")
 setup_plugin("render-markdown")
 setup_plugin("jupytext")
 setup_plugin("quarto")
-setup_plugin("asyncrun")
+utils.packadd("asyncrun")
 setup_plugin("structlog")
 setup_plugin("neorepl")
-setup_plugin("dashboard-nvim")
-setup_plugin("dashboard")
 setup_plugin("noice")
 setup_plugin("modes")
+
+-- hacky, but works -> necessary due to name collision
+-- local function setup_dashboard()
+-- 	utils.packadd("dashboard-nvim")
+-- 	local dashboard = require("dashboard")
+-- 	dashboard.setup()
+-- end
+
+-- TODO: fix error
+-- setup_plugin_explicit("dashboard-nvim", "dashboard", {})
+
+setup_plugin("dashboard", {})

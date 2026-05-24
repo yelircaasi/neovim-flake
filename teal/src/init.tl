@@ -245,7 +245,7 @@ setup_plugin("nvim-cmp")
 ------ snippets (as main focus)
 setup_plugin("friendly-snippets")
 setup_plugin("ultisnips")
-setup_plugin("LuaSnip")
+setup_plugin("luasnip")
 ------ completion sources
 setup_plugin("cmp-nvim-lsp")
 setup_plugin("cmp-buffer")

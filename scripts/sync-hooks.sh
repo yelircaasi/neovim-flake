@@ -34,7 +34,6 @@ function sync_hooks() {
 sync_hooks before_init.lua
 sync_hooks after_init.lua
 sync_hooks lua/ai.lua
-sync_hooks lua/autocommands.lua
 sync_hooks lua/colors.lua
 sync_hooks lua/commands.lua
 sync_hooks lua/completion.lua
@@ -44,7 +43,6 @@ sync_hooks lua/diff.lua
 sync_hooks lua/editing.lua
 sync_hooks lua/explorers.lua
 sync_hooks lua/folding.lua
-sync_hooks lua/ft.lua
 sync_hooks lua/git.lua
 sync_hooks lua/lsp_etc.lua
 sync_hooks lua/macros.lua
@@ -52,11 +50,11 @@ sync_hooks lua/mappings.lua
 sync_hooks lua/miscellaneous.lua
 sync_hooks lua/navigation.lua
 sync_hooks lua/options.lua
-sync_hooks lua/overseer.lua
+sync_hooks lua/task_runner.lua
 sync_hooks lua/projects.lua
 sync_hooks lua/search.lua
 sync_hooks lua/sketches.lua
-sync_hooks lua/telescope.lua
+sync_hooks lua/telescope_etc.lua
 sync_hooks lua/terminal.lua
 sync_hooks lua/testing.lua
 sync_hooks lua/tex.lua

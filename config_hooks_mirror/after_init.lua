@@ -109,9 +109,21 @@ if no_skip then
 	vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
 end
 
+function setup_plugin_explicit(dir_name, mod_name, config_or_function)
+    utils.packadd(dir_name)
+	mod = require(mod_name)
+	if type(config_or_function) == "function" then
+		config_or_function(mod)
+	else
+		mod.setup(config_or_function)
+	end
+end
+
 -- GLOBALS ====================================================================
 
 vim.g.mapleader = " "
+
+require("options")
 
 function map_explicit(spec)
 	vim.keymap.set(spec.mode, spec.sequence or spec.lhs, spec.action or spec.rhs, spec.opts)
@@ -125,10 +137,11 @@ packadd = utils.packadd
 vim.keymap.set({ "n", "v" }, "<leader>pp", function()
 	print("This is working!")
 end)
+
+require("treesitter")
+
 require("wezterm_send").setup()
 require("explorers")
-
-print("Required explorers.")
 
 vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
 local odenwald = require("odenwald")
@@ -154,5 +167,45 @@ require("langs.lua_language")
 vim.opt.runtimepath:prepend("/home/isaac/repos/consilium.nvim")
 local consilium = require("consilium")
 consilium.setup()
+
+require("diff")
+require("core")
+require("git")
+require("editing")
+require("search")
+require("folding")
+require("debugging")
+require("ui")
+require("telescope_etc")
+require("terminal")
+
+local function prequire(plugin_name)
+	success, plugin = pcall(require, plugin_name)
+	if not success then
+		print(plugin_name .. " failed.")
+		print("ERROR: " .. plugin)
+	end
+end
+
+require("ai")
+require("colors")
+require("task_runner")
+require("mappings")
+require("navigation")
+require("projects")
+require("macros")
+
+print("=========")
+prequire("commands")
+prequire("completion")
+prequire("tex")
+prequire("miscellaneous")
+
+--[[
+
+prequire("sketches")
+require("wezterm")
+
+--]]
 
 print("Reached end of config.")

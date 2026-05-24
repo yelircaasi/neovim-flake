@@ -68,10 +68,10 @@ local my_parser_install_dir = my_install_dir .. "/parser"
 -- (not HAS_NIX) and (vim.fn.stdpath("data")) .. "/site/parsers" or DERIVATION_DIR ..
 local my_ensure_installed = HAS_NIX and {} or TS_LANGUAGES
 
-utils.printb("Setting up treesitter.")
-utils.printb("my_install_dir:        " .. my_install_dir)
-utils.printb("my_parser_install_dir: " .. my_parser_install_dir)
-utils.printb("my_ensure_installed:   " .. vim.inspect(my_ensure_installed))
+utils.printbv("Setting up treesitter.")
+utils.printbv("my_install_dir:        " .. my_install_dir)
+utils.printbv("my_parser_install_dir: " .. my_parser_install_dir)
+utils.printbv("my_ensure_installed:   " .. vim.inspect(my_ensure_installed))
 
 local old_config = {
 	-- directory to install parsers and queries to (prepended to `runtimepath` to have priority)
@@ -85,7 +85,8 @@ local old_config = {
 -- SETUP / CHECKS
 local parsers_to_ensure = { "c", "lua", "python", "javascript", "typescript", "bash", "json" }
 for _, lang in ipairs(parsers_to_ensure) do
-	if not vim.treesitter.language.is_installed(lang) then
+	local is_installed, _ = pcall(vim.treesitter.language.add, lang)
+	if not is_installed then
 		print("Treesitter parser not installed: " .. lang)
 	end
 end
@@ -182,6 +183,3 @@ setup_plugin("nvim-treesitter-textobjects", {
 		include_surrounding_whitespace = false,
 	},
 })
-
--- STILL NEEDED?
-setup_plugin("treesitter-modules")
