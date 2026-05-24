@@ -34,7 +34,9 @@ local function go_direction(direction)
 	local current_window = vim.fn.win_getid()
 	vim.api.nvim_command("wincmd " .. direction)
 	local at_edge = current_window == vim.fn.win_getid()
-	if at_edge then navigate(direction) end
+	if at_edge then
+		navigate(direction)
+	end
 end
 
 local function make_keys()
@@ -42,7 +44,9 @@ local function make_keys()
 	for key, _ in pairs(directions) do
 		table.insert(keys, {
 			"<c-" .. key .. ">",
-			function() wez.go_direction(key) end,
+			function()
+				wez.go_direction(key)
+			end,
 			mode = { "n" },
 			desc = "Navigate " .. arrows[key],
 		})
@@ -52,12 +56,13 @@ end
 
 function setup(opts)
 	for key, _ in pairs(directions) do
-		vim.keymap.set("", "<c-" .. key .. ">", function() go_direction(key) end)
+		vim.keymap.set("", "<c-" .. key .. ">", function()
+			go_direction(key)
+		end)
 		-- support ctrl arrow keys in normal an insert mode
-		vim.keymap.set(
-		    { "i", "n", "v", "x", "c" },
-		    "<c-" .. arrows[key] .. ">",
-		    function() go_direction(key) end)
+		vim.keymap.set({ "i", "n", "v", "x", "c" }, "<c-" .. arrows[key] .. ">", function()
+			go_direction(key)
+		end)
 	end
 end
 
@@ -79,7 +84,6 @@ local move = function(direction)
 		vim.cmd("wincmd " .. direction)
 	end
 end
-
 
 -- ianhomer WEZTERM SCRATCH
 
@@ -139,14 +143,10 @@ function wez.setup(opts)
 			wez.go_direction(key)
 		end)
 		-- support ctrl arrow keys in normal an insert mode
-		vim.keymap.set(
-		    { "i", "n", "v", "x", "c" },
-		    "<c-" .. arrows[key] .. ">",
-		    function()
+		vim.keymap.set({ "i", "n", "v", "x", "c" }, "<c-" .. arrows[key] .. ">", function()
 			-- print("D" .. key)
 			M.go_direction(key)
-		    end
-		)
+		end)
 	end
 end
 

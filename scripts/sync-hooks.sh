@@ -53,7 +53,6 @@ sync_hooks lua/miscellaneous.lua
 sync_hooks lua/navigation.lua
 sync_hooks lua/options.lua
 sync_hooks lua/overseer.lua
-sync_hooks lua/proglangs.lua
 sync_hooks lua/projects.lua
 sync_hooks lua/search.lua
 sync_hooks lua/sketches.lua
@@ -65,3 +64,12 @@ sync_hooks lua/treesitter.lua
 sync_hooks lua/ui.lua
 sync_hooks lua/wezterm.lua
 sync_hooks lua/wezterm_send.lua
+
+sync_hooks lua/langs/init.lua
+sync_hooks lua/langs/consilium.lua
+sync_hooks lua/langs/rust.lua
+sync_hooks lua/langs/haskell.lua
+sync_hooks lua/langs/xit.lua
+sync_hooks lua/langs/python.lua
+sync_hooks lua/langs/lua_language.lua
+sync_hooks lua/langs/go.lua

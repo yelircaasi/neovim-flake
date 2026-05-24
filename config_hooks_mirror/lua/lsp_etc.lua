@@ -102,51 +102,29 @@ vim.lsp.config["rust-analyzer"] = { --------------------------------------------
 }
 
 -- AUTOCOMMANDS -------------------------------------------------------------------------------
-vim.api.nvim_create_autocmd("LspAttach", {
-	callback = function(ev)
-		local client = vim.lsp.get_client_by_id(ev.data.client_id)
-		if client:supports_method("textDocument/completion") then
-			vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
-		end
-	end,
-})
 
-local function on_attach(client, bufnr)
-	-- Disable Ruff hover if you add another server like pyright/basedpyright later
+local function on_attach(ev)
+	local client = vim.lsp.get_client_by_id(ev.data.client_id)
 	if client.name == "ruff" then
 		client.server_capabilities.hoverProvider = false
 	end
 
-	-- Common keymaps (adjust as needed)
-end
-
-local function on_attach(client, bufnr)
-	-- Disable Ruff hover if you add another server like pyright/basedpyright later
-	if client.name == "ruff" then
-		client.server_capabilities.hoverProvider = false
+	if client:supports_method("textDocument/completion") then
+		vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
 	end
 
-	-- Common keymaps (adjust as needed)
-	local opts = { buffer = bufnr, silent = true }
+	local opts = { buffer = ev.buf, silent = true }
 	vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
 	vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
 	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
 	vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
 	vim.keymap.set("n", "<leader>cf", function()
-		require("conform").format({ bufnr = bufnr })
+		require("conform").format({ bufnr = ev.buf })
 	end, opts)
+	vim.keymap.set("n", "<leader>cl", vim.lsp.codelens.run, opts)
 end
 
-vim.api.nvim_create_autocmd("LspAttach", {
-	callback = function(args)
-		local opts = { buffer = args.buf }
-		-- Note: 'grn' (rename), 'gra' (code action), and 'grr' (references)
-		-- are now built-in defaults in 0.12.
-		vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-		vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-		vim.keymap.set("n", "<leader>cl", vim.lsp.codelens.run, opts)
-	end,
-})
+vim.api.nvim_create_autocmd("LspAttach", { callback = on_attach })
 
 -- ENABLE -------------------------------------------------------------------------------------
 vim.lsp.enable("lua_ls")
@@ -160,17 +138,9 @@ vim.lsp.enable("tinymist")
 
 -- LSP UI ------------------------------------------------------------------------------------------------
 
--- ALTERNATIVE
-vim.diagnostic.config({
-	virtual_text = { prefix = "●", spacing = 2 },
-	signs = true,
-	underline = true,
-	update_in_insert = false,
-	severity_sort = true,
-	float = { border = "rounded", source = "always" },
-})
+current_mode_index = 1
+diagnostics_active = false
 
--- CURRENT
 local diagnostic_modes = {
 	{
 		name = "End of Line (Virtual Text)",
@@ -184,6 +154,8 @@ local diagnostic_modes = {
 			signs = true,
 			underline = true,
 			update_in_insert = false,
+			severity_sort = true,
+			float = { border = "rounded", source = "always" },
 		},
 	},
 	{
@@ -198,6 +170,8 @@ local diagnostic_modes = {
 			signs = true,
 			underline = true,
 			update_in_insert = false,
+			severity_sort = true,
+			float = { border = "rounded", source = "always" },
 		},
 	},
 	{
@@ -216,6 +190,8 @@ local diagnostic_modes = {
 			},
 			underline = false, -- Often cleaner to disable underline in "minimal" mode
 			update_in_insert = false,
+			severity_sort = true,
+			float = { border = "rounded", source = "always" },
 		},
 	},
 }
@@ -223,14 +199,14 @@ local diagnostic_modes = {
 local function set_diagnostics_mode()
 	if not diagnostics_active then
 		vim.diagnostic.enable(false)
-		printv("LSP Diagnostics: OFF")
+		utils.printv("LSP Diagnostics: OFF")
 		return
 	end
 
 	vim.diagnostic.enable(true)
 	local mode = diagnostic_modes[current_mode_index]
 	vim.diagnostic.config(mode.config)
-	printv("LSP Mode: " .. mode.name)
+	utils.printv("LSP Mode: " .. mode.name)
 end
 
 vim.keymap.set("n", "<leader>dt", function()
@@ -251,12 +227,10 @@ vim.keymap.set("n", "<leader>dm", function()
 	set_diagnostics_mode()
 end, { desc = "Cycle LSP Diagnostic Modes" })
 
--- OLD:
--- vim.diagnostic.config({ virtual_text = false, virtual_lines = { current_line = true } })
-
 set_diagnostics_mode()
 
 -- CONFORM --------------------------------------------------------------------------------------------
+
 setup_plugin("conform", function(conform)
 	conform.setup({
 		formatters_by_ft = {
@@ -386,16 +360,19 @@ setup_plugin("lspsaga")
 setup_plugin("trouble.nvim")
 setup_plugin("quicker")
 
-vim.api.nvim_create_autocmd("TODO", function()
-	setup_plugin("nvim-bqf", {
-		ft = "qf", -- Lazy load on opening the quickfix window
-		-- TODO should lazy load on opening the quickfix window -> ft = "qf"
-	})
-end)
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = "qf",
+
+	callback = function()
+		print("Entered quickfix!")
+	end,
+
+	setup_plugin("nvim-bqf", {}),
+})
 
 -- MISCELLANEOUS
-setup_plugin("none-ls") -- still necessary?
-setup_plugin("guard")
+setup_plugin("null-ls") -- still necessary?
+-- setup_plugin("guard") -- TODO - needed?
 setup_plugin("mypy")
 setup_plugin("nvim-lint")
 setup_plugin("refactoring")

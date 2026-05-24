@@ -71,7 +71,7 @@
 print("Entering after_init.lua.")
 --TODO: change after new build
 NVIM_HOME = vim.fn.expand("~/.config/nvim")
-print(NVIM_HOME)
+-- print(NVIM_HOME)
 vim.opt.runtimepath:prepend(NVIM_HOME)
 -- print(utils)
 
@@ -82,49 +82,74 @@ if no_skip then
 	utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
 
 	local CONFIG_DIR = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h")
-local PWD = vim.fn.getcwd()
-local NVIM_DIR = vim.fn.expand("~/.config/nvim")
-HAS_NIX, PLUGIN_LOCATIONS = pcall(dofile, NVIM_DIR .. "/nix_plugins.lua")
-BE_VERBOSE = false
+	local PWD = vim.fn.getcwd()
+	local NVIM_DIR = vim.fn.expand("~/.config/nvim")
+	HAS_NIX, PLUGIN_LOCATIONS = pcall(dofile, NVIM_DIR .. "/nix_plugins.lua")
+	BE_VERBOSE = false
 end
 
-local setup_plugin = utils.setup_plugin
-local packadd = utils.packadd
 
 -- utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
 
 
-
-local current_mode_index = 1
-local diagnostics_active = false
-
 -- PATH MANAGEMENT ========================================================================================
 
 if no_skip then
-local config_dir = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h")
--- print(config_dir)
-vim.opt.runtimepath:prepend(config_dir)
+	local config_dir = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h")
+	-- print(config_dir)
+	vim.opt.runtimepath:prepend(config_dir)
 
-if HAS_NIX then
+	if HAS_NIX then
+		vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
+	end
+
+	package.path = config_dir .. "/lua/?.lua;" .. config_dir .. "/lua/?/init.lua;" .. package.path
+
+	vim.opt.runtimepath:prepend("/nix/store/ydlwparyk4mxl6wzhlp3x54zl3nk82c5-pde")
 	vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
 end
 
-package.path = config_dir .. "/lua/?.lua;" .. config_dir .. "/lua/?/init.lua;" .. package.path
+-- GLOBALS ====================================================================
 
-vim.opt.runtimepath:prepend("/nix/store/ydlwparyk4mxl6wzhlp3x54zl3nk82c5-pde")
-vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
-end 
+vim.g.mapleader = " "
+
+function map_explicit(spec)
+	vim.keymap.set(spec.mode, spec.sequence or spec.lhs, spec.action or spec.rhs, spec.opts)
+end
+map = utils.map
+
+setup_plugin = utils.setup_plugin
+packadd = utils.packadd
 -- MODULES
 
-print("Set keybind")
-vim.g.mapleader = " "
-vim.keymap.set({"n", "v"}, "<leader>pp", function() print("This is working!") end)
+vim.keymap.set({ "n", "v" }, "<leader>pp", function()
+	print("This is working!")
+end)
 require("wezterm_send").setup()
+require("explorers")
+
+print("Required explorers.")
 
 vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
 local odenwald = require("odenwald")
 odenwald.setup()
 odenwald.load()
+
+require("lsp_etc")
+require("testing")
+
+vim.filetype.add({
+    extension = {
+        hs = "haskell",
+        rs = "rust",
+		xit = "xit",
+    },
+})
+require("langs.xit")
+require("langs.rust")
+require("langs.haskell")
+require("langs.python")
+require("langs.lua_language")
 
 -- setup_plugin("odenwald", function(odenwald)
 -- 	odenwald.setup({
@@ -138,3 +163,5 @@ odenwald.load()
 -- 	vim.cmd("colorscheme odenwald")
 -- 	vim.cmd(":hi statusline guibg=#081608")
 -- end)
+
+require("consilium")

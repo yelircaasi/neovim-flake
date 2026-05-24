@@ -1,9 +1,5 @@
 -- MAPPINGS ========================================================================================
 
-local function map_explicit(spec)
-	vim.keymap.set(spec.mode, spec.sequence or spec.lhs, spec.action or spec.rhs, spec.opts)
-end
-local map = utils.map
 -- WAS:
 -- local map = vim.keymap.set
 if mappings_lua then
@@ -428,33 +424,5 @@ if other_mappings then
 			require("zen-mode").toggle({ window = { width = 0.85 } })
 		end,
 		opts = { desc = "" },
-	})
-
-	map_explicit({
-		mode = { "n", "v" },
-		sequence = "<leader>-",
-		action = function()
-			load_yazi()
-			vim.cmd("Yazi")
-		end,
-		opts = { desc = "Open yazi at the current file." },
-	})
-	map_explicit({
-		mode = { "n", "v" },
-		sequence = "<leader>cw",
-		action = function()
-			load_yazi()
-			vim.cmd("Yazi cwd")
-		end,
-		opts = { desc = "Open the file manager in nvim's working directory." },
-	})
-	map_explicit({
-		mode = { "n", "v" },
-		sequence = "<c-up>",
-		action = function()
-			load_yazi()
-			vim.cmd("Yazi toggle")
-		end,
-		opts = { desc = "Resume the last yazi session." },
 	})
 end

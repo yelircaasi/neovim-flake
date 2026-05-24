@@ -149,18 +149,10 @@ end, {
 	end,
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "xit",
-	callback = function(ev)
-		print("executing xit callback")
-		vim.treesitter.language.add("xit", { path = PARSER_DIR .. "/xit.so" })
-		vim.treesitter.start(ev.buf, "xit")
-	end,
-})
+
 
 -- REGISTER LANGUAGES
 vim.treesitter.language.register("py", "python")
-vim.treesitter.language.register("xit", "xit")
 
 -- treesitter textobjects
 

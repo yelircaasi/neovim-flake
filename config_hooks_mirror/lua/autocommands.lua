@@ -11,7 +11,7 @@ vim.api.nvim_create_autocmd({ "BufEnter", "BufWinEnter" }, {
 
 vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, function()
 	setup_plugin("markit", function(markit)
-		utils.packadd("pickme")
+		-- utils.packadd("pickme")
 	end)
 end)
 

@@ -1,9 +1,9 @@
 -- TODO: https://tamerlan.dev/setting-up-a-testing-environment-in-neovim/
 setup_plugin("neotest", function(neotest)
-	utils.packadd("plenary")
-	utils.packadd("FixCursorHold")
-	utils.packadd("nvim-nio")
-	utils.packadd("neotest-python")
+	-- utils.packadd("plenary")
+	-- utils.packadd("FixCursorHold")
+	-- utils.packadd("nvim-nio")
+	-- utils.packadd("neotest-python")
 	-- DEPRECATE: utils.packadd("nvim-treesitter")
 	neotest.setup({
 		adapters = {
