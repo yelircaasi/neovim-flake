@@ -66,7 +66,9 @@
 	AUTOMATIC/TOGGLABLE FUNCTIONALITIES
 	--> dull colors everywhere except in active block (via treesitter?)
 	--> custom syntax highlighting for my special formats (from consilium-notes: jn, ...)
-	--]]
+--]]
+
+-- Set up a local map function for convenience
 
 print("Entering after_init.lua.")
 --TODO: change after new build
@@ -88,9 +90,7 @@ if no_skip then
 	BE_VERBOSE = false
 end
 
-
 -- utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
-
 
 -- PATH MANAGEMENT ========================================================================================
 
@@ -139,11 +139,11 @@ require("lsp_etc")
 require("testing")
 
 vim.filetype.add({
-    extension = {
-        hs = "haskell",
-        rs = "rust",
+	extension = {
+		hs = "haskell",
+		rs = "rust",
 		xit = "xit",
-    },
+	},
 })
 require("langs.xit")
 require("langs.rust")
@@ -151,17 +151,8 @@ require("langs.haskell")
 require("langs.python")
 require("langs.lua_language")
 
--- setup_plugin("odenwald", function(odenwald)
--- 	odenwald.setup({
--- 		style = "multiplex",
--- 		colors = {
--- 			bg0 = "#020802",
--- 		},
--- 	});
--- 	odenwald.load()
--- 	utils.printbv("Set up odenwald")
--- 	vim.cmd("colorscheme odenwald")
--- 	vim.cmd(":hi statusline guibg=#081608")
--- end)
+vim.opt.runtimepath:prepend("/home/isaac/repos/consilium.nvim")
+local consilium = require("consilium")
+consilium.setup()
 
-require("consilium")
+print("Reached end of config.")

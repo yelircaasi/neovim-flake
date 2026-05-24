@@ -66,7 +66,6 @@ sync_hooks lua/wezterm.lua
 sync_hooks lua/wezterm_send.lua
 
 sync_hooks lua/langs/init.lua
-sync_hooks lua/langs/consilium.lua
 sync_hooks lua/langs/rust.lua
 sync_hooks lua/langs/haskell.lua
 sync_hooks lua/langs/xit.lua

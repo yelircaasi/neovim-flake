@@ -1,4 +1,3 @@
-
 -- setup_plugin("rustaceanvim")
 
 -- local ht = setup_plugin("haskell-tools")

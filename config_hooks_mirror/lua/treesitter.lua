@@ -149,8 +149,6 @@ end, {
 	end,
 })
 
-
-
 -- REGISTER LANGUAGES
 vim.treesitter.language.register("py", "python")
 
