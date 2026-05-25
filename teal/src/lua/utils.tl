@@ -158,6 +158,14 @@ local function setup(config: UtilsConfig): Utils
 		vim.keymap.set(mode, lhs, rhs, (opts or {}) as vim.keymap.SetOpts)
 	end
 
+	M.get_executable = function(name: string): string
+		local result: string = vim.trim(vim.fn.system({ "which", name }) as string)
+		if (vim.v.shell_error ~= 0) or (result == "") then
+			return ""
+		end
+		return result
+	end
+
 	return M
 end
 

@@ -1,12 +1,15 @@
 setup_plugin("octo")
 
-local function setup_gitlab_nvim()
-	utils.packadd("gitlab-nvim")
-	setup_plugin("gitlab", {})
-end
-setup_gitlab_nvim()
+local include_gitlab = false
+if include_gitlab then
+	local function setup_gitlab_nvim()
+		utils.packadd("gitlab-nvim")
+		setup_plugin("gitlab", {})
+	end
+	setup_gitlab_nvim()
 
-setup_plugin("gitlab")
+	setup_plugin("gitlab")
+end
 
 setup_plugin("gitsigns", function(gitsigns)
 	vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
@@ -18,11 +21,6 @@ end)
 
 setup_plugin("jj")
 
--- local function setup_jujutsu_nvim()
--- 	utils.packadd("jujutsu")
--- 	setup_plugin("jujutsu-nvim", {})
--- end
--- setup_jujutsu_nvim()
 setup_plugin("jujutsu-nvim", {})
 setup_plugin("jiejie")
 

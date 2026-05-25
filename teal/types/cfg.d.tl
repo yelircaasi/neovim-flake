@@ -34,6 +34,7 @@ global record Utils
 	packadd: function(string, ? function())
 	packadd_default: function(string, ? function())
 	packadd_safe: function(string, ? function())
+	get_executable: function(string): string
 	map: MapFunction
 end
 
