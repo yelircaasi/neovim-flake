@@ -1,5 +1,18 @@
 -- TODO: see https://www.reddit.com/r/neovim/comments/1afw5tc/rustaceanvim_now_with_neotest_integration/
+--
+-- wezterm desiderata:
+--   select and copy terminal output
+--   unicode working right
+--   rearrange terminal layout
+--   default pane layout
+--   history
+--   different shells
+--   open path in output in X (new pane, current pane, new tab)
+--   proper handling of url
+--   vim keybindings for line editing (provided by wezterm or shell? or simply open minimal vim editor to edit command)
+--   comfortable switching between different shells (bash, nushell, xonsh, elvish, etc)
 
+-- add <leader>wq, <leader>qq, etc
 -- wezterm: TODO: vendor
 -- https://github.com/willothy/wezterm.nvim
 -- https://github.com/ianhomer/wezterm.nvim
@@ -14,7 +27,8 @@
 -- jsonls and yamlls
 -- https://www.npmjs.com/package/vscode-json-languageserver
 -- https://github.com/redhat-developer/yaml-language-server
-
+-- write my own LSP(s) for consilium
+--
 -- on macos:
 -- brew install ruff
 -- brew install lua-language-server
@@ -71,46 +85,11 @@
 -- Set up a local map function for convenience
 
 print("Entering after_init.lua.")
---TODO: change after new build
-NVIM_HOME = vim.fn.expand("~/.config/nvim")
--- print(NVIM_HOME)
+NVIM_HOME = vim.fn.expand("~/.config/nvim") --TODO: change after new build makes this global
 vim.opt.runtimepath:prepend(NVIM_HOME)
--- print(utils)
-
-no_skip = false
-if no_skip then
-	utils.printv("CONFIG_DIR: " .. CONFIG_DIR)
-	utils.printv("PLUGINS INCLUDED: " .. vim.inspect(utils.PLUGINS_INCLUDED))
-	utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
-
-	local CONFIG_DIR = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h")
-	local PWD = vim.fn.getcwd()
-	local NVIM_DIR = vim.fn.expand("~/.config/nvim")
-	HAS_NIX, PLUGIN_LOCATIONS = pcall(dofile, NVIM_DIR .. "/nix_plugins.lua")
-	BE_VERBOSE = false
-end
-
--- utils.printbv(#utils.PLUGINS_INCLUDED .. " plugins included")
-
--- PATH MANAGEMENT ========================================================================================
-
-if no_skip then
-	local config_dir = vim.fn.fnamemodify(debug.getinfo(1).source:sub(2), ":p:h")
-	-- print(config_dir)
-	vim.opt.runtimepath:prepend(config_dir)
-
-	if HAS_NIX then
-		vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
-	end
-
-	package.path = config_dir .. "/lua/?.lua;" .. config_dir .. "/lua/?/init.lua;" .. package.path
-
-	vim.opt.runtimepath:prepend("/nix/store/ydlwparyk4mxl6wzhlp3x54zl3nk82c5-pde")
-	vim.opt.runtimepath:remove("/home/isaac/.local/share/nvim/site")
-end
 
 function setup_plugin_explicit(dir_name, mod_name, config_or_function)
-    utils.packadd(dir_name)
+	utils.packadd(dir_name)
 	mod = require(mod_name)
 	if type(config_or_function) == "function" then
 		config_or_function(mod)
@@ -121,85 +100,68 @@ end
 
 -- GLOBALS ====================================================================
 
-vim.g.mapleader = " "
-
-require("options")
-
 function map_explicit(spec)
 	vim.keymap.set(spec.mode, spec.sequence or spec.lhs, spec.action or spec.rhs, spec.opts)
 end
 map = utils.map
-
 setup_plugin = utils.setup_plugin
 packadd = utils.packadd
+
+vim.g.mapleader = " "
+
 -- MODULES
 
-vim.keymap.set({ "n", "v" }, "<leader>pp", function()
-	print("This is working!")
-end)
-
-require("treesitter")
-
-require("wezterm_send").setup()
-require("explorers")
-
-vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
-local odenwald = require("odenwald")
-odenwald.setup()
-odenwald.load()
-
-require("lsp_etc")
 require("testing")
 
-vim.filetype.add({
-	extension = {
-		hs = "haskell",
-		rs = "rust",
-		xit = "xit",
-	},
-})
-require("langs.xit")
-require("langs.rust")
-require("langs.haskell")
-require("langs.python")
-require("langs.lua_language")
+if false then
+	require("options")
+	require("treesitter")
+	require("wezterm_send").setup()
+	require("explorers")
 
-vim.opt.runtimepath:prepend("/home/isaac/repos/consilium.nvim")
-local consilium = require("consilium")
-consilium.setup()
+	vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
+	local odenwald = require("odenwald")
+	odenwald.setup()
+	odenwald.load()
 
-require("diff")
-require("core")
-require("git")
-require("editing")
-require("search")
-require("folding")
-require("debugging")
-require("ui")
-require("telescope_etc")
-require("terminal")
+	require("lsp_etc")
 
-local function prequire(plugin_name)
-	success, plugin = pcall(require, plugin_name)
-	if not success then
-		print(plugin_name .. " failed.")
-		print("ERROR: " .. plugin)
-	end
+	require("langs.xit")
+	require("langs.rust")
+	require("langs.haskell")
+	require("langs.python")
+	require("langs.lua_language")
+
+	vim.opt.runtimepath:prepend("/home/isaac/repos/consilium.nvim")
+	local consilium = require("consilium")
+	consilium.setup()
+
+	require("diff")
+	require("core")
+	require("git")
+	require("editing")
+	require("search")
+	require("folding")
+	require("debugging")
+	require("ui")
+	require("telescope_etc")
+
+	require("terminal")
+
+	require("ai")
+	require("task_runner")
+	require("mappings")
+	require("navigation")
+	require("projects")
+	require("macros")
 end
 
-require("ai")
 -- require("colors")
-require("task_runner")
-require("mappings")
-require("navigation")
-require("projects")
-require("macros")
 
-print("=========")
-prequire("commands")
-prequire("completion")
-prequire("tex")
-prequire("miscellaneous")
+-- prequire("commands")
+-- prequire("completion")
+-- prequire("tex")
+-- prequire("miscellaneous")
 
 --[[
 
@@ -208,4 +170,4 @@ require("wezterm")
 
 --]]
 
-print("Reached end of config.")
+print("Reached end of after_init.lua.")

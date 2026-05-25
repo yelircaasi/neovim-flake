@@ -3,7 +3,7 @@ setup_plugin("nvim-cmp", function()
 	utils.packadd("cmp-buffer")
 	utils.packadd("cmp-path")
 	utils.packadd("cmp_luasnip")
-    utils.packadd("cmp-cmdline")
+	utils.packadd("cmp-cmdline")
 
 	vim.lsp.config("*", { capabilities = require("cmp_nvim_lsp").default_capabilities() })
 	vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
@@ -186,4 +186,3 @@ vim.api.nvim_create_autocmd("InsertEnter", {
 -- setup_plugin("cmp-cmdline")
 
 setup_plugin("luasnip")
-

@@ -46,7 +46,7 @@
 
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs/91849ded6ed12d309e6697bea17e0bda5fdc7ad3";
+      url = "github:nixos/nixpkgs/612012e504d5a5f1625362a9de4779a4d00bd644";
     };
 
     flake-utils = {
@@ -54,7 +54,7 @@
     };
 
     neovim-nightly-overlay = {
-      url = "github:nix-community/neovim-nightly-overlay/80b1f16dba171a70c44c2ee6ec9529876152a7f5";
+      url = "github:nix-community/neovim-nightly-overlay/0cbdb3a8833e52d3e51207291b17e613e8e94c99";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

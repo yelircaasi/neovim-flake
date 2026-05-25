@@ -19,11 +19,11 @@ setup_plugin("gitsigns", function(gitsigns)
 	})
 end)
 
-setup_plugin("jj")
-
-setup_plugin("jujutsu-nvim", {})
-setup_plugin("jiejie")
-
+if false then
+	setup_plugin("jj")
+	setup_plugin("jujutsu-nvim", {})
+	setup_plugin("jiejie")
+end
 setup_plugin("gitsigns")
 setup_plugin("lazygit")
 setup_plugin("git-conflict")

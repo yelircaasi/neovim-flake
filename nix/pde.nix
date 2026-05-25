@@ -22,11 +22,9 @@
       pynvim
     ]);
 
-  nodeEnv = pkgs.nodePackages.neovim;
-
   pyEnvSnippet = ''--cmd 'let g:python3_host_prog=\"${pythonEnv}/bin/python3\"' '';
 
-  nodeEnvSnippet = ''--cmd 'let g:node_host_prog=\"${nodeEnv}/bin/neovim-node-host\"' '';
+  nodeEnvSnippet = ''--cmd 'let g:node_host_prog=\"${pkgs.neovim-node-client}/bin/neovim-node-host\"' '';
 in
   pkgs.stdenv.mkDerivation rec {
     name = "pde";
@@ -79,12 +77,6 @@ in
 
       mkdir -p $out/pack
       ${derefCopyDir} ${pluginDerivation}/pack/. $out/pack
-
-      # ${derefCopy} ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
-      # ${derefCopy} ${pkgs.ruff}/bin/ruff $out/bin/ruff
-
-      # ${derefCopy} ${pythonEnv}/bin/python3 $out/bin/python3
-      # ${derefCopy} ${nodeEnv}/bin/neovim-node-host $out/bin/neovim-node-host
 
       ln -s ${pkgs.nodejs}/bin/node $out/bin/node
 

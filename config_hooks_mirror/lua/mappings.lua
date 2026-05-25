@@ -1,4 +1,5 @@
 -- MAPPINGS ========================================================================================
+vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
 
 -- WAS:
 -- local map = vim.keymap.set
