@@ -16,6 +16,17 @@
 
   derefCopy = "cp -L";
   derefCopyDir = "cp -rL";
+
+  pythonEnv = pkgs.python3.withPackages (ps:
+    with ps; [
+      pynvim
+    ]);
+
+  nodeEnv = pkgs.nodePackages.neovim;
+
+  pyEnvSnippet = ''--cmd 'let g:python3_host_prog=\"${pythonEnv}/bin/python3\"' '';
+
+  nodeEnvSnippet = ''--cmd 'let g:node_host_prog=\"${nodeEnv}/bin/neovim-node-host\"' '';
 in
   pkgs.stdenv.mkDerivation rec {
     name = "pde";
@@ -32,28 +43,28 @@ in
         pkgs.nodejs
         pkgs.ruby
         pkgs.luajit
-      ]
-      ++ (
-        with pkgs.vimPlugins;
-          [
-            lualine-nvim
-            nvim-navic
-            nvim-lspconfig
-          ]
-          ++ (with pkgs.python312Packages; [
-            python-lsp-server # alt: node.pyright
-            pylsp-mypy
-            pyls-isort
-            python-lsp-black
-            pylsp-rope
-            python-lsp-ruff
-            pytest
-            pylint
-            pytest-cov
-            coverage
-            pynvim
-          ])
-      );
+      ];
+      # ++ (
+      #   with pkgs.vimPlugins;
+      #     [
+      #       lualine-nvim
+      #       nvim-navic
+      #       nvim-lspconfig
+      #     ]
+      #     ++ (with pkgs.python312Packages; [
+      #       python-lsp-server # alt: node.pyright
+      #       pylsp-mypy
+      #       pyls-isort
+      #       python-lsp-black
+      #       pylsp-rope
+      #       python-lsp-ruff
+      #       pytest
+      #       pylint
+      #       pytest-cov
+      #       coverage
+      #       pynvim
+      #     ])
+      # );
 
     buildPhase = ''
       mkdir -p $out
@@ -69,17 +80,25 @@ in
       mkdir -p $out/pack
       ${derefCopyDir} ${pluginDerivation}/pack/. $out/pack
 
-      ${derefCopy} ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
-      ${derefCopy} ${pkgs.ruff}/bin/ruff $out/bin/ruff
+      # ${derefCopy} ${pkgs.python312Packages.python-lsp-server}/bin/pylsp $out/bin/pylsp
+      # ${derefCopy} ${pkgs.ruff}/bin/ruff $out/bin/ruff
+
+      # ${derefCopy} ${pythonEnv}/bin/python3 $out/bin/python3
+      # ${derefCopy} ${nodeEnv}/bin/neovim-node-host $out/bin/neovim-node-host
+
+      ln -s ${pkgs.nodejs}/bin/node $out/bin/node
 
       chmod -R u+w $out/config
       echo "#!${pkgs.runtimeShell}" > $out/bin/pde
-      # REMOVED: --cmd 'set packpath^=$out' \
-      echo "${neovim-nightly}/bin/nvim \
+      echo "PATH=\$PATH:$out/bin ${neovim-nightly}/bin/nvim \
+        ${pyEnvSnippet} \
+        ${nodeEnvSnippet} \
         -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
 
       echo "#!${pkgs.runtimeShell}" > $out/bin/nvim
-      echo "${neovim-nightly}/bin/nvim \
+      echo "PATH=\$PATH:$out/bin ${neovim-nightly}/bin/nvim \
+        ${pyEnvSnippet} \
+        ${nodeEnvSnippet} \
         -u \$HOME/.config/nvim/init.lua ${argCatcher}" >> $out/bin/nvim
 
       chmod +x $out/bin/pde $out/bin/nvim
