@@ -188,7 +188,7 @@ local function prequire(plugin_name)
 end
 
 require("ai")
-require("colors")
+-- require("colors")
 require("task_runner")
 require("mappings")
 require("navigation")

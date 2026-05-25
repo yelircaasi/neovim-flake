@@ -8,7 +8,7 @@ setup_plugin("swm", function(swm)
 end)
 
 setup_plugin("smart-splits")
-setup_plugin("harpoon-core")
+setup_plugin("harpoon-core", {})
 setup_plugin("marks", {})
 setup_plugin("nvim-pasta")
 setup_plugin("beam")
