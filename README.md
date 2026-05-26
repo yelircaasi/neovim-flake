@@ -2,6 +2,10 @@
 
 ## Roadmap
 
+- add jsregexp for luasnip
+- load python snippets from various formats
+-
+
 - [ ] gather all nvim configs I have written, glean what
       is still usable, combine them here
 - [x] fork dial, fix structure, write nix expression

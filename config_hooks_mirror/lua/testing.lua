@@ -1,8 +1,4 @@
-vim.opt.shell = utils.get_executable("sh")
-local pytest_exec = utils.get_executable("pytest")
-local python_exec = utils.get_executable("python")
-print(pytest_exec)
-print(python_exec)
+vim.opt.shell = utils.get_executable("sh") -- TODO: move to global opts file?
 
 -- neotest = utils.get_plugin("neotest")
 -- neotest.setup({
@@ -11,9 +7,9 @@ setup_plugin("neotest", function(neotest)
 		adapters = {
 			require("neotest-python")({
 				dap = { justMyCode = false },
+				python = function(_) return utils.get_executable("python") end,
+			    runner = "pytest",
 			}),
-			python = python_exec,
-			runner = pytest_exec,
 		},
 		strategies = {
 			integrated = {
@@ -21,10 +17,25 @@ setup_plugin("neotest", function(neotest)
 			},
 		},
 	})
-	vim.keymap.set("n", "<leader>tt", function()
+
+	local nmap = function(lhs, rhs, desc)
+		vim.keymap.set("n", lhs, rhs, { silent = true, desc = desc })
+	end
+
+	nmap("<leader>tt", function()
 		neotest.run.run({
 			strategy = "integrated",
 			enter = false,
 		})
-	end, { desc = "Run nearest test" })
+	end, "Run nearest test")
+
+	nmap("<leader>to", function()
+		neotest.output.open({ enter = false, short = false })
+	end, "Open test output")
+	nmap("<leader>tO", function()
+		neotest.output_panel.toggle()
+	end, "Toggle output panel")
+	nmap("<leader>tS", function()
+		neotest.summary.toggle()
+	end, "Toggle test summary")
 end)

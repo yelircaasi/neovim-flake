@@ -122,11 +122,11 @@ require("core")
 require("explorers")
 require("testing")
 require("treesitter")
-require("wezterm_send").setup()
 require("langs.python")
 require("lsp_etc")
 
 if false then
+	require("wezterm_send").setup()
 	require("options")
 
 	require("langs.xit")

@@ -54,3 +54,8 @@ vim.fn.expand("%:p") -- full path
 vim.fn.expand("%") -- path as opened (may be relative)
 vim.fn.expand("%:t") -- filename only (tail)
 vim.fn.expand("%:h") -- directory only (head)
+
+local pytest_exec = utils.get_executable("pytest")
+local python_exec = utils.get_executable("python")
+print(pytest_exec)
+print(python_exec)
