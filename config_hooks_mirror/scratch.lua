@@ -49,3 +49,8 @@ vim.filetype.add({
 vim.keymap.set({ "n", "v" }, "<leader>pp", function()
 	print("This is working!")
 end)
+
+vim.fn.expand("%:p") -- full path
+vim.fn.expand("%") -- path as opened (may be relative)
+vim.fn.expand("%:t") -- filename only (tail)
+vim.fn.expand("%:h") -- directory only (head)

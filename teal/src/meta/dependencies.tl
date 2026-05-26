@@ -10,6 +10,7 @@ local M: {string: {string}} = {
 	["nvim-cmp"]      = { "LuaSnip", "cmp-nvim-lsp", "cmp-buffer", "cmp-path", "cmp_luasnip", "lazydev", "luasnip" },
     ["diffview"]      = { "plenary" },
 	["NeoComposer"]   = { "sqlite" },
-	["recorder"]      = { "notify" }
+	["recorder"]      = { "notify" },
+	["refactoring"]   = { "async" },
 }
 return M

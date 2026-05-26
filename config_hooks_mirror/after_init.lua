@@ -1,3 +1,5 @@
+-- make shell-highlighted scratch buffer that sends the command to wezterm and collects the output
+
 -- TODO: see https://www.reddit.com/r/neovim/comments/1afw5tc/rustaceanvim_now_with_neotest_integration/
 --
 -- wezterm desiderata:
@@ -111,25 +113,25 @@ vim.g.mapleader = " "
 
 -- MODULES
 
+vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
+local odenwald = require("odenwald")
+odenwald.setup()
+odenwald.load()
+
+require("core")
+require("explorers")
 require("testing")
+require("treesitter")
+require("wezterm_send").setup()
+require("langs.python")
+require("lsp_etc")
 
 if false then
 	require("options")
-	require("treesitter")
-	require("wezterm_send").setup()
-	require("explorers")
-
-	vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
-	local odenwald = require("odenwald")
-	odenwald.setup()
-	odenwald.load()
-
-	require("lsp_etc")
 
 	require("langs.xit")
 	require("langs.rust")
 	require("langs.haskell")
-	require("langs.python")
 	require("langs.lua_language")
 
 	vim.opt.runtimepath:prepend("/home/isaac/repos/consilium.nvim")
@@ -137,7 +139,6 @@ if false then
 	consilium.setup()
 
 	require("diff")
-	require("core")
 	require("git")
 	require("editing")
 	require("search")

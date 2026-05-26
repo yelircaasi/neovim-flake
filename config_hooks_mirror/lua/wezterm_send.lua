@@ -323,6 +323,112 @@ function M.send_selection(opts)
 	M.send_text(text, opts)
 end
 
+function M.make_current_file_command(opts)
+	opts = opts or {}
+	local file_path = vim.api.nvim_buf_get_name(0)
+	local file_type = vim.bo.filetype
+
+	local runners = {
+		python = { prefix = "python3", suffix = "" },
+		lua = { prefix = "lua", suffix = "" },
+		javascript = { prefix = "node", suffix = "" },
+		typescript = { prefix = "npx ts-node", suffix = "" },
+		rust = { prefix = "cargo run --manifest-path", suffix = "" },
+		haskell = { prefix = "runghc", suffix = "" },
+		sh = { prefix = "bash", suffix = "" },
+		ruby = { prefix = "ruby", suffix = "" },
+	}
+
+	local runner = runners[file_type]
+	if not runner then
+		vim.notify("wezterm_send: no runner configured for filetype: " .. file_type, vim.log.levels.WARN)
+		return nil
+	end
+
+	local parts = { runner.prefix, file_path }
+	if runner.suffix ~= "" then
+		table.insert(parts, runner.suffix)
+	end
+	return table.concat(parts, " ")
+end
+
+function M.run_current_file(opts)
+	opts = opts or {}
+	local command = M.make_current_file_command(opts)
+	if not command then
+		return
+	end
+
+	-- Prefer a pane that looks like a shell (title matches sh/bash/zsh/fish)
+	local shell_pane = pane_by_match(opts.match or "bash")
+		or pane_by_match("zsh")
+		or pane_by_match("fish")
+		or pane_by_match("sh")
+
+	if shell_pane then
+		local ok, err = send_to_pane(shell_pane, command)
+		if not ok then
+			vim.notify("wezterm_send: " .. (err or "unknown error"), vim.log.levels.ERROR)
+		end
+	else
+		-- No shell pane found: spawn one to the right, then send
+		local spawn_out, code = run({ "wezterm", "cli", "split-pane", "--right", "--percent", "40" })
+		if code ~= 0 then
+			vim.notify("wezterm_send: could not open a new pane", vim.log.levels.ERROR)
+			return
+		end
+		local new_pane_id = vim.trim(spawn_out)
+		-- Brief pause to let the shell initialise before sending
+		vim.defer_fn(function()
+			local ok, err = send_to_pane(new_pane_id, command)
+			if not ok then
+				vim.notify("wezterm_send: " .. (err or "unknown error"), vim.log.levels.ERROR)
+			end
+		end, 300)
+	end
+end
+
+function M.get_output(opts)
+	opts = opts or {}
+
+	-- Resolve which pane to read from: explicit id, direction, match, or the
+	-- only other visible pane if there's just one.
+	local pane_id
+	if opts.pane_id then
+		pane_id = opts.pane_id
+	elseif opts.direction then
+		pane_id = pane_by_direction(opts.direction)
+	elseif opts.match then
+		pane_id = pane_by_match(opts.match)
+	else
+		-- Fall back: if exactly one other pane exists, use it unambiguously
+		local my_id = current_pane_id()
+		local others = vim.tbl_filter(function(p)
+			return p.pane_id ~= my_id
+		end, list_panes())
+		if #others == 1 then
+			pane_id = others[1].pane_id
+		end
+	end
+
+	if not pane_id then
+		vim.notify("wezterm_send: could not resolve a pane to read from", vim.log.levels.WARN)
+		return nil
+	end
+
+	local lines = opts.lines or 50 -- how many lines of scrollback to capture
+	local out, code = run({ "wezterm", "cli", "get-text", "--pane-id", pane_id, "--escapes" })
+	if code ~= 0 then
+		vim.notify("wezterm_send: get-text failed for pane " .. pane_id, vim.log.levels.ERROR)
+		return nil
+	end
+
+	-- Trim to the last `lines` lines to avoid swamping the caller with scrollback
+	local all_lines = vim.split(out, "\n", { plain = true })
+	local tail = vim.list_slice(all_lines, math.max(1, #all_lines - lines + 1))
+	return table.concat(tail, "\n")
+end
+
 local directions = {
 	h = "Left",
 	l = "Right",
@@ -331,6 +437,124 @@ local directions = {
 	n = "Next",
 	p = "Prev",
 }
+
+--- If in normal mode, check for treesitter and if it is available, send current 'block';
+--- otherwise fall back to sending line
+local function get_current_block()
+	-- Attempt treesitter first
+	local ok, node = pcall(vim.treesitter.get_node)
+	if ok and node then
+		-- Walk up the tree to find a meaningful top-level block: a statement,
+		-- definition, declaration, or expression at the root's direct child level.
+		-- These type fragments cover most languages' top-level constructs.
+		local block_types = {
+			-- generic
+			"block",
+			"chunk",
+			"body",
+			-- statements / definitions
+			"function_definition",
+			"function_declaration",
+			"method_definition",
+			"class_definition",
+			"class_declaration",
+			"if_statement",
+			"for_statement",
+			"while_statement",
+			"do_statement",
+			"try_statement",
+			"with_statement",
+			"match_statement",
+			"return_statement",
+			"expression_statement",
+			-- Lua-specific
+			"local_function",
+			"local_variable_declaration",
+			"assignment_statement",
+			-- Python-specific
+			"decorated_definition",
+			-- Rust-specific
+			"impl_item",
+			"function_item",
+			"struct_item",
+			"enum_item",
+			"mod_item",
+			-- Haskell-specific
+			"function",
+			"type_signature",
+		}
+
+		local block_type_set = {}
+		for _, t in ipairs(block_types) do
+			block_type_set[t] = true
+		end
+
+		-- Walk upward; stop when the parent is the root (depth 1 node) or we
+		-- hit a recognised block type, whichever comes first.
+		local candidate = node
+		local parent = candidate:parent()
+		while parent do
+			local grandparent = parent:parent()
+			if block_type_set[candidate:type()] and (grandparent == nil or grandparent:parent() == nil) then
+				break
+			end
+			-- Also stop if the parent is the root — candidate is already top-level
+			if grandparent == nil then
+				candidate = parent
+				break
+			end
+			candidate = parent
+			parent = grandparent
+		end
+
+		local start_row, start_col, end_row, end_col = candidate:range()
+		local lines = vim.api.nvim_buf_get_text(0, start_row, start_col, end_row, end_col, {})
+		if #lines > 0 then
+			return table.concat(lines, "\n")
+		end
+	end
+
+	-- Treesitter unavailable or returned nothing: fall back to current line
+	local line = vim.api.nvim_get_current_line()
+	return line
+end
+
+local vmap_send = function(key)
+	local lhs = prefix_send .. key
+	local direction = directions[key]
+	local direction_lower = string.lower(direction)
+	local rhs = function()
+		print("Sending selection " .. direction_lower .. ".")
+		M.send_selection({ direction = direction })
+	end
+	local desc = "Send selection: WezTerm pane (" .. direction_lower .. ")"
+	vim.keymap.set("v", lhs, rhs, { desc = desc }) --, silent = true })
+end
+
+local nmap_send = function(key)
+	local lhs = prefix_send .. key
+	local direction = directions[key]
+	local direction_lower = string.lower(direction)
+	local text = get_current_block()
+	local rhs = function()
+		print("Sending current block " .. direction_lower .. ".")
+		M.send_text(text, { direction = direction })
+	end
+	local desc = "Send current block: WezTerm pane (" .. direction_lower .. ")"
+	vim.keymap.set("n", lhs, rhs, { desc = desc }) --, silent = true })
+end
+
+local map_run = function(key)
+	local lhs = prefix_send .. key
+	local direction = directions[key]
+	local direction_lower = string.lower(direction)
+	local rhs = function()
+		print("Sending selection " .. direction_lower .. ".")
+		M.send_selection({ direction = direction })
+	end
+	local desc = "Running current file: WezTerm pane (" .. direction_lower .. ")"
+	vim.keymap.set({ "n", "v" }, lhs, rhs, { desc = desc }) --, silent = true })
+end
 
 ---@class WeztermSendSetupOpts
 ---@field keymaps? boolean   Enable default keymaps (default: true)
@@ -341,34 +565,33 @@ local directions = {
 function M.setup(opts)
 	opts = vim.tbl_deep_extend("force", {
 		keymaps = true,
-		prefix = "<leader>w",
+		prefix_send = "<leader>w",
+		prefix_run = "<leader>r",
 	}, opts or {})
 
 	if not opts.keymaps then
 		return
 	end
 
-	local prefix = opts.prefix
-
-	local wezmap = function(key)
-		local lhs = prefix .. key
-		local direction = directions[key]
-		local direction_lower = string.lower(direction)
-		local rhs = function()
-			print("Sending selection " .. direction_lower .. ".")
-			M.send_selection({ direction = direction })
-		end
-		local desc = "Send selection: WezTerm pane (" .. direction_lower .. ")"
-		vim.keymap.set("v", lhs, rhs, { desc = desc }) --, silent = true })
-	end
+	local prefix_send = opts.prefix_send
+	local prefix_run = opts.prefix_run
 
 	for _, k in pairs({ "h", "j", "k", "l", "n", "p" }) do
-		wezmap(k)
+		map_send_visual(k)
+		map_run(k)
 	end
 
-	vim.keymap.set("v", prefix .. "w", function()
+	vim.keymap.set("v", prefix_send .. "w", function()
 		M.send_selection({ pick = true })
 	end, { desc = "Send selection: pick WezTerm pane", silent = true })
+
+	vim.keymap.set("v", prefix_run .. "r", function()
+		M.send_selection({ pick = true })
+	end, { desc = "Run file: pick WezTerm pane", silent = true })
 end
 
 return M
+
+-- TODO: send line if in normal mode -> use treesitter to get block?
+-- TODO: package as plugin and call it wezterm-native.nvim
+-- TODO: add guard to detect whether in wezterm; no-op if not

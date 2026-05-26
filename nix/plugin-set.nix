@@ -3283,6 +3283,10 @@ in rec {
       path = nvim-nio;
     }
     {
+      name = "async";
+      path = async-nvim;
+    }
+    {
       name = "nvim-web-devicons";
       path = nvim-web-devicons;
     }
@@ -3366,9 +3370,13 @@ in rec {
       name = "nvim-navbuddy";
       path = nvim-navbuddy;
     }
+    # { UNFREE LICENSE (?) TODO: vendor
+    #   name = "barbar";
+    #   path = barbar-nvim;
+    # }
     {
-      name = "barbar";
-      path = barbar-nvim;
+      name = "tabby";
+      path = tabby-nvim;
     }
     {
       name = "cokeline";
@@ -3454,10 +3462,10 @@ in rec {
       name = "substitute";
       path = substitute-nvim;
     }
-    {
-      name = "replacer";
-      path = replacer-nvim;
-    }
+    # {  VENDORED
+    #   name = "replacer";
+    #   path = replacer-nvim;
+    # }
     {
       name = "renamer";
       path = renamer-nvim;
@@ -3570,10 +3578,10 @@ in rec {
       name = "better-escape";
       path = better-escape-nvim;
     }
-    {
-      name = "unimpaired-which-key";
-      path = unimpaired-which-key-nvim;
-    }
+    # { TODO: vendor?
+    #   name = "unimpaired-which-key";
+    #   path = unimpaired-which-key-nvim;
+    # }
     {
       name = "nvim-whichkey-setup.lua";
       path = nvim-whichkey-setup-lua;
@@ -3718,10 +3726,10 @@ in rec {
       name = "cmp-nvim-lsp-signature-help";
       path = cmp-nvim-lsp-signature-help;
     }
-    {
-      name = "diagflow";
-      path = diagflow-nvim;
-    }
+    # {  TODO: unfree -> vendor
+    #   name = "diagflow";
+    #   path = diagflow-nvim;
+    # }
     {
       name = "lightbulb";
       path = nvim-lightbulb;
@@ -3886,10 +3894,10 @@ in rec {
       name = "gitsigns";
       path = gitsigns-nvim;
     }
-    {
-      name = "git-conflict";
-      path = git-conflict-nvim;
-    }
+    # {   TODO: unfree -> vendor
+    #   name = "git-conflict";
+    #   path = git-conflict-nvim;
+    # }
     {
       name = "vim-fugitive";
       path = vim-fugitive;
@@ -3974,10 +3982,10 @@ in rec {
       name = "markdown-preview";
       path = markdown-preview-nvim;
     }
-    {
-      name = "vim-pug";
-      path = vim-pug;
-    }
+    # {  TODO: vendor? (unfree)
+    #   name = "vim-pug";
+    #   path = vim-pug;
+    # }
     {
       name = "panvimdoc";
       path = pkgs.panvimdoc;

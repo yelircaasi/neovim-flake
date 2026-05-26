@@ -29,6 +29,8 @@ https://github.com/calops/nix/tree/main/modules/home/programs/neovim
 [ ] https://github.com/cwfryer/neovim-flake/
 [ ] https://github.com/rockerBOO/awesome-neovim?tab=readme-ov-file#plugin-template
 
+[ ] https://github.com/tpope/vim-unimpaired/
+
 ## Data Flow
 
 `plugin-set.nix` gets plugins from `nixpkgs` and `self-packaged-plugins.nix`.
