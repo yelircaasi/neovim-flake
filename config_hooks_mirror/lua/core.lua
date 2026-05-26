@@ -28,7 +28,17 @@ setup_plugin("zen-mode", {
 		font = "+4", -- (10% increase per step)
 	},
 })
-setup_plugin("lualine", {})
+vim.o.laststatus = 3
+setup_plugin("lualine", {
+	inactive_sections = {
+		lualine_a = {},
+		lualine_b = {},
+		lualine_c = {},
+		lualine_x = {},
+		lualine_y = {},
+		lualine_z = {},
+	},
+})
 
 setup_plugin("nvim-navic")
 setup_plugin("bufferline")

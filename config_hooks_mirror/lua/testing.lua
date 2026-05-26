@@ -7,8 +7,10 @@ setup_plugin("neotest", function(neotest)
 		adapters = {
 			require("neotest-python")({
 				dap = { justMyCode = false },
-				python = function(_) return utils.get_executable("python") end,
-			    runner = "pytest",
+				python = function(_)
+					return utils.get_executable("python")
+				end,
+				runner = "pytest",
 			}),
 		},
 		strategies = {
