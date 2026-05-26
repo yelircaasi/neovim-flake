@@ -54,4 +54,10 @@ in {
       '')
       grammarList}
   '';
+  queries = pkgs.fetchFromGitHub {
+    owner = "yelircaasi";
+    repo = "treesitter-queries";
+    rev = "cc2d454397e7f7e05007739ea8d1438cc0dc7dc6";
+    hash = "sha256-v1zWxFX2I/ze0IKDuBNcZdt03a0KbdCmsPSZdteCD5I=";
+  };
 }

@@ -131,6 +131,21 @@ vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
 local odenwald = require("odenwald")
 odenwald.setup()
 odenwald.load()
+vim.api.nvim_set_hl(0, "pythonConstant", {
+	link = "Constant",
+})
+vim.api.nvim_set_hl(0, "pythonBoolean", {
+	link = "Constant",
+})
+vim.api.nvim_set_hl(0, "pythonAttribute", {
+	link = "Constant",
+})
+map_explicit({
+	mode = "n",
+	lhs = "<leader>ii",
+	rhs = "<cmd>Inspect<cr>",
+})
+vim.api.nvim_set_hl(0, "@variable", { link = "Identifier" })
 
 require("core")
 require("explorers")

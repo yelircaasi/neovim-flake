@@ -7,7 +7,7 @@
   custom = import ./self-packaged-plugins.nix {inherit pkgs;};
   pluginDerivation = (import ./plugins-derivation.nix {inherit pkgs;}).nvimPlugins;
 
-  treesitterDerivation = (import ./treesitter.nix {inherit pkgs;}).allParsers;
+  treesitterDerivations = (import ./treesitter.nix {inherit pkgs;});
 
   configDir = "config";
   argCatcher = ''"\$@"'';
@@ -73,7 +73,8 @@ in
     installPhase = ''
       ${derefCopyDir} ${transpiled}/config/ $out/
       ${derefCopyDir} ${pluginDerivation}/meta/ $out/
-      ${derefCopyDir} ${treesitterDerivation}/parser/ $out/
+      ${derefCopyDir} ${treesitterDerivations.allParsers}/parser/ $out/
+      ${derefCopyDir} ${treesitterDerivations.queries}/queries $out/queries
 
       mkdir -p $out/pack
       ${derefCopyDir} ${pluginDerivation}/pack/. $out/pack

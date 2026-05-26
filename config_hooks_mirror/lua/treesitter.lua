@@ -96,6 +96,9 @@ vim.filetype.add({
 	extension = { xit = "xit" },
 })
 
+-- REGISTER LANGUAGES
+-- vim.treesitter.language.register("py", "python")
+
 -- vim.opt.foldmethod = "expr" + foldexpr
 vim.opt.foldmethod = "expr"
 vim.opt.foldexpr = "v:lua.vim.treesitter.foldexpr()"
@@ -108,31 +111,52 @@ vim.treesitter.language.register("javascript", "jsx")
 vim.treesitter.language.register("typescript", "tsx")
 
 -- QUERIES
-vim.treesitter.query.add_predicate("python", "highlights", [[(function_definition name: (identifier) @function.def)]])
+-- vim.treesitter.query.add_predicate("python", "highlights", [[(function_definition name: (identifier) @function.def)]])
 
 -- AUTOCOMMANDS
+-- vim.api.nvim_create_autocmd("FileType", {
+-- 	pattern = { "rust", "go", "python" }, -- add languages
+-- 	callback = function()
+-- 		if not vim.treesitter.language.get_lang(vim.bo.filetype) then
+-- 			-- Or use a plugin/helper for installation
+-- 			print("No Treesitter parser for " .. vim.bo.filetype)
+-- 		end
+-- 	end,
+-- })
+
 vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "rust", "go", "python" }, -- add languages
-	callback = function()
-		if not vim.treesitter.language.get_lang(vim.bo.filetype) then
-			-- Or use a plugin/helper for installation
-			print("No Treesitter parser for " .. vim.bo.filetype)
+	callback = function(ev)
+		local lang = vim.treesitter.language.get_lang(vim.bo.filetype)
+		if lang then
+			local ok, err = pcall(vim.treesitter.start, ev.buf, lang)
+			if not ok then
+				vim.notify("treesitter start failed for " .. lang .. ": " .. err, vim.log.levels.WARN)
+			end
 		end
 	end,
 })
 
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = "lua",
-	callback = function()
-		vim.treesitter.start()
-	end,
-})
+if false then
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = "lua",
+		callback = function()
+			vim.treesitter.start()
+		end,
+	})
 
-vim.api.nvim_create_autocmd("FileType", {
-	callback = function()
-		pcall(vim.treesitter.start) -- pcall: silently skips if no parser
-	end,
-})
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = "python",
+		callback = function(ev)
+			vim.treesitter.start(ev.buf, "python")
+		end,
+	})
+
+	vim.api.nvim_create_autocmd("FileType", {
+		callback = function()
+			pcall(vim.treesitter.start) -- pcall: silently skips if no parser
+		end,
+	})
+end
 
 -- COMMANDS
 
@@ -149,9 +173,6 @@ end, {
 		return {}
 	end,
 })
-
--- REGISTER LANGUAGES
-vim.treesitter.language.register("py", "python")
 
 -- treesitter textobjects
 
