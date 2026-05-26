@@ -2,6 +2,7 @@
 
 ## Roadmap
 
+-add minvim: minimal nvim (or just vim?) executable+config with good colorscheme and nothing (or very little) else, for quick edits (like open nvim with wezterm visible)
 - add jsregexp for luasnip
 - load python snippets from various formats
 -
@@ -34,6 +35,11 @@ https://github.com/calops/nix/tree/main/modules/home/programs/neovim
 [ ] https://github.com/rockerBOO/awesome-neovim?tab=readme-ov-file#plugin-template
 
 [ ] https://github.com/tpope/vim-unimpaired/
+
+- [ ] add custom syntax highlighting (later maybe even LSPs) for pictrix and kleidoukhos DSLs: analogous to,
+      and using similar setups to, consilium DSLs -> write treesitter parsers someday
+
+-[ ] install cooklang LSP and tooling
 
 ## Data Flow
 
