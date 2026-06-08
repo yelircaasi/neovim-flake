@@ -27,7 +27,6 @@
   - [ ] haskell-tools
   - [ ] lazydev
   - [ ] crates
-  - [ ] 
   - [ ] texmagic
   - [ ] vimtex
   - [ ] quarto
