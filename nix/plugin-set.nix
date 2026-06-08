@@ -3282,7 +3282,10 @@ in rec {
     customPlugins;
 
   nixpkgsList = with pkgs.vimPlugins; [
-
+    # {
+    #   name = "jsregexp";
+    #   path = pkgs.luajitPackages.jsregexp;
+    # }
     {
       name = "promise-async";
       path = promise-async;

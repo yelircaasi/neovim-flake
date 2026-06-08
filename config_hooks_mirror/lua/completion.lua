@@ -1,3 +1,52 @@
+print("A.")
+local setup_luasnip = function()
+	vim.cmd(":packadd luasnip")
+	local ls = require("luasnip")
+
+	ls.setup()
+	print("This ran.")
+	print(require("luasnip.util.jsregexp"))
+
+	-- utils.packadd("jsregexp")
+	require("jsregexp")
+
+	local s = ls.snippet
+	local t = ls.text_node
+
+	ls.add_snippets("all", {
+		s({ trig = "a.*b", regTrig = true }, {
+			t("REGEX OK"),
+		}),
+	})
+
+	-- loaders
+	-- TODO: https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#lua
+
+	require("luasnip.loaders.from_vscode").lazy_load()
+	-- NOTE:
+	-- It's mandatory to have a `package.json` file in the snippet directory. For examples, see [friendly-snippets](https://github.com/rafamadriz/friendly-snippets/blob/main/package.json).
+	-- require("luasnip.loaders.from_vscode").lazy_load({ paths = { "./my-cool-snippets" } })
+
+	require("luasnip.loaders.from_snipmate").lazy_load()
+
+	vim.keymap.set({ "i" }, "<C-K>", function()
+		ls.expand()
+	end, { silent = true })
+	vim.keymap.set({ "i", "s" }, "<C-L>", function()
+		ls.jump(1)
+	end, { silent = true })
+	vim.keymap.set({ "i", "s" }, "<C-J>", function()
+		ls.jump(-1)
+	end, { silent = true })
+
+	vim.keymap.set({ "i", "s" }, "<C-E>", function()
+		if ls.choice_active() then
+			ls.change_choice(1)
+		end
+	end, { silent = true })
+end
+setup_luasnip()
+
 setup_plugin("nvim-cmp", function()
 	utils.packadd("cmp-nvim-lsp")
 	utils.packadd("cmp-buffer")
@@ -169,13 +218,17 @@ setup_plugin("blink.cmp", { ----------------------------------------------------
 utils.packadd("friendly-snippets")
 utils.packadd("ultisnips")
 
+-- utils.packadd("jsregexp")
+-- require("jsregexp")
+
 vim.api.nvim_create_autocmd("InsertEnter", {
 	callback = function()
-		setup_plugin("luasnip", function(luasnip)
-			-- TODO: rewrite from lazy.nvim config
-			utils.packadd("friendly-snippets") -- Optional: for pre-made snippets
-			-- build = "make install_jsregexp" -- For regex snippets -- TODO: check build in Nix
-		end)
+		utils.packadd("friendly-snippets") -- Optional: for pre-made snippets
+
+		-- utils.packadd("jsregexp")
+		-- require("jsregexp")
+		require("luasnip.loaders.from_vscode").lazy_load()
+		require("luasnip.loaders.from_snipmate").lazy_load()
 	end,
 })
 
@@ -184,5 +237,3 @@ vim.api.nvim_create_autocmd("InsertEnter", {
 -- setup_plugin("cmp-buffer")
 -- setup_plugin("cmp-path")
 -- setup_plugin("cmp-cmdline")
-
-setup_plugin("luasnip")

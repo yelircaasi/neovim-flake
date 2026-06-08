@@ -149,6 +149,8 @@ vim.api.nvim_set_hl(0, "@variable", { link = "Identifier" })
 
 require("core")
 require("ui")
+
+require("completion")
 require("explorers")
 require("testing")
 require("treesitter")
@@ -187,7 +189,6 @@ if false then
 
 	-- require("colors")
 	-- prequire("commands")
-	-- prequire("completion")
 	-- prequire("tex")
 	-- prequire("miscellaneous")
 end

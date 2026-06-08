@@ -204,3 +204,6 @@ setup_plugin("nvim-treesitter-textobjects", {
 		include_surrounding_whitespace = false,
 	},
 })
+
+pcall(vim.treesitter.language.register, "markdown", "snacks_notif")
+pcall(vim.treesitter.language.register, "markdown", "blink-cmp-menu")

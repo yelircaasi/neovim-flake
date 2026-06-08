@@ -6,9 +6,17 @@ end
 global DERIVATION_DIR: string = (vim.fn.resolve(vim.fn.expand("<sfile>:p:h:h") as string) as string)
 global CONFIG_DIR: string = join_paths(DERIVATION_DIR, "config")
 global PARSER_DIR: string = join_paths(DERIVATION_DIR, "parser")
+global LUA51_SHARE: string = join_paths(DERIVATION_DIR, "share/lua/5.1")
+global LUA51_LIB: string = join_paths(DERIVATION_DIR, "lib/lua/5.1")
 vim.opt.runtimepath:prepend(DERIVATION_DIR)
 vim.opt.runtimepath:prepend(PARSER_DIR)
 vim.opt.packpath:prepend(DERIVATION_DIR)
+
+package.path = package.path
+    .. ";" .. join_paths(LUA51_SHARE, "?.lua")
+    .. ";" .. join_paths(LUA51_SHARE, "?/init.lua")
+package.cpath = package.cpath
+    .. ";" .. join_paths(LUA51_LIB, "?.so")
 
 -- PRE HOOKS ===========================================================================================================
 global NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string

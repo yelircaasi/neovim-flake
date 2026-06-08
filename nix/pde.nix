@@ -25,6 +25,8 @@
   pyEnvSnippet = ''--cmd 'let g:python3_host_prog=\"${pythonEnv}/bin/python3\"' '';
 
   nodeEnvSnippet = ''--cmd 'let g:node_host_prog=\"${pkgs.neovim-node-client}/bin/neovim-node-host\"' '';
+
+  jsregexp = pkgs.luajitPackages.jsregexp;
 in
   pkgs.stdenv.mkDerivation rec {
     name = "pde";
@@ -40,33 +42,15 @@ in
         pkgs.python3
         pkgs.nodejs
         pkgs.ruby
-        pkgs.luajit
+        pkgs.luajit  # .withPackages (ps: [ ps.jsregexp ])
+        jsregexp
       ];
-      # ++ (
-      #   with pkgs.vimPlugins;
-      #     [
-      #       lualine-nvim
-      #       nvim-navic
-      #       nvim-lspconfig
-      #     ]
-      #     ++ (with pkgs.python312Packages; [
-      #       python-lsp-server # alt: node.pyright
-      #       pylsp-mypy
-      #       pyls-isort
-      #       python-lsp-black
-      #       pylsp-rope
-      #       python-lsp-ruff
-      #       pytest
-      #       pylint
-      #       pytest-cov
-      #       coverage
-      #       pynvim
-      #     ])
-      # );
 
     buildPhase = ''
       mkdir -p $out
       mkdir -p $out/bin
+      mkdir -p $out/share/lua/5.1
+      mkdir -p $out/lib/lua/5.1
       export VIMINIT='let &swapfile = 0'
     '';
 
@@ -75,6 +59,11 @@ in
       ${derefCopyDir} ${pluginDerivation}/meta/ $out/
       ${derefCopyDir} ${treesitterDerivations.allParsers}/parser/ $out/
       ${derefCopyDir} ${treesitterDerivations.queries}/queries $out/queries
+
+      # jsregexp (LuaSnip dependency)
+
+      ${derefCopyDir} ${jsregexp}/share/lua/5.1/* $out/share/lua/5.1/
+      ${derefCopyDir} ${jsregexp}/lib/lua/5.1/* $out/lib/lua/5.1/
 
       mkdir -p $out/pack
       ${derefCopyDir} ${pluginDerivation}/pack/. $out/pack
@@ -86,12 +75,14 @@ in
       echo "PATH=\$PATH:$out/bin ${neovim-nightly}/bin/nvim \
         ${pyEnvSnippet} \
         ${nodeEnvSnippet} \
+        --cmd 'set rtp+=$out' \
         -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
 
       echo "#!${pkgs.runtimeShell}" > $out/bin/nvim
       echo "PATH=\$PATH:$out/bin ${neovim-nightly}/bin/nvim \
         ${pyEnvSnippet} \
         ${nodeEnvSnippet} \
+        --cmd 'set rtp+=$out' \
         -u \$HOME/.config/nvim/init.lua ${argCatcher}" >> $out/bin/nvim
 
       chmod +x $out/bin/pde $out/bin/nvim
