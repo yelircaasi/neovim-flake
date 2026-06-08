@@ -154,7 +154,13 @@ require("treesitter")
 require("langs.python")
 require("lsp_etc")
 
+require("editing")
 require("folding")
+require("search")
+require("navigation")
+require("telescope_etc")
+require("diff")
+require("terminal")
 
 if false then
 	require("wezterm_send").setup()
@@ -169,30 +175,22 @@ if false then
 	local consilium = require("consilium")
 	consilium.setup()
 
-	require("diff")
 	require("git")
-	require("editing")
-	require("search")
 	require("debugging")
 	require("ui")
-	require("telescope_etc")
-
-	require("terminal")
 
 	require("ai")
 	require("task_runner")
 	require("mappings")
-	require("navigation")
 	require("projects")
 	require("macros")
+
+	-- require("colors")
+	-- prequire("commands")
+	-- prequire("completion")
+	-- prequire("tex")
+	-- prequire("miscellaneous")
 end
-
--- require("colors")
-
--- prequire("commands")
--- prequire("completion")
--- prequire("tex")
--- prequire("miscellaneous")
 
 --[[
 

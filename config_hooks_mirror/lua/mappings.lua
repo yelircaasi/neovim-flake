@@ -385,3 +385,11 @@ if other_mappings then
 		opts = { desc = "" },
 	})
 end
+
+-- TODO: Hydra is too generic for a global setup; just expose the module:
+setup_plugin("hydra")
+
+setup_plugin("insx", function(insx)
+	require("insx.preset.standard").setup()
+	-- insx.add(require("insx.preset.standard").setup())
+end)
