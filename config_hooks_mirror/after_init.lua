@@ -166,6 +166,8 @@ require("diff")
 require("terminal")
 require("debugging")
 
+require("task_runner")
+
 if false then
 	require("wezterm_send").setup()
 	require("options")
@@ -180,9 +182,7 @@ if false then
 	consilium.setup()
 
 	require("git")
-
 	require("ai")
-	require("task_runner")
 	require("mappings")
 	require("projects")
 	require("macros")

@@ -2,7 +2,49 @@
 
 ## Roadmap
 
--add minvim: minimal nvim (or just vim?) executable+config with good colorscheme and nothing (or very little) else, for quick edits (like open nvim with wezterm visible)
+- set up with at least minimal config:
+  - [ ] mypy
+  - [ ] lsp-format
+  - [ ] lspkind
+  - [ ] lspsaga
+  - [ ] trouble.nvim
+  - [ ] quicker
+  - [ ] null-ls
+  - [ ] nvim-lint
+  - [ ] refactoring
+  - [ ] NeoComposer
+  - [ ] recorder
+  - [ ] hydra
+  - [ ] auto-session
+  - [ ] persistence
+  - [ ] project_nvim
+  - [ ] deck
+  - [ ] neotest-haskell
+  - [ ] neotest-python
+  - [ ] go
+  - [ ] gopher
+  - [ ] rustaceanvim
+  - [ ] haskell-tools
+  - [ ] lazydev
+  - [ ] crates
+  - [ ] 
+  - [ ] texmagic
+  - [ ] vimtex
+  - [ ] quarto
+  - [ ] structlog
+  - [ ] neorepl
+  - [ ] noice
+  - [ ] modes
+  - [ ] firenvim
+  - [ ] schemastore
+
+- https://www.reddit.com/r/rust/comments/1efj1ci/is_it_possible_to_use_clippy_with_nvim_and_get/
+
+- xit rewrite
+- wezterm_send
+- consilium
+
+- add minvim: minimal nvim (or just vim?) executable+config with good colorscheme and nothing (or very little) else, for quick edits (like open nvim with wezterm visible)
 - add jsregexp for luasnip
 - load python snippets from various formats
 -
@@ -16,6 +58,8 @@
       make each into own derivation? -> pass through as output packages
 - [ ] go through, clean up and pare down notes
 - [ ] get Python LSP running properly
+
+https://github.com/idris-community/idris2-nvim
 
 https://ayats.org/blog/neovim-wrapper
 https://github.com/calops/nix/tree/main/modules/home/programs/neovim
