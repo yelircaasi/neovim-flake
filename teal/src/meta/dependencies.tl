@@ -12,5 +12,6 @@ local M: {string: {string}} = {
 	["NeoComposer"]   = { "sqlite" },
 	["recorder"]      = { "notify" },
 	["refactoring"]   = { "async" },
+	["ufo"]           = { "promise-async" },
 }
 return M

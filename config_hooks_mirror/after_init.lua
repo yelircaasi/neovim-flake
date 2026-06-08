@@ -154,6 +154,8 @@ require("treesitter")
 require("langs.python")
 require("lsp_etc")
 
+require("folding")
+
 if false then
 	require("wezterm_send").setup()
 	require("options")
@@ -171,7 +173,6 @@ if false then
 	require("git")
 	require("editing")
 	require("search")
-	require("folding")
 	require("debugging")
 	require("ui")
 	require("telescope_etc")

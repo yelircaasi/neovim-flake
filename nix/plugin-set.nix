@@ -3270,6 +3270,11 @@ in rec {
     customPlugins;
 
   nixpkgsList = with pkgs.vimPlugins; [
+
+    {
+      name = "promise-async";
+      path = promise-async;
+    }
     {
       name = "nvim-teal-maker";
       path = nvim-teal-maker;

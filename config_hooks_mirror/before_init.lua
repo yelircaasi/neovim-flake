@@ -15,5 +15,5 @@
 -- print(vim.inspect(vim.opt.packpath))
 
 VERBOSE = false
-SAFE = true
+SAFE = false
 LAYERS = nil
