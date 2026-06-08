@@ -3,35 +3,38 @@
 ## Roadmap
 
 - set up with at least minimal config:
-  - [ ] mypy
-  - [ ] lsp-format
-  - [ ] lspkind
-  - [ ] lspsaga
-  - [ ] trouble.nvim
-  - [ ] quicker
-  - [ ] null-ls
-  - [ ] nvim-lint
-  - [ ] refactoring
-  - [ ] NeoComposer
-  - [ ] recorder
+  - [x] mypy
+  - [x] lsp-format
+  - [x] lspkind
+  - [x] lspsaga
+  - [x] trouble.nvim
+  - [x] quicker
+  - [x] null-ls
+  - [x] nvim-lint
+  - [x] refactoring
+  - [x] NeoComposer
+  - [x] recorder
+  - [x] auto-session
+  - [x] persistence
+  - [x] project_nvim
+  - [x] deck
+  - [x] neotest-python
+  - [x] rustaceanvim
+  - [x] haskell-tools
+  - [x] lazydev
+  - [x] crates
+  - [x] cargo
+  - [x] neorepl
+
+- LATER:
   - [ ] hydra
-  - [ ] auto-session
-  - [ ] persistence
-  - [ ] project_nvim
-  - [ ] deck
   - [ ] neotest-haskell
-  - [ ] neotest-python
   - [ ] go
   - [ ] gopher
-  - [ ] rustaceanvim
-  - [ ] haskell-tools
-  - [ ] lazydev
-  - [ ] crates
   - [ ] texmagic
   - [ ] vimtex
   - [ ] quarto
   - [ ] structlog
-  - [ ] neorepl
   - [ ] noice
   - [ ] modes
   - [ ] firenvim

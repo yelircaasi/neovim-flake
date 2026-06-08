@@ -7,9 +7,6 @@ setup_plugin("jupytext")
 setup_plugin("quarto")
 utils.packadd("asyncrun")
 setup_plugin("structlog")
-setup_plugin("neorepl")
-setup_plugin("noice")
-setup_plugin("modes")
 
 -- hacky, but works -> necessary due to name collision
 -- local function setup_dashboard()

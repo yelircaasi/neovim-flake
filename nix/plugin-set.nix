@@ -14,6 +14,23 @@ in rec {
     #   };
     #   meta.homepage = "https://github.com/tris203/hawtkeys.nvim";
     # };
+    cargo = pkgs.vimUtils.buildVimPlugin {
+      pname = "cargo.nvim";
+      version = "2026-05-27";
+
+      src = pkgs.fetchFromGitHub {
+        owner = "nwiizo";
+        repo = "cargo.nvim";
+        rev = "921a3ad364125d08c23a401a911841dd8f89db2c";
+        sha256 = "sha256-0VOFyrUfKzFVIRUdznQ2aWeTHIZr219Jw1rD6KTpvks=";
+      };
+
+      meta = {
+        description = "Neovim plugin for Cargo integration";
+        homepage = "https://github.com/nwiizo/cargo.nvim";
+        license = pkgs.lib.licenses.mit;
+      };
+    };
     keymap-amend-nvim = pkgs.vimUtils.buildVimPlugin {
       pname = "keymap-amend.nvim";
       version = "2022-09-22";

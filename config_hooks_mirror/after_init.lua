@@ -165,6 +165,12 @@ require("telescope_etc")
 require("diff")
 require("terminal")
 require("debugging")
+require("projects")
+require("macros")
+
+require("langs.rust")
+require("langs.haskell")
+require("langs.lua_language")
 
 require("task_runner")
 
@@ -173,9 +179,6 @@ if false then
 	require("options")
 
 	require("langs.xit")
-	require("langs.rust")
-	require("langs.haskell")
-	require("langs.lua_language")
 
 	vim.opt.runtimepath:prepend("/home/isaac/repos/consilium.nvim")
 	local consilium = require("consilium")
@@ -184,8 +187,6 @@ if false then
 	require("git")
 	require("ai")
 	require("mappings")
-	require("projects")
-	require("macros")
 
 	-- require("colors")
 	-- prequire("commands")
