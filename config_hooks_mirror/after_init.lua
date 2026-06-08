@@ -148,6 +148,7 @@ map_explicit({
 vim.api.nvim_set_hl(0, "@variable", { link = "Identifier" })
 
 require("core")
+require("ui")
 require("explorers")
 require("testing")
 require("treesitter")
@@ -161,6 +162,7 @@ require("navigation")
 require("telescope_etc")
 require("diff")
 require("terminal")
+require("debugging")
 
 if false then
 	require("wezterm_send").setup()
@@ -176,8 +178,6 @@ if false then
 	consilium.setup()
 
 	require("git")
-	require("debugging")
-	require("ui")
 
 	require("ai")
 	require("task_runner")

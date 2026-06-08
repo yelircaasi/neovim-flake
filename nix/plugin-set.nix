@@ -203,6 +203,18 @@ in rec {
       };
       meta.homepage = "https://github.com/m-demare/hlargs.nvim";
     };
+    dropbar = pkgs.vimUtils.buildVimPlugin {
+      pname = "dropbar.nvim";
+      version = "2026-05-31";
+      src = pkgs.fetchFromGitHub {
+        owner = "Bekaboo";
+        repo = "dropbar.nvim";
+        rev = "808ba31cde89aec8833e9789f5e04557cd31c9e1";
+        sha256 = "sha256-S9TD5PkHKHoo2jfjOXkQoNtyr/PNtR/eljXB+8PtGU8=";
+      };
+      doCheck = false;
+      meta.homepage = "https://github.com/Bekaboo/dropbar.nvim";
+    };
     # code-runner-nvim = pkgs.vimUtils.buildVimPlugin {
     #   pname = "code_runner.nvim";
     #   version = "2023-11-18";
@@ -3335,10 +3347,10 @@ in rec {
       name = "FeMaco";
       path = nvim-FeMaco-lua;
     }
-    {
-      name = "dropbar";
-      path = dropbar-nvim;
-    }
+    # {
+    #   name = "dropbar";
+    #   path = dropbar-nvim;
+    # }
     {
       name = "aerial";
       path = aerial-nvim;

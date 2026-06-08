@@ -13,5 +13,6 @@ local M: {string: {string}} = {
 	["recorder"]      = { "notify" },
 	["refactoring"]   = { "async" },
 	["ufo"]           = { "promise-async" },
+	["nvim-navbuddy"] = { "nui" },
 }
 return M
