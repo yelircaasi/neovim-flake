@@ -2,7 +2,16 @@
 
 ## Roadmap
 
-- set up with at least minimal config:
+- VENDOR: -----------------------------------------------------------------------
+
+  - k8vim
+  - telemake
+  - virtcolumn
+  - wezterm-nvim
+  - AdvancedNewFile  | https://github.com/Mohammed-Taher/AdvancedNewFile.nvim
+  - spread  (uses nvim-treesitter)
+
+- set up with at least minimal config: ------------------------------------------
   - [x] mypy
   - [x] lsp-format
   - [x] lspkind
