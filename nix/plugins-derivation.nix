@@ -1,8 +1,8 @@
-{pkgs}: let
+{pkgs, blink-lib}: let
   lib = pkgs.lib;
   stdenvNoCC = pkgs.stdenvNoCC;
 
-  inherit (import ./plugin-set.nix {inherit pkgs;}) nixpkgsList customList;
+  inherit (import ./plugin-set.nix {inherit pkgs blink-lib;}) nixpkgsList customList;
 
   fullList = customList ++ nixpkgsList;
 

@@ -11,13 +11,14 @@
   } @ inputs:
     flake-utils.lib.eachDefaultSystem (
       system: let
+        blink-lib = inputs.blink-lib.packages.${system}.default;
         neovim-nightly = inputs.neovim-nightly-overlay.packages.${system}.default;
         nix-treesitter = inputs.nix-treesitter.packages.${system}.default;
         pkgs = import inputs.nixpkgs {
           inherit system;
           # overlays = [neovim-nightly];
         };
-        pdeDerivation = import ./nix/pde.nix {inherit pkgs nix-treesitter neovim-nightly;}; # neovim-nightly ;};
+        pdeDerivation = import ./nix/pde.nix {inherit pkgs nix-treesitter neovim-nightly blink-lib;}; # neovim-nightly ;};
       in {
         apps = rec {
           default = pde;
@@ -61,6 +62,11 @@
     nix-treesitter = {
       # TODO: use or delete
       url = "github:ratson/nix-treesitter/d9d35e37a5b2aee2f3f4d14c66e2bf0604dae4ce";
+      inputs.nixpkgs.follows = "nixpkgs";
+    };
+
+    blink-lib = {
+      url = "github:saghen/blink.lib/b127d48bf8e9ac9cf41f6e0fbead317503f76558";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

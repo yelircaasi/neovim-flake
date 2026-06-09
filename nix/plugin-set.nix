@@ -1,4 +1,4 @@
-{pkgs}: let
+{pkgs, blink-lib}: let
   custom = import ./self-packaged-plugins.nix;
 in rec {
   # CURRENTLY NOT USED - TO REVIEW
@@ -41,6 +41,29 @@ in rec {
         sha256 = "sha256-fjhZLetXo+chDywxukJtuMv15gJgi4c3lwYx+ubOUr4=";
       };
       meta.homepage = "https://github.com/anuvyklack/keymap-amend.nvim";
+    };
+    utils = pkgs.vimUtils.buildVimPlugin {
+      pname = "utils.nvim";
+      version = "2025-07-27";
+      src = pkgs.fetchFromGitHub {
+        owner = "2KAbhishek";
+        repo = "utils.nvim";
+        rev = "8950622bd6861f2257364e5027c5613f29225e17";
+        sha256 = "sha256-A7SpGhI+ui8uCwgOJyiYFUg2LhLRwBlNn/CzjY00v5o=";
+      };
+      doCheck = false;
+      meta.homepage = "https://github.com/2KAbhishek/utils.nvim";
+    };
+    coop = pkgs.vimUtils.buildVimPlugin {
+      pname = "coop.nvim";
+      version = "2026-04-20";
+      src = pkgs.fetchFromGitHub {
+        owner = "gregorias";
+        repo = "coop.nvim";
+        rev = "b156e541316aee14be4ae64c93ed8bddb6d03bc1";
+        sha256 = "sha256-S6iGmdakI714Im0tetgfASbe0K4/olYsjj26+WP+rSU=";
+      };
+      meta.homepage = "https://github.com/gregorias/coop.nvim";
     };
     qfview-nvim = pkgs.vimUtils.buildVimPlugin {
       pname = "qfview.nvim";
@@ -253,17 +276,6 @@ in rec {
         sha256 = "sha256-QvkbWGFFdPA2AmXMqok90V07HiVu3fUPTaKXJryHJ2U=";
       };
       meta.homepage = "https://github.com/Zeioth/compiler.nvim";
-    };
-    yarepl-nvim = pkgs.vimUtils.buildVimPlugin {
-      pname = "yarepl.nvim";
-      version = "2023-11-18";
-      src = pkgs.fetchFromGitHub {
-        owner = "milanglacier";
-        repo = "yarepl.nvim";
-        rev = "c0ec78ef10ba01ab841b3e870421c33b1bbd6292";
-        sha256 = "sha256-2xBNIjv5sUbGMs8YGKNdfEmyEgfL8v0euExV9GAP9ek=";
-      };
-      meta.homepage = "https://github.com/milanglacier/yarepl.nvim";
     };
     iron-nvim = pkgs.vimUtils.buildVimPlugin {
       pname = "iron.nvim";
@@ -592,21 +604,21 @@ in rec {
         description = "";
       };
     };
-    nvim-treesitter = pkgs.vimUtils.buildVimPlugin {
-      pname = "nvim-treesitter";
-      version = "2026-03-23";
-      src = pkgs.fetchFromGitHub {
-        owner = "nvim-treesitter";
-        repo = "nvim-treesitter";
-        rev = "6620ae1c44dfa8623b22d0cbf873a9e8d073b849";
-        hash = "sha256-Md10P3QJ1q8SYOF2CpvOMCGrbgobU0lOIFnrT26ikJg=";
-      };
-      doCheck = false;
-      meta = {
-        homepage = "https://github.com/nvim-treesitter/nvim-treesitter";
-        description = "";
-      };
-    };
+    # nvim-treesitter = pkgs.vimUtils.buildVimPlugin {  # TODO: remove
+    #   pname = "nvim-treesitter";
+    #   version = "2026-03-23";
+    #   src = pkgs.fetchFromGitHub {
+    #     owner = "nvim-treesitter";
+    #     repo = "nvim-treesitter";
+    #     rev = "6620ae1c44dfa8623b22d0cbf873a9e8d073b849";
+    #     hash = "sha256-Md10P3QJ1q8SYOF2CpvOMCGrbgobU0lOIFnrT26ikJg=";
+    #   };
+    #   doCheck = false;
+    #   meta = {
+    #     homepage = "https://github.com/nvim-treesitter/nvim-treesitter";
+    #     description = "";
+    #   };
+    # };
     symbols = pkgs.vimUtils.buildVimPlugin {
       pname = "symbols";
       version = "2025-08-19";
@@ -1566,7 +1578,7 @@ in rec {
         description = "";
       };
     };
-    bullets = pkgs.vimUtils.buildVimPlugin {
+    Bullets = pkgs.vimUtils.buildVimPlugin {
       pname = "bullets";
       version = "2025-10-03";
       src = pkgs.fetchFromGitHub {
@@ -1896,7 +1908,7 @@ in rec {
         description = "";
       };
     };
-    quicktype = pkgs.vimUtils.buildVimPlugin {
+    mvim-quicktype = pkgs.vimUtils.buildVimPlugin {
       pname = "quicktype";
       version = "2025-05-10";
       src = pkgs.fetchFromGitHub {
@@ -1911,7 +1923,7 @@ in rec {
         description = "";
       };
     };
-    yaml = pkgs.vimUtils.buildVimPlugin {
+    yaml_nvim = pkgs.vimUtils.buildVimPlugin {
       pname = "yaml";
       version = "2026-01-04";
       src = pkgs.fetchgit {
@@ -2224,7 +2236,7 @@ in rec {
         description = "";
       };
     };
-    monorepos = pkgs.vimUtils.buildVimPlugin {
+    nvim-monorepos = pkgs.vimUtils.buildVimPlugin {
       pname = "monorepos";
       version = "2025-08-14";
       src = pkgs.fetchFromGitHub {
@@ -2299,19 +2311,19 @@ in rec {
         description = "";
       };
     };
-    g-worktree = pkgs.vimUtils.buildVimPlugin {
-      pname = "g-worktree";
-      version = "2023-09-03";
+    worktrees = pkgs.vimUtils.buildVimPlugin {
+      pname = "worktrees.nvim";
+      version = "2026-04-11";
       src = pkgs.fetchFromGitHub {
-        owner = "Mohanbarman";
-        repo = "g-worktree.nvim";
-        rev = "9a4808325f6b705b8425c1322fa47550798c9aab";
-        hash = "sha256-NlhZx7SR9C8t0tSO7obTgQknEkpMSv3jS2ZMbec9vto=";
+        owner = "Juksuu";
+        repo = "worktrees.nvim";
+        rev = "9682494e33b375feccf93412adf807eb15f36c1e";
+        hash = "sha256-iz8jHbe8+tw2ORlga9kFqfJgTwPoKhhkRPf0ms0f/6w=";
       };
       doCheck = false;
       meta = {
-        homepage = "https://github.com/Mohanbarman/g-worktree.nvim";
-        description = "";
+        homepage = "https://github.com/Juksuu/worktrees.nvim";
+        description = "Git worktree wrapper for neovim";
       };
     };
     gitlab-nvim = pkgs.vimUtils.buildVimPlugin {
@@ -2659,7 +2671,7 @@ in rec {
         description = "";
       };
     };
-    pre-commit = pkgs.vimUtils.buildVimPlugin {
+    precommit = pkgs.vimUtils.buildVimPlugin {
       pname = "pre-commit";
       version = "2025-09-08";
       src = pkgs.fetchFromGitHub {
@@ -2809,7 +2821,7 @@ in rec {
         description = "";
       };
     };
-    Hypersonic = pkgs.vimUtils.buildVimPlugin {
+    hypersonic = pkgs.vimUtils.buildVimPlugin {
       pname = "Hypersonic";
       version = "2024-08-11";
       src = pkgs.fetchFromGitHub {
@@ -2991,16 +3003,16 @@ in rec {
     };
     kubectl = pkgs.vimUtils.buildVimPlugin {
       pname = "kubectl";
-      version = "2025-08-26";
+      version = "2026-05-31";
       src = pkgs.fetchFromGitHub {
-        owner = "michaelPotter";
+        owner = "Ramilito";
         repo = "kubectl.nvim";
-        rev = "f460bd034e2796564c01b2094578b99d4a748424";
-        hash = "sha256-YnSuYnZ8ychpNMlPEqYmyzO7NswYlo0QVyc6aIhUpJw=";
+        rev = "84522036936b87f7811d13800ac3cbeaad093423";
+        hash = "sha256-bRiJ0Mt8gLusp4Q9N1YZDTsDkFbYPdiD9l2+5J8K92s=";
       };
       doCheck = false;
       meta = {
-        homepage = "https://github.com/michaelPotter/kubectl.nvim";
+        homepage = "https://github.com/Ramilito/kubectl.nvim";
         description = "";
       };
     };
@@ -3303,6 +3315,11 @@ in rec {
     #   name = "jsregexp";
     #   path = pkgs.luajitPackages.jsregexp;
     # }
+
+    {
+      name = "blink.lib";
+      path = blink-lib;
+    }
     {
       name = "promise-async";
       path = promise-async;
@@ -3314,6 +3331,10 @@ in rec {
     {
       name = "plenary";
       path = plenary-nvim;
+    }
+    {
+      name = "guihua";
+      path = guihua-lua;
     }
     {
       name = "nio";
@@ -3376,7 +3397,7 @@ in rec {
       path = aerial-nvim;
     }
     {
-      name = "nvim-treesitter-context";
+      name = "treesitter-context";
       path = nvim-treesitter-context;
     }
     {
@@ -3484,11 +3505,11 @@ in rec {
       path = nvim-spectre;
     }
     {
-      name = "nvim-rip-substitute";
+      name = "rip-substitute";
       path = nvim-rip-substitute;
     }
     {
-      name = "inc-rename";
+      name = "inc_rename";
       path = inc-rename-nvim;
     }
     {
@@ -3615,10 +3636,10 @@ in rec {
       name = "better-escape";
       path = better-escape-nvim;
     }
-    # { TODO: vendor?
-    #   name = "unimpaired-which-key";
-    #   path = unimpaired-which-key-nvim;
-    # }
+    {  # TODO: vendor because "unfree" (?)
+      name = "unimpaired-which-key";
+      path = unimpaired-which-key-nvim;
+    }
     {
       name = "nvim-whichkey-setup.lua";
       path = nvim-whichkey-setup-lua;
@@ -3763,12 +3784,12 @@ in rec {
       name = "cmp-nvim-lsp-signature-help";
       path = cmp-nvim-lsp-signature-help;
     }
-    # {  TODO: unfree -> vendor
-    #   name = "diagflow";
-    #   path = diagflow-nvim;
-    # }
+    {  # TODO: vendor because "unfree" (?)
+      name = "diagflow";
+      path = diagflow-nvim;
+    }
     {
-      name = "lightbulb";
+      name = "nvim-lightbulb";
       path = nvim-lightbulb;
     }
     {
@@ -3904,7 +3925,7 @@ in rec {
       path = telescope-project-nvim;
     }
     {
-      name = "advanced-git-search";
+      name = "advanced_git_search";
       path = advanced-git-search-nvim;
     }
     {
@@ -4019,10 +4040,10 @@ in rec {
       name = "markdown-preview";
       path = markdown-preview-nvim;
     }
-    # {  TODO: vendor? (unfree)
-    #   name = "vim-pug";
-    #   path = vim-pug;
-    # }
+    {  # TODO: vendor? (unfree)
+      name = "vim-pug";
+      path = vim-pug;
+    }
     {
       name = "copilot";
       path = copilot-lua;

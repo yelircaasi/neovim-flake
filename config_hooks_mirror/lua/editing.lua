@@ -40,30 +40,6 @@ utils.packadd("vim-visual-multi", function()
 	vim.g.VM_default_mappings = true
 end)
 
---[[
-utils.packadd("vim-sandwich")
-utils.packadd("vim-mundo")
-utils.packadd("indent-blankline")
-utils.packadd("tabular")
-utils.packadd("nvim-various-textobjs")
-utils.packadd("vim-commentary")
-
-setup_plugin("treesj")
-setup_plugin("leap")
-setup_plugin("flash")
-setup_plugin("hop")
-setup_plugin("rainbow-delimiters")
-setup_plugin("nvim-autopairs")
-setup_plugin("nvim-surround")
-setup_plugin("mini.keymap")
-setup_plugin("hydra")
-setup_plugin("insx")
-setup_plugin("indentmini")
-setup_plugin("nvim-anydent")
-setup_plugin("mini.align")
-setup_plugin("Comment")
-]]
-
 vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
 	callback = function()
 		setup_plugin("todo-comments", {})

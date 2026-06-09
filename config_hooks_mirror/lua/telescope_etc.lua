@@ -12,6 +12,7 @@ local telescope = utils.setup_plugin_default("telescope", function(telescope)
 			},
 		},
 	})
+	telescope.load_extension("advanced_git_search")
 	telescope.load_extension("fzf")
 	telescope.load_extension("project")
 	-- print("loaded telescope with fzf-native")

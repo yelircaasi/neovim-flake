@@ -2,10 +2,11 @@
   pkgs,
   neovim-nightly,
   nix-treesitter,
+  blink-lib,
   ...
 }: let
-  custom = import ./self-packaged-plugins.nix {inherit pkgs;};
-  pluginDerivation = (import ./plugins-derivation.nix {inherit pkgs;}).nvimPlugins;
+  # custom = import ./self-packaged-plugins.nix {inherit pkgs;};
+  pluginDerivation = (import ./plugins-derivation.nix {inherit pkgs blink-lib;}).nvimPlugins;
 
   treesitterDerivations = (import ./treesitter.nix {inherit pkgs;});
 

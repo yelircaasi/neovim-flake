@@ -40,6 +40,7 @@
   - [ ] firenvim
   - [ ] schemastore
 
+- https://github.com/skanehira/k8s.vim
 - https://github.com/m00qek/baleia.nvim
 - https://www.reddit.com/r/rust/comments/1efj1ci/is_it_possible_to_use_clippy_with_nvim_and_get/
 

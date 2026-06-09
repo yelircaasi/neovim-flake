@@ -1,3 +1,4 @@
+-- TODO: set up pylsp-rope for refactoring
 -- LSP ========================================================================================
 
 -- Mypy integration

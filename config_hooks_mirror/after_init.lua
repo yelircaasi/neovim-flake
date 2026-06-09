@@ -162,6 +162,7 @@ require("editing")
 require("folding")
 require("search")
 require("navigation")
+
 require("telescope_etc")
 require("diff")
 require("terminal")
@@ -179,6 +180,8 @@ require("git")
 require("ai")
 
 require("mappings") -- TODO: move out to respective files
+
+require("tmp")
 
 if false then
 	-- TODO

@@ -8,7 +8,7 @@ end)
 
 setup_plugin("stickybuf", function(stickybuf)
 	-- Automatically pin special buffers so they can't be replaced
-	stickybuf.setup({
+	local cfg = {
 		get_auto_pin = function(bufnr)
 			local buftype = vim.bo[bufnr].buftype
 			local filetype = vim.bo[bufnr].filetype
@@ -28,7 +28,9 @@ setup_plugin("stickybuf", function(stickybuf)
 				return stickybuf.strategy.buf
 			end
 		end,
-	})
+	}
+	cfg = {} -- TODO
+	stickybuf.setup(cfg)
 end)
 
 setup_plugin("swm", function(swm)

@@ -1,5 +1,4 @@
 local ht = setup_plugin("haskell-tools")
-ht.lsp.start()
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "haskell",

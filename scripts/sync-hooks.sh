@@ -57,16 +57,18 @@ sync_hooks lua/sketches.lua
 sync_hooks lua/telescope_etc.lua
 sync_hooks lua/terminal.lua
 sync_hooks lua/testing.lua
-sync_hooks lua/tex.lua
+sync_hooks lua/tmp.lua
 sync_hooks lua/treesitter.lua
 sync_hooks lua/ui.lua
 sync_hooks lua/wezterm.lua
 sync_hooks lua/wezterm_send.lua
 
 sync_hooks lua/langs/init.lua
-sync_hooks lua/langs/rust.lua
-sync_hooks lua/langs/haskell.lua
-sync_hooks lua/langs/xit.lua
-sync_hooks lua/langs/python.lua
-sync_hooks lua/langs/lua_language.lua
 sync_hooks lua/langs/go.lua
+sync_hooks lua/langs/haskell.lua
+sync_hooks lua/langs/lua_language.lua
+sync_hooks lua/langs/python.lua
+sync_hooks lua/langs/rust.lua
+sync_hooks lua/langs/tex.lua
+sync_hooks lua/langs/typst.lua
+sync_hooks lua/langs/xit.lua
