@@ -536,7 +536,7 @@ in rec {
       pname = "xit.nvim";
       version = "2025-05-09";
       dependencies = [
-        pkgs.vimPlugins.nvim-treesitter
+        # pkgs.vimPlugins.nvim-treesitter
       ];
       doCheck = false;
       src = pkgs.fetchFromGitHub {
@@ -3931,10 +3931,10 @@ in rec {
       name = "gitsigns";
       path = gitsigns-nvim;
     }
-    # {   TODO: unfree -> vendor
-    #   name = "git-conflict";
-    #   path = git-conflict-nvim;
-    # }
+    {  # TODO: unfree -> vendor
+      name = "git-conflict";
+      path = git-conflict-nvim;
+    }
     {
       name = "vim-fugitive";
       path = vim-fugitive;
@@ -4023,6 +4023,14 @@ in rec {
     #   name = "vim-pug";
     #   path = vim-pug;
     # }
+    {
+      name = "copilot";
+      path = copilot-lua;
+    }
+    {
+      name = "opencode";
+      path = opencode-nvim;
+    }
     {
       name = "panvimdoc";
       path = pkgs.panvimdoc;

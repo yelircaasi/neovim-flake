@@ -10,7 +10,7 @@
   treesitterDerivations = (import ./treesitter.nix {inherit pkgs;});
 
   configDir = "config";
-  argCatcher = ''"\$@"'';
+  argCatcher = ''\$@'';
 
   transpiled = import ./transpilation.nix {inherit pkgs;};
 
@@ -22,9 +22,9 @@
       pynvim
     ]);
 
-  pyEnvSnippet = ''--cmd 'let g:python3_host_prog=\"${pythonEnv}/bin/python3\"' '';
+  pyEnvSnippet = ''--cmd 'let g:python3_host_prog="${pythonEnv}/bin/python3"' '';
 
-  nodeEnvSnippet = ''--cmd 'let g:node_host_prog=\"${pkgs.neovim-node-client}/bin/neovim-node-host\"' '';
+  nodeEnvSnippet = ''--cmd 'let g:node_host_prog="${pkgs.neovim-node-client}/bin/neovim-node-host"' '';
 
   jsregexp = pkgs.luajitPackages.jsregexp;
 in
@@ -71,19 +71,24 @@ in
       ln -s ${pkgs.nodejs}/bin/node $out/bin/node
 
       chmod -R u+w $out/config
-      echo "#!${pkgs.runtimeShell}" > $out/bin/pde
-      echo "PATH=\$PATH:$out/bin ${neovim-nightly}/bin/nvim \
-        ${pyEnvSnippet} \
-        ${nodeEnvSnippet} \
-        --cmd 'set rtp+=$out' \
-        -u $out/config/init.lua ${argCatcher}" >> $out/bin/pde
 
-      echo "#!${pkgs.runtimeShell}" > $out/bin/nvim
-      echo "PATH=\$PATH:$out/bin ${neovim-nightly}/bin/nvim \
-        ${pyEnvSnippet} \
-        ${nodeEnvSnippet} \
-        --cmd 'set rtp+=$out' \
-        -u \$HOME/.config/nvim/init.lua ${argCatcher}" >> $out/bin/nvim
+      cat > $out/bin/pde << EOF
+      #!${pkgs.runtimeShell}
+      PATH=\$PATH:$out/bin ${neovim-nightly}/bin/nvim \\
+        ${pyEnvSnippet} \\
+        ${nodeEnvSnippet} \\
+        --cmd 'set rtp+=$out' \\
+        -u $out/config/init.lua "\$@"
+      EOF
+
+      cat > $out/bin/nvim << EOF
+      #!${pkgs.runtimeShell}
+      PATH=\$PATH:$out/bin ${neovim-nightly}/bin/nvim \
+        ${pyEnvSnippet} \\
+        ${nodeEnvSnippet} \\
+        --cmd 'set rtp+=$out' \\
+        -u \$HOME/.config/nvim/init.lua "\$@"
+      EOF
 
       chmod +x $out/bin/pde $out/bin/nvim
     '';

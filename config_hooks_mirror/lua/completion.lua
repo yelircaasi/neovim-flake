@@ -1,11 +1,9 @@
-print("A.")
 local setup_luasnip = function()
 	vim.cmd(":packadd luasnip")
 	local ls = require("luasnip")
 
 	ls.setup()
-	print("This ran.")
-	print(require("luasnip.util.jsregexp"))
+	-- print(require("luasnip.util.jsregexp"))
 
 	-- utils.packadd("jsregexp")
 	require("jsregexp")

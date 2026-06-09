@@ -86,7 +86,7 @@
 
 -- Set up a local map function for convenience
 
-print("Entering after_init.lua.")
+utils.printv("Entering after_init.lua.")
 NVIM_HOME = vim.fn.expand("~/.config/nvim") --TODO: change after new build makes this global
 vim.opt.runtimepath:prepend(NVIM_HOME)
 
@@ -147,6 +147,7 @@ map_explicit({
 })
 vim.api.nvim_set_hl(0, "@variable", { link = "Identifier" })
 
+require("options")
 require("core")
 require("ui")
 
@@ -174,31 +175,26 @@ require("langs.lua_language")
 
 require("task_runner")
 
+require("git")
+require("ai")
+
+require("mappings") -- TODO: move out to respective files
+
 if false then
+	-- TODO
 	require("wezterm_send").setup()
-	require("options")
 
-	require("langs.xit")
-
+	-- TODO
 	vim.opt.runtimepath:prepend("/home/isaac/repos/consilium.nvim")
 	local consilium = require("consilium")
 	consilium.setup()
 
-	require("git")
-	require("ai")
-	require("mappings")
+	require("langs.xit") -- TODO
+	require("langs.tex")
+	require("langs.typst")
+	require("langs.go")
 
-	-- require("colors")
-	-- prequire("commands")
-	-- prequire("tex")
-	-- prequire("miscellaneous")
+	require("miscellaneous") -- TODO
 end
 
---[[
-
-prequire("sketches")
-require("wezterm")
-
---]]
-
-print("Reached end of after_init.lua.")
+utils.printv("Reached end of after_init.lua.")

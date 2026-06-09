@@ -1,5 +1,5 @@
 -- COLORS ========================================================================================
-
+-- TODO KEPT FOR REFERENCE ONLY -> refactor to odenwald.nvim
 vim.api.nvim_set_hl(0, "Normal", { bg = "#020802" })
 
 vim.cmd("hi link Floaterm Normal")
