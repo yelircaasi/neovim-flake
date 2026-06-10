@@ -3,6 +3,7 @@ local function setup(config: UtilsConfig): Utils
 	local prepend_safe = config.prepend_safe
 	local PLUGIN_PATHS = config.plugin_paths
 	local DEPENDENCIES = config.dependencies
+	local MODULES = config.dependencies._modules
 	local LAYERS = config.layers and config.layers or {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10}
 	local PLUGINS_BY_LAYER = config.plugins_by_layer
 
@@ -78,9 +79,11 @@ local function setup(config: UtilsConfig): Utils
 	    -- local path = PLUGIN_PATHS[plugin_name]
 	    local deps = DEPENDENCIES[plugin_name]
 	    if deps then
-		   for _, dep_name in ipairs(deps) do
-			  vim.cmd.packadd(dep_name)
-		   end
+		    for _, dep_name in ipairs(deps) do
+		        if not vim.tbl_contains(MODULES, dep_name) then
+			        vim.cmd.packadd(dep_name)
+				end
+		    end
 	    end
 	    -- if path then prepend_safe(path) end
 		vim.cmd.packadd(plugin_name)
@@ -95,8 +98,10 @@ local function setup(config: UtilsConfig): Utils
 	    if path then prepend_safe(path) end
 	    if deps then
 		   for _, dep_name in ipairs(deps) do
-			  local dep_path = PLUGIN_PATHS[dep_name]
-			  if dep_path then prepend_safe(dep_path) end
+			    if not vim.tbl_contains(MODULES, dep_name) then
+			        local dep_path = PLUGIN_PATHS[dep_name]
+			        if dep_path then prepend_safe(dep_path) end
+				end
 		   end
 	    end
 	    vim.cmd.packadd(plugin_name)

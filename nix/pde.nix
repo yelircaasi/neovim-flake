@@ -8,7 +8,9 @@
   # custom = import ./self-packaged-plugins.nix {inherit pkgs;};
   pluginDerivation = (import ./plugins-derivation.nix {inherit pkgs blink-lib;}).nvimPlugins;
 
-  treesitterDerivations = (import ./treesitter.nix {inherit pkgs;});
+  moduleDerivation = (import ./lua-modules.nix {inherit pkgs;}).luaModules;
+
+  treesitterDerivations = import ./treesitter.nix {inherit pkgs;};
 
   configDir = "config";
   argCatcher = ''\$@'';
@@ -35,17 +37,16 @@ in
 
     propagatedBuildInputs = import ./tools.nix {inherit pkgs;};
 
-    buildInputs =
-      [
-        neovim-nightly
-        pkgs.ruff
+    buildInputs = [
+      neovim-nightly
+      pkgs.ruff
 
-        pkgs.python3
-        pkgs.nodejs
-        pkgs.ruby
-        pkgs.luajit  # .withPackages (ps: [ ps.jsregexp ])
-        jsregexp
-      ];
+      pkgs.python3
+      pkgs.nodejs
+      pkgs.ruby
+      pkgs.luajit # .withPackages (ps: [ ps.jsregexp ])
+      jsregexp
+    ];
 
     buildPhase = ''
       mkdir -p $out
@@ -58,18 +59,22 @@ in
     installPhase = ''
       ${derefCopyDir} ${transpiled}/config/ $out/
       ${derefCopyDir} ${pluginDerivation}/meta/ $out/
+      chmod -R u+w $out/meta
       ${derefCopyDir} ${treesitterDerivations.allParsers}/parser/ $out/
       ${derefCopyDir} ${treesitterDerivations.queries}/queries $out/queries
 
-      # jsregexp (LuaSnip dependency)
 
-      ${derefCopyDir} ${jsregexp}/share/lua/5.1/* $out/share/lua/5.1/
-      ${derefCopyDir} ${jsregexp}/lib/lua/5.1/* $out/lib/lua/5.1/
+
+      ${derefCopyDir} ${moduleDerivation}/share/lua/5.1/*         $out/share/lua/5.1/
+      ${derefCopyDir} ${moduleDerivation}/lib/lua/5.1/*           $out/lib/lua/5.1/
+      ${derefCopyDir} ${moduleDerivation}/meta/module_paths.json  $out/meta
+      ${derefCopyDir} ${moduleDerivation}/meta/module_paths.lua   $out/meta
 
       mkdir -p $out/pack
       ${derefCopyDir} ${pluginDerivation}/pack/. $out/pack
 
       ln -s ${pkgs.nodejs}/bin/node $out/bin/node
+      ln -s ${pkgs.panvimdoc}/bin/panvimdoc $out/bin/panvimdoc
 
       chmod -R u+w $out/config
 

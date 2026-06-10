@@ -1,4 +1,7 @@
-{pkgs, blink-lib}: let
+{
+  pkgs,
+  blink-lib,
+}: let
   custom = import ./self-packaged-plugins.nix;
 in rec {
   # CURRENTLY NOT USED - TO REVIEW
@@ -3311,13 +3314,9 @@ in rec {
     customPlugins;
 
   nixpkgsList = with pkgs.vimPlugins; [
-    # {
-    #   name = "jsregexp";
-    #   path = pkgs.luajitPackages.jsregexp;
-    # }
     {
-      name = "lua-utils";  # TODO: find a clean approach for lua module deps (luarocks adapter?)
-      path = luajitPackages.lua-utils-nvim;
+      name = "arshlib";
+      path = arshlib-nvim;
     }
     {
       name = "blink.lib";
@@ -3351,18 +3350,10 @@ in rec {
       name = "nvim-web-devicons";
       path = nvim-web-devicons;
     }
-    {
-      name = "nui";
-      path = nui-nvim;
-    }
-    {
-      name = "commons";
-      path = pkgs.luajitPackages.commons-nvim;
-    }
-    {
-      name = "pathlib";
-      path = pkgs.luajitPackages.pathlib-nvim;
-    }
+    # { MOVED TO LUA MODULES
+    #   name = "nui";
+    #   path = nui-nvim;
+    # }
     {
       name = "sqlite";
       path = sqlite-lua;
@@ -3639,7 +3630,8 @@ in rec {
       name = "better-escape";
       path = better-escape-nvim;
     }
-    {  # TODO: vendor because "unfree" (?)
+    {
+      # TODO: vendor because "unfree" (?)
       name = "unimpaired-which-key";
       path = unimpaired-which-key-nvim;
     }
@@ -3787,7 +3779,8 @@ in rec {
       name = "cmp-nvim-lsp-signature-help";
       path = cmp-nvim-lsp-signature-help;
     }
-    {  # TODO: vendor because "unfree" (?)
+    {
+      # TODO: vendor because "unfree" (?)
       name = "diagflow";
       path = diagflow-nvim;
     }
@@ -3955,7 +3948,8 @@ in rec {
       name = "gitsigns";
       path = gitsigns-nvim;
     }
-    {  # TODO: unfree -> vendor
+    {
+      # TODO: unfree -> vendor
       name = "git-conflict";
       path = git-conflict-nvim;
     }
@@ -4043,7 +4037,8 @@ in rec {
       name = "mkdp";
       path = markdown-preview-nvim;
     }
-    {  # TODO: vendor? (unfree)
+    {
+      # TODO: vendor? (unfree)
       name = "vim-pug";
       path = vim-pug;
     }
@@ -4055,10 +4050,10 @@ in rec {
       name = "opencode";
       path = opencode-nvim;
     }
-    {
-      name = "panvimdoc";
-      path = pkgs.panvimdoc;
-    }
+    # {  using as binary
+    #   name = "panvimdoc";
+    #   path = pkgs.panvimdoc;
+    # }
     {
       name = "knap";
       path = knap;

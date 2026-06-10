@@ -1,4 +1,16 @@
 local M: {string: {string}} = {
+	["_modules"]       = {
+		"commons",
+		"nui",
+		"lua-utils",
+		"luassert",
+		"nio",
+		"nui",
+		"pathlib",
+		"plenary",
+		"jsregexp",
+		"say"
+	},
 	["nvim-navbuddy"]  = { "nui" },
 	["yazi"]           = { "plenary" },
 	["telescope"]      = { "plenary", "telescope-fzf-native", "telescope-project", "advanced_git_search" },
@@ -22,6 +34,7 @@ local M: {string: {string}} = {
 	["kpops"]          = { "coop" },
 	["menu"]           = { "volt" },
 	["knap"]           = { "commons" },
+	["indent-tools"]   = { "plenary", "nui", "arshlib" },
 	["structlog"]      = { "ts_context_commentstring" },
 }
 return M

@@ -1,6 +1,7 @@
 -- ============== TESTING =======================
 local PREVIOUS = false
 local NEXT = true
+local COMPLICATIONS = false
 
 if PREVIOUS then
 	-- utils.packadd("neomux")         TODO: debug nvr-go
@@ -206,13 +207,14 @@ if NEXT then
 	-- GET IMPORTING NEXT
 	-------------------------------------------------------------------------------
 
-	-- setup_plugin("control-panel", {})
-	-- setup_plugin("doc-window", {}) DEPENDS ON ts_utils
-	-- setup_plugin("edit-list", {}) -- expects /home/isaac/.cache/nvim/edit-list.json
-	-- setup_plugin("feed", {}) FIX OPTIONS
-	-- setup_plugin("hierarchy", {}) -- null global error
-	-- setup_plugin("ido", {}) -- module 'fzy.lua' not found
-	-- setup_plugin("indent-tools", {}) -- archlib.quick not found
+	setup_plugin("api-browser", {})
+	setup_plugin("control_panel", {})
+	setup_plugin("indent-tools", {})
+	setup_plugin("nvim-keymapper", {})
+	setup_plugin("nvim-license", {})
+	setup_plugin("menu", {})
+	setup_plugin("output_panel", {})
+
 	setup_plugin("date-time-inserter", {})
 	setup_plugin("dmap", {})
 	setup_plugin("doing", {})
@@ -227,15 +229,9 @@ if NEXT then
 	setup_plugin("http-codes", function(http_codes) end)  -- use vim.g.http_codes
 	setup_plugin("inlayhint-filler", {})
 	setup_plugin("interlaced", {})
-	-- setup_plugin("ivy", {}) -- libivyrs.so not found
-	-- setup_plugin("jvim", {})  -- DEPENDS ON nvim-treesitter
-	-- setup_plugin("keymapper", {}) -- TODO: rebuild nix
 	setup_plugin("keyseer", {})
 	setup_plugin("Launch", {})
-	-- setup_plugin("nvim-license", {}) -- TODO: rebuild nix
 	setup_plugin("live-server", function(live_server) end)  -- use vim.g.live_server
-	-- setup_plugin("lvim-ui-config", {}) -- not requirable
-	-- setup_plugin("menu", {}) -- TODO: rebuild nix
 	setup_plugin("metrics", {})
 	setup_plugin("minimal-narrow-region", function(_) end)
 	setup_plugin("moonicipal", {})
@@ -245,11 +241,8 @@ if NEXT then
 	setup_plugin("neowell-lua", {})
 	setup_plugin("neowords", function(_) end)
 	setup_plugin("nerdy", {})
-	-- setup_plugin("nvim_winpick", {}) REQUIRES BUILD
 	setup_plugin("nvim-genghis", {}) -- https://github.com/chrisgrieser/nvim-genghis Lightweight and quick file operations without being a full-blown file manager.
-	-- setup_plugin("output_panel", {}) -- TODO: rebuild nix
 	setup_plugin("paint", {})
-	-- setup_plugin("pathlib", {}) -- use as lua module / vendor
 	setup_plugin("pragma", {})
 	setup_plugin("quicknote", {})
 	setup_plugin("reactive", {})
@@ -261,7 +254,6 @@ if NEXT then
 	setup_plugin("sche", {})
 	setup_plugin("search-replace", {})
 	setup_plugin("sentiment-nvim", {})
-	-- setup_plugin("sg", {}) -- requires interactive input
 	setup_plugin("sort", {})
 	setup_plugin("spaceport-nvim", {})
 	setup_plugin("spear", {})
@@ -269,7 +261,6 @@ if NEXT then
 	setup_plugin("symbols", {})
 	setup_plugin("tdo", {})
 	setup_plugin("treemonkey", function(_) end)
-	-- setup_plugin("TreePin", {}) REQUIRES UPDATE FROM nvim-treesitter
 	setup_plugin("twig", {})
 	setup_plugin("ultimate-autopair-nvim", {})
 	utils.packadd("vim-twig")
@@ -281,20 +272,27 @@ if NEXT then
 	setup_plugin("wf", {})
 	setup_plugin("whaler", {})
 	setup_plugin("wildfire", {})
-	-- setup_plugin("windows", {}) ERRORRED
 
+	-------------------------------------------------------------------------------
+	-- MODULES: ---------------------------------------------------------------------
+	-------------------------------------------------------------------------------
+    require("commons.fio")
+	require("nio")
+	require("nui.input")
+	require("jsregexp")
+	require("pathlib")
+	
 	-------------------------------------------------------------------------------
 	-- DEFERRED: ---------------------------------------------------------------------
 	-------------------------------------------------------------------------------
-	-- TODO: rebuild nix setup_plugin("knap", {}) -- https://github.com/frabjous/knap
+	setup_plugin("knap", {}) -- https://github.com/frabjous/knap
+	setup_plugin("nvmm", {}) -- nvim-mail-merge
+
 	setup_plugin("zpragmatic", {}) -- https://github.com/muhammadzkralla/zpragmatic.nvim  prompts you with alert dialog questions whenever you attempt to save changes in a file
-	-- setup_plugin("commons", {}) TODO: use as lua module
 	setup_plugin("volt", function(_) end) -- https://github.com/nvzone/volt  Create blazing fast & beautiful reactive UI in Neovim
 
-	-- setup_plugin("panvimdoc", {}) USE AS EXECUTRABLE / LUA MODULE
 	setup_plugin("qalc", {})
 	setup_plugin("channelot", function(_) end)
-	-- NIX REBUILD setup_plugin("nvmm", {}) -- nvim-mail-merge
 
 	setup_plugin("jaq-nvim", {}) -- https://github.com/is0n/jaq-nvim Just Another Quickrun Plugin for Neovim in Lua
 
@@ -315,7 +313,6 @@ if NEXT then
 
 	setup_plugin("drop", {}) -- https://github.com/folke/drop.nvim  Fun little plugin that can be used as a screensaver and on your dashboard
 
-	-- NIX REBUILD setup_plugin("api-browser", {})
 
 	---------------- time -------------
 	setup_plugin("pommodoro-clock", {})
@@ -330,11 +327,10 @@ if NEXT then
 	setup_plugin("orgmode", {})
 	setup_plugin("Calendar", {})
 	setup_plugin("zettelkasten", {})
-	-- config error setup_plugin("daily-focus", {})
 
 	---------------- performance -------------
 	setup_plugin("keylab", {}) -- https://github.com/BooleanCube/keylab.nvim
-	-- nix rebuild setup_plugin("nvim-apm", {})
+	setup_plugin("nvim-apm", {})
 
 	---------------- ai -------------
 	setup_plugin("avante", {}) -- https://github.com/yetone/avante.nvim
@@ -355,15 +351,13 @@ if NEXT then
 	setup_plugin("windline", function(_) end)
 
 	---------------- alternative explorers -------------
-	setup_plugin("chadtree", {})
 	setup_plugin("neo-tree", {})
 
 	---------------- build -------------
 
+	setup_plugin("officer", {})
 	setup_plugin("compiler", function(_) end)
 	setup_plugin("compiler-nvim", {})
-	-- setup_plugin("xmake", {}) TODO: install xmake
-	-- nix rebuild setup_plugin("officer", {})
 
 	---------------- color -------------
 	setup_plugin("text-to-colorscheme", {})
@@ -379,8 +373,9 @@ if NEXT then
 	-- PROBABLY NOT, BUT WORTH A TRY: ------------------------------------------------
 	-------------------------------------------------------------------------------
 
+	setup_plugin("whichkey_setup", {}) --
+	setup_plugin("ts_context_commentstring", {})
 
-	-- nix rebuild setup_plugin("ts_context_commentstring", {})
 	utils.packadd("vim-wordmotion")
 	setup_plugin("hop", {}) --
 	utils.packadd("clever-f.vim") --
@@ -390,7 +385,6 @@ if NEXT then
 	utils.packadd("vim-edgemotion") --
 	setup_plugin("notify", {}) -- (== nvim-notify ?)
 	setup_plugin("lsp_signature", {}) --
-	-- nix rebuild setup_plugin("whichkey_setup", {}) --
 	setup_plugin("nvim-teal-maker", {}) --
 	setup_plugin("cmdbuf", {}) -- https://github.com/notomo/cmdbuf.nvim
 	setup_plugin("nvim-rg", {}) -- https://github.com/duane9/nvim-rg
@@ -401,21 +395,29 @@ if NEXT then
 	setup_plugin("savior", {})
 	utils.packadd("vim-auto-save")
 
+end
+
+
+if COMPLICATIONS then
+
+	-- setup_plugin("nvim_winpick", {}) -- RUST
+	-- setup_plugin("xmake", {}) TODO: install xmake
+	-- setup_plugin("feed", {}) FIX OPTIONS
+	-- setup_plugin("hierarchy", {}) -- null global error
+	-- config error setup_plugin("daily-focus", {})
+
 	-- SEEM TO HANG INDEFINITELY
 	-- setup_plugin("shade", {})
 	-- setup_plugin("sunglasses", {})
+	-- setup_plugin("TreePin", {}) REQUIRES UPDATE FROM nvim-treesitter
 
-	-------------------------------------------------------------------------------
-	-- DECIDED AGAINST: --------------------------------------------------------------
-	-------------------------------------------------------------------------------
-	
-	-- setup_plugin("tree-sitter-just", {})
-	-- setup_plugin("guard", {})
-	-- setup_plugin("nvim-treesitter", {})
-	-- setup_plugin("splitjoin.vim", {})   -- kept lua version
-	-- setup_plugin("none-ls", {})
-	-- setup_plugin("nvim-alt-substitute", {})-- archived; superseded by nvim-rip-substitute
-	-- setup_plugin("pylsp-rope", {})
+	-- setup_plugin("lvim-ui-config", {}) -- not requirable
 
-	--]]
+	-- setup_plugin("edit-list", {}) -- expects /home/isaac/.cache/nvim/edit-list.json
+
+	-- setup_plugin("jvim", {})  -- DEPENDS ON nvim-treesitter
+	-- setup_plugin("doc-window", {}) DEPENDS ON ts_utils
+	-- setup_plugin("sg", {}) -- requires interactive input
+	-- setup_plugin("windows", {}) ERRORRED
+	setup_plugin("chadtree", {}) -- annoying messages & non-nix install habits
 end

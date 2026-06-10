@@ -16,12 +16,11 @@
     "go"
     "xit"
     "just"
-    "orgmode"
   ];
 
-  tsGrammars =
-    pkgs.vimPlugins.nvim-treesitter.withPlugins (p:
-      with p; grammarList);
+  # tsGrammars =
+  #   pkgs.vimPlugins.nvim-treesitter.withPlugins (p:
+  #     with p; grammarList);
 
   customGrammars = {
     just = pkgs.neovimUtils.grammarToPlugin (pkgs.tree-sitter.buildGrammar {
@@ -44,9 +43,24 @@
         sha256 = "sha256-wTr7YyGnz/dWfA5oecRqxeR8Unoob6isGnQg4/iu+MI=";
       };
     });
+    org = pkgs.neovimUtils.grammarToPlugin (pkgs.tree-sitter.buildGrammar {
+      language = "org";
+      version = "2.0.4";
+      src = pkgs.fetchFromGitHub {
+        owner = "nvim-orgmode";
+        repo = "tree-sitter-org";
+        rev = "219c0b27fdb2c0aeb43841f23f03d6f54657f288";
+        sha256 = pkgs.lib.fakeHash; # replace with actual hash after first build
+      };
+      meta = {
+        homepage = "https://github.com/nvim-orgmode/tree-sitter-org";
+        license = pkgs.lib.licenses.mit;
+      };
+    });
   };
 
-  grammars = pkgs.vimPlugins.nvim-treesitter.grammarPlugins // customGrammars;
+  # grammars = pkgs.vimPlugins.nvim-treesitter.grammarPlugins // customGrammars;
+  grammars = pkgs.vimPlugins.nvim-treesitter-parsers // customGrammars;
 in {
   allParsers = pkgs.runCommand "nvim-ts-parsers" {} ''
     mkdir -p $out/parser

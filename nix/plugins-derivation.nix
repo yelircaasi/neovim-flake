@@ -1,4 +1,7 @@
-{pkgs, blink-lib}: let
+{
+  pkgs,
+  blink-lib,
+}: let
   lib = pkgs.lib;
   stdenvNoCC = pkgs.stdenvNoCC;
 
@@ -88,7 +91,7 @@ in {
     cp $out/pack/bundle/opt/dial/plugin/dial.lua $out/pack/bundle/opt/dial/lua/dial/init.lua
   '';
 
-  standardPathsDerivation = stdenvNoCC.mkDerivation {
+  OLD_standardPathsDerivation = stdenvNoCC.mkDerivation {
     name = "neovim-opt-pack";
 
     dontUnpack = true;

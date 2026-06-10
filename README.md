@@ -2,7 +2,26 @@
 
 ## Roadmap
 
-<!-- add tree-sitter-just to queries -->
+```lua
+	-------------------------------------------------------------------------------
+	-- DECIDED AGAINST: --------------------------------------------------------------
+	-------------------------------------------------------------------------------
+	
+	-- setup_plugin("tree-sitter-just", {})
+	-- setup_plugin("guard", {})
+	-- setup_plugin("nvim-treesitter", {})
+	-- setup_plugin("splitjoin.vim", {})   -- kept lua version
+	-- setup_plugin("none-ls", {})
+	-- setup_plugin("nvim-alt-substitute", {})-- archived; superseded by nvim-rip-substitute
+	-- setup_plugin("pylsp-rope", {})
+```
+
+More complicated installations:
+
+```lua
+  setup_plugin("ido", {}) -- 'fzy.lua' not found
+  setup_plugin("ivy", {}) -- libivyrs.so not found
+```
 
 Set up `efm` as language server, not plugin
 
