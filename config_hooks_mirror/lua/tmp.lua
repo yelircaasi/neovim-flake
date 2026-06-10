@@ -4,8 +4,6 @@ local NEXT = true
 local COMPLICATIONS = false
 
 if PREVIOUS then
-	-- utils.packadd("neomux")         TODO: debug nvr-go
-	-- setup_plugin("kubernetes", {})  TODO: install kubectl
 
 	setup_plugin("inc_rename", {})
 	setup_plugin("treesitter-context", {})
@@ -400,6 +398,8 @@ end
 
 if COMPLICATIONS then
 
+	-- utils.packadd("neomux")         TODO: debug nvr-go
+	-- setup_plugin("kubernetes", {})  TODO: install kubectl
 	-- setup_plugin("nvim_winpick", {}) -- RUST
 	-- setup_plugin("xmake", {}) TODO: install xmake
 	-- setup_plugin("feed", {}) FIX OPTIONS
