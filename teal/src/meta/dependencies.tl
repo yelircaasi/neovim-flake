@@ -20,5 +20,8 @@ local M: {string: {string}} = {
 	["octohub"]        = { "plenary", "utils", "pickme" },
 	["kubectl"]        = { "blink.lib" },
 	["kpops"]          = { "coop" },
+	["menu"]           = { "volt" },
+	["knap"]           = { "commons" },
+	["structlog"]      = { "ts_context_commentstring" },
 }
 return M

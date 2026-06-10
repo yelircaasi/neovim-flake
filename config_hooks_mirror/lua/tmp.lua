@@ -1,6 +1,6 @@
 -- ============== TESTING =======================
-local PREVIOUS = true
-local NEXT = false
+local PREVIOUS = false
+local NEXT = true
 
 if PREVIOUS then
 	-- utils.packadd("neomux")         TODO: debug nvr-go
@@ -199,59 +199,57 @@ t = {
 	})
 end
 
+require("miscellaneous")
+
 if NEXT then
 	-------------------------------------------------------------------------------
 	-- GET IMPORTING NEXT
 	-------------------------------------------------------------------------------
 
-	setup_plugin("neowell-lua", {})
-	setup_plugin("control-panel", {})
+	-- setup_plugin("control-panel", {})
+	-- setup_plugin("doc-window", {}) DEPENDS ON ts_utils
+	-- setup_plugin("edit-list", {}) -- expects /home/isaac/.cache/nvim/edit-list.json
+	-- setup_plugin("feed", {}) FIX OPTIONS
+	-- setup_plugin("hierarchy", {}) -- null global error
+	-- setup_plugin("ido", {}) -- module 'fzy.lua' not found
+	-- setup_plugin("indent-tools", {}) -- archlib.quick not found
 	setup_plugin("date-time-inserter", {})
 	setup_plugin("dmap", {})
-	setup_plugin("doc-window", {})
 	setup_plugin("doing", {})
 	setup_plugin("dotdot", {})
 	setup_plugin("easycolor", {})
-	setup_plugin("edit-list", {})
 	setup_plugin("equals", {})
-	setup_plugin("export-colorscheme", {})
-	setup_plugin("feed", {})
+	setup_plugin("export-colorscheme", function(_) end)
 	setup_plugin("flashcards", {})
 	setup_plugin("flote", {})
 	setup_plugin("fsplash", {})
-	setup_plugin("fsread", {})
-	setup_plugin("hierarchy", {})
 	setup_plugin("highlight-current-n-nvim", {})
-	setup_plugin("http-codes", {})
-	setup_plugin("ido", {})
-	setup_plugin("indent-tools", {})
+	setup_plugin("http-codes", function(http_codes) end)  -- use vim.g.http_codes
 	setup_plugin("inlayhint-filler", {})
 	setup_plugin("interlaced", {})
-	setup_plugin("ivy", {})
-	setup_plugin("jvim", {})
-	setup_plugin("keymapper", {})
+	-- setup_plugin("ivy", {}) -- libivyrs.so not found
+	-- setup_plugin("jvim", {})  -- DEPENDS ON nvim-treesitter
+	-- setup_plugin("keymapper", {}) -- TODO: rebuild nix
 	setup_plugin("keyseer", {})
 	setup_plugin("Launch", {})
-	setup_plugin("license", {})
-	setup_plugin("live-server", {})
-	setup_plugin("lvim-ui-config", {})
-	setup_plugin("menu", {})
+	-- setup_plugin("nvim-license", {}) -- TODO: rebuild nix
+	setup_plugin("live-server", function(live_server) end)  -- use vim.g.live_server
+	-- setup_plugin("lvim-ui-config", {}) -- not requirable
+	-- setup_plugin("menu", {}) -- TODO: rebuild nix
 	setup_plugin("metrics", {})
-	setup_plugin("minimal-narrow-region", {})
+	setup_plugin("minimal-narrow-region", function(_) end)
 	setup_plugin("moonicipal", {})
 	setup_plugin("navigator", {})
 	setup_plugin("neocomposer-nvim", {})
 	setup_plugin("neotest-plenary", {})
-	setup_plugin("neowords", {})
+	setup_plugin("neowell-lua", {})
+	setup_plugin("neowords", function(_) end)
 	setup_plugin("nerdy", {})
-	setup_plugin("nvim_winpick", {})
-	setup_plugin("nvim-api-wrappers", {})
-	setup_plugin("nvim-cmp-fonts", {})
-	setup_plugin("nvim-cmp-lua-latex-symbols", {})
+	-- setup_plugin("nvim_winpick", {}) REQUIRES BUILD
 	setup_plugin("nvim-genghis", {}) -- https://github.com/chrisgrieser/nvim-genghis Lightweight and quick file operations without being a full-blown file manager.
-	setup_plugin("output-panel", {})
+	-- setup_plugin("output_panel", {}) -- TODO: rebuild nix
 	setup_plugin("paint", {})
-	setup_plugin("pathlib", {})
+	-- setup_plugin("pathlib", {}) -- use as lua module / vendor
 	setup_plugin("pragma", {})
 	setup_plugin("quicknote", {})
 	setup_plugin("reactive", {})
@@ -259,51 +257,44 @@ if NEXT then
 	setup_plugin("renamer", {})
 	setup_plugin("resin", {})
 	setup_plugin("retrospect", {})
-	setup_plugin("runtimetable", {})
+	setup_plugin("runtimetable", function(_) end)
 	setup_plugin("sche", {})
 	setup_plugin("search-replace", {})
 	setup_plugin("sentiment-nvim", {})
-	setup_plugin("sg", {})
+	-- setup_plugin("sg", {}) -- requires interactive input
 	setup_plugin("sort", {})
 	setup_plugin("spaceport-nvim", {})
 	setup_plugin("spear", {})
 	setup_plugin("strict", {})
 	setup_plugin("symbols", {})
 	setup_plugin("tdo", {})
-	setup_plugin("telescope-code-actions", {})
-	setup_plugin("telescope-file-browser", {})
-	setup_plugin("telescope-github", {})
-	setup_plugin("telescope-json-history", {})
-	setup_plugin("telescope-project", {})
-	setup_plugin("telescope-repo", {})
-	setup_plugin("telescope-smart-history", {})
-	setup_plugin("telescope-xc", {})
-	setup_plugin("tracebundler", {})
-	setup_plugin("treemonkey", {})
-	setup_plugin("TreePin", {})
+	setup_plugin("treemonkey", function(_) end)
+	-- setup_plugin("TreePin", {}) REQUIRES UPDATE FROM nvim-treesitter
 	setup_plugin("twig", {})
 	setup_plugin("ultimate-autopair-nvim", {})
-	setup_plugin("vim-twig", {})
+	utils.packadd("vim-twig")
 	setup_plugin("vuffers", {})
-	setup_plugin("wastebin", {})
+	setup_plugin("wastebin", {
+		url = "https://foo.bar.com",
+	}) -- TODO: install https://github.com/matze/wastebin
 	setup_plugin("web-tools", {})
 	setup_plugin("wf", {})
 	setup_plugin("whaler", {})
 	setup_plugin("wildfire", {})
-	setup_plugin("windows", {})
+	-- setup_plugin("windows", {}) ERRORRED
 
 	-------------------------------------------------------------------------------
 	-- DEFERRED: ---------------------------------------------------------------------
 	-------------------------------------------------------------------------------
-	setup_plugin("knap", {}) -- https://github.com/frabjous/knap
+	-- TODO: rebuild nix setup_plugin("knap", {}) -- https://github.com/frabjous/knap
 	setup_plugin("zpragmatic", {}) -- https://github.com/muhammadzkralla/zpragmatic.nvim  prompts you with alert dialog questions whenever you attempt to save changes in a file
-	setup_plugin("commons", {})
-	setup_plugin("volt", {}) -- https://github.com/nvzone/volt  Create blazing fast & beautiful reactive UI in Neovim
+	-- setup_plugin("commons", {}) TODO: use as lua module
+	setup_plugin("volt", function(_) end) -- https://github.com/nvzone/volt  Create blazing fast & beautiful reactive UI in Neovim
 
-	setup_plugin("panvimdoc", {})
+	-- setup_plugin("panvimdoc", {}) USE AS EXECUTRABLE / LUA MODULE
 	setup_plugin("qalc", {})
-	setup_plugin("channelot", {})
-	setup_plugin("nvim-mail-merge", {})
+	setup_plugin("channelot", function(_) end)
+	-- NIX REBUILD setup_plugin("nvmm", {}) -- nvim-mail-merge
 
 	setup_plugin("jaq-nvim", {}) -- https://github.com/is0n/jaq-nvim Just Another Quickrun Plugin for Neovim in Lua
 
@@ -312,13 +303,10 @@ if NEXT then
 	setup_plugin("present", {})
 
 	setup_plugin("cmdTree", {}) -- https://github.com/CWood-sdf/cmdTree.nvim  Declaratively make your neovim user commands
-	setup_plugin("cmp_bulma", {})
-	setup_plugin("cmp-nvim-lsp-signature-help", {})
-	setup_plugin("cmp-nvim-telekasten-tags", {})
 
-	setup_plugin("better-digraphs", {})
+	setup_plugin("better-digraphs", function(_) end)
 
-	setup_plugin("vim-slime", {})
+	utils.packadd("vim-slime")
 
 	setup_plugin("keymap-amend-nvim", {}) -- https://github.com/anuvyklack/keymap-amend.nvim
 
@@ -327,7 +315,7 @@ if NEXT then
 
 	setup_plugin("drop", {}) -- https://github.com/folke/drop.nvim  Fun little plugin that can be used as a screensaver and on your dashboard
 
-	setup_plugin("endpoint-previewer", {})
+	-- NIX REBUILD setup_plugin("api-browser", {})
 
 	---------------- time -------------
 	setup_plugin("pommodoro-clock", {})
@@ -337,37 +325,34 @@ if NEXT then
 	setup_plugin("nomodoro", {})
 
 	---------------- pkm -------------
-	setup_plugin("vimwiki", {})
-	setup_plugin("neorg", {})
-	setup_plugin("neorg-taskwarrior", {})
-	setup_plugin("obsidian", {})
+	utils.packadd("vimwiki", {})
+	setup_plugin("obsidian", { legacy_commands = false })
 	setup_plugin("orgmode", {})
 	setup_plugin("Calendar", {})
 	setup_plugin("zettelkasten", {})
-	setup_plugin("tktodo", {}) -- https://github.com/tarting/tktodo.nvim  A telescope extension to toggle todo items in notes from the telekasten.nvim home directory.
-	setup_plugin("daily-focus", {})
+	-- config error setup_plugin("daily-focus", {})
 
 	---------------- performance -------------
 	setup_plugin("keylab", {}) -- https://github.com/BooleanCube/keylab.nvim
-	setup_plugin("apm", {}) --
+	-- nix rebuild setup_plugin("nvim-apm", {})
 
 	---------------- ai -------------
 	setup_plugin("avante", {}) -- https://github.com/yetone/avante.nvim
 	setup_plugin("codecompanion", {}) --
 	setup_plugin("llm", {})
-	setup_plugin("vim-ai", {})
+	utils.packadd("vim-ai")
 
 	---------------- alternative lines -------------
 	setup_plugin("cokeline", {})
-	setup_plugin("galaxyline", {})
+	setup_plugin("galaxyline", function(_) end)
 	setup_plugin("heirline", {})
 	setup_plugin("heirline-components", {})
-	setup_plugin("nougat", {})
+	setup_plugin("nougat", function(_) end)
 	setup_plugin("staline", {})
 	setup_plugin("tabby", {})
 	setup_plugin("minibar", {})
 	setup_plugin("winbar", {})
-	setup_plugin("windline", {})
+	setup_plugin("windline", function(_) end)
 
 	---------------- alternative explorers -------------
 	setup_plugin("chadtree", {})
@@ -375,72 +360,62 @@ if NEXT then
 
 	---------------- build -------------
 
-	setup_plugin("compiler", {})
+	setup_plugin("compiler", function(_) end)
 	setup_plugin("compiler-nvim", {})
-	setup_plugin("xmake", {})
-	setup_plugin("yabs", {})
+	-- setup_plugin("xmake", {}) TODO: install xmake
+	-- nix rebuild setup_plugin("officer", {})
 
 	---------------- color -------------
 	setup_plugin("text-to-colorscheme", {})
 	setup_plugin("minty", {})
 	setup_plugin("color-picker", {})
 	setup_plugin("baleia", {}) -- Colorize text with ANSI escape sequences (8, 16, 256 or TrueColor)
-	setup_plugin("bamboo", {})
-	setup_plugin("kreative", {}) -- https://github.com/katawful/kreative  A colorscheme creation tool for Neovim, written in Fennel with Aniseed
-
-	-------------------------------------------------------------------------------
-	-- IN MISCELLANEOUS: -------------------------------------------------------------
-	-------------------------------------------------------------------------------
-
-	setup_plugin("asyncrun", {})
-	setup_plugin("markdown-preview", {})
-	setup_plugin("dashboard", {})
-	setup_plugin("dashboard-nvim", {})
-	setup_plugin("schemastore", {})
-	setup_plugin("vimtex", {})
-	setup_plugin("render-markdown", {})
-	setup_plugin("structlog", {})
-	setup_plugin("texmagic", {})
+	if false then
+	    setup_plugin("bamboo", {})
+	    setup_plugin("kreative", function(_) end) -- https://github.com/katawful/kreative  A colorscheme creation tool for Neovim, written in Fennel with Aniseed
+    end
 
 	-------------------------------------------------------------------------------
 	-- PROBABLY NOT, BUT WORTH A TRY: ------------------------------------------------
 	-------------------------------------------------------------------------------
 
-	setup_plugin("ts-context-commentstring", {})
-	setup_plugin("vim-wordmotion", {})
+
+	-- nix rebuild setup_plugin("ts_context_commentstring", {})
+	utils.packadd("vim-wordmotion")
 	setup_plugin("hop", {}) --
-	setup_plugin("clever-f.vim", {}) --
+	utils.packadd("clever-f.vim") --
 	setup_plugin("better-escape", {}) --
 	setup_plugin("hlsearch-nvim", {}) --
 	setup_plugin("improved-search-nvim", {}) --
-	setup_plugin("vim-edgemotion", {}) --
-	setup_plugin("efm", {}) --
+	utils.packadd("vim-edgemotion") --
 	setup_plugin("notify", {}) -- (== nvim-notify ?)
 	setup_plugin("lsp_signature", {}) --
-	setup_plugin("nvim-whichkey-setup.lua", {}) --
+	-- nix rebuild setup_plugin("whichkey_setup", {}) --
 	setup_plugin("nvim-teal-maker", {}) --
 	setup_plugin("cmdbuf", {}) -- https://github.com/notomo/cmdbuf.nvim
 	setup_plugin("nvim-rg", {}) -- https://github.com/duane9/nvim-rg
 	setup_plugin("homerows", {}) -- https://github.com/unode/homerow.vim/blob/master/autoload/homerow.vim
 
-	setup_plugin("vim-multiple-cursors", {})
+	utils.packadd("vim-multiple-cursors")
 
 	setup_plugin("savior", {})
-	setup_plugin("vim-auto-save", {})
+	utils.packadd("vim-auto-save")
 
-	setup_plugin("shade", {})
-	setup_plugin("sunglasses", {})
+	-- SEEM TO HANG INDEFINITELY
+	-- setup_plugin("shade", {})
+	-- setup_plugin("sunglasses", {})
 
 	-------------------------------------------------------------------------------
 	-- DECIDED AGAINST: --------------------------------------------------------------
 	-------------------------------------------------------------------------------
+	
+	-- setup_plugin("tree-sitter-just", {})
 	-- setup_plugin("guard", {})
 	-- setup_plugin("nvim-treesitter", {})
 	-- setup_plugin("splitjoin.vim", {})   -- kept lua version
 	-- setup_plugin("none-ls", {})
 	-- setup_plugin("nvim-alt-substitute", {})-- archived; superseded by nvim-rip-substitute
 	-- setup_plugin("pylsp-rope", {})
-	-- setup_plugin("tree-sitter-just", {})
 
 	--]]
 end

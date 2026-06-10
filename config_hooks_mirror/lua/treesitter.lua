@@ -239,6 +239,7 @@ local ts_disabled = {
 	TelescopePrompt = true,
 	TelescopeResults = true,
 	TelescopePreview = true,
+	dmap = true,
 }
 
 local orig_ts_start = vim.treesitter.start

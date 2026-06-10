@@ -16,6 +16,7 @@
     "go"
     "xit"
     "just"
+    "orgmode"
   ];
 
   tsGrammars =

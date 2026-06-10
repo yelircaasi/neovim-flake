@@ -125,7 +125,7 @@ local function setup(config: UtilsConfig): Utils
 
 	    if config_or_function is PluginConfig then
 			local plugin_with_setup = plugin as PluginWithSetup
-			M.call_safe(plugin_with_setup.setup, config_or_function, "ERROR: configuring" .. plugin_name)
+			M.call_safe(plugin_with_setup.setup, config_or_function, "ERROR: configuring " .. plugin_name)
 	    elseif config_or_function is function then
 			M.call_safe(config_or_function, plugin, "ERROR: custom setup function failed for " .. plugin_name)
 	    end

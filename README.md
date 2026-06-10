@@ -2,14 +2,61 @@
 
 ## Roadmap
 
+<!-- add tree-sitter-just to queries -->
+
+Set up `efm` as language server, not plugin
+
+fix dependency: ts-context-commentstring
+```lua
+	setup_plugin("structlog", {})
+```
+
+Set up telescope extensions:
+
+```lua
+	setup_plugin("tktodo", {}) -- https://github.com/tarting/tktodo.nvim  A telescope extension to toggle todo items in notes from the telekasten.nvim home directory.
+	setup_plugin("telescope-code-actions", {})
+	setup_plugin("telescope-file-browser", {})
+	setup_plugin("telescope-github", {})
+	setup_plugin("telescope-json-history", {})
+	setup_plugin("telescope-project", {})
+	setup_plugin("telescope-repo", {})
+	setup_plugin("telescope-smart-history", {})
+	setup_plugin("telescope-xc", {})
+```
+
+Set up completion sources:
+
+```lua
+	setup_plugin("cmp_bulma", {})
+	setup_plugin("cmp-nvim-lsp-signature-help", {})
+	setup_plugin("cmp-nvim-telekasten-tags", {})
+	setup_plugin("cmp-fonts", {})
+	setup_plugin("cmp-lua-latex-symbols", {}) -- TODO: rebuild nix
+```
+
+Resolve neorg dependencies
+
+- treesitter, pathlib, utils.lua, etc: https://github.com/nvim-neorg/neorg#neorg-kickstart
+
+```lua
+	setup_plugin("neorg", {})
+	setup_plugin("neorg-taskwarrior", {})
+```
+
+neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
+
 - VENDOR: -----------------------------------------------------------------------
 
+  - nvim-api-wrappers
   - k8vim
   - telemake
   - virtcolumn
   - wezterm-nvim
   - AdvancedNewFile  | https://github.com/Mohammed-Taher/AdvancedNewFile.nvim
   - spread  (uses nvim-treesitter)
+  - fsread
+  - tracebundler
 
 - set up with at least minimal config: ------------------------------------------
   - [x] mypy

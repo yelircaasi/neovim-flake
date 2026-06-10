@@ -1129,8 +1129,8 @@ in rec {
         description = "";
       };
     };
-    apm = pkgs.vimUtils.buildVimPlugin {
-      pname = "apm";
+    nvim-apm = pkgs.vimUtils.buildVimPlugin {
+      pname = "nvim-apm";
       version = "2023-03-04";
       src = pkgs.fetchFromGitHub {
         owner = "pseudocc";
@@ -1144,8 +1144,8 @@ in rec {
         description = "";
       };
     };
-    keymapper = pkgs.vimUtils.buildVimPlugin {
-      pname = "keymapper";
+    nvim-keymapper = pkgs.vimUtils.buildVimPlugin {
+      pname = "nvim-keymapper";
       version = "2022-11-10";
       src = pkgs.fetchFromGitHub {
         owner = "bgrohman";
@@ -1638,7 +1638,7 @@ in rec {
         description = "";
       };
     };
-    nvim-cmp-fonts = pkgs.vimUtils.buildVimPlugin {
+    cmp-fonts = pkgs.vimUtils.buildVimPlugin {
       pname = "nvim-cmp-fonts";
       version = "2022-10-10";
       src = pkgs.fetchFromGitHub {
@@ -1653,7 +1653,7 @@ in rec {
         description = "";
       };
     };
-    nvim-cmp-lua-latex-symbols = pkgs.vimUtils.buildVimPlugin {
+    cmp-lua-latex-symbols = pkgs.vimUtils.buildVimPlugin {
       pname = "nvim-cmp-lua-latex-symbols";
       version = "2023-09-23";
       src = pkgs.fetchFromGitHub {
@@ -1713,7 +1713,7 @@ in rec {
         description = "";
       };
     };
-    output-panel = pkgs.vimUtils.buildVimPlugin {
+    output_panel = pkgs.vimUtils.buildVimPlugin {
       pname = "output-panel";
       version = "2026-03-04";
       src = pkgs.fetchFromGitHub {
@@ -1728,7 +1728,7 @@ in rec {
         description = "";
       };
     };
-    control-panel = pkgs.vimUtils.buildVimPlugin {
+    control_panel = pkgs.vimUtils.buildVimPlugin {
       pname = "control-panel";
       version = "2023-05-12";
       src = pkgs.fetchFromGitHub {
@@ -1966,8 +1966,8 @@ in rec {
     #     description = "";
     #   };
     # };
-    yabs = pkgs.vimUtils.buildVimPlugin {
-      pname = "yabs";
+    officer = pkgs.vimUtils.buildVimPlugin {
+      pname = "officer";
       version = "2025-09-10";
       src = pkgs.fetchFromGitHub {
         owner = "pianocomposer321";
@@ -2581,7 +2581,7 @@ in rec {
         description = "";
       };
     };
-    license = pkgs.vimUtils.buildVimPlugin {
+    nvim-license = pkgs.vimUtils.buildVimPlugin {
       pname = "license";
       version = "2023-05-13";
       src = pkgs.fetchFromGitHub {
@@ -2611,7 +2611,7 @@ in rec {
         description = "";
       };
     };
-    nvim-mail-merge = pkgs.vimUtils.buildVimPlugin {
+    nvmm = pkgs.vimUtils.buildVimPlugin {
       pname = "nvim-mail-merge";
       version = "2025-05-07";
       src = pkgs.fetchFromGitHub {
@@ -2686,7 +2686,7 @@ in rec {
         description = "";
       };
     };
-    endpoint-previewer = pkgs.vimUtils.buildVimPlugin {
+    api-browser = pkgs.vimUtils.buildVimPlugin {
       pname = "endpoint-previewer";
       version = "2023-12-21";
       src = pkgs.fetchFromGitHub {
@@ -2915,14 +2915,14 @@ in rec {
       pname = "easycolor";
       version = "2024-05-24";
       src = pkgs.fetchFromGitHub {
-        owner = "neph-iap";
+        owner = "vi013t";
         repo = "easycolor.nvim";
         rev = "327135955e27ca8568cf4782ffc7840a89f31fef";
         hash = "sha256-lIE7Wbgyab6Xd9NcZs7FJ/u3w+0gsK79xFHJtM0xN9c=";
       };
       doCheck = false;
       meta = {
-        homepage = "https://github.com/neph-iap/easycolor.nvim";
+        homepage = "https://github.com/vi013t/easycolor.nvim";
         description = "";
       };
     };
@@ -3315,7 +3315,10 @@ in rec {
     #   name = "jsregexp";
     #   path = pkgs.luajitPackages.jsregexp;
     # }
-
+    {
+      name = "lua-utils";  # TODO: find a clean approach for lua module deps (luarocks adapter?)
+      path = luajitPackages.lua-utils-nvim;
+    }
     {
       name = "blink.lib";
       path = blink-lib;
@@ -3641,7 +3644,7 @@ in rec {
       path = unimpaired-which-key-nvim;
     }
     {
-      name = "nvim-whichkey-setup.lua";
+      name = "whichkey_setup";
       path = nvim-whichkey-setup-lua;
     }
     {
@@ -4037,7 +4040,7 @@ in rec {
       path = render-markdown-nvim;
     }
     {
-      name = "markdown-preview";
+      name = "mkdp";
       path = markdown-preview-nvim;
     }
     {  # TODO: vendor? (unfree)
@@ -4131,6 +4134,10 @@ in rec {
     {
       name = "neorg";
       path = neorg;
+    }
+    {
+      name = "ts_context_commentstring";
+      path = nvim-ts-context-commentstring;
     }
   ];
 }
