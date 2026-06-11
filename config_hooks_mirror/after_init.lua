@@ -147,43 +147,62 @@ map_explicit({
 })
 vim.api.nvim_set_hl(0, "@variable", { link = "Identifier" })
 
-require("options")
-require("core")
-require("ui")
+local config_modules = {
+	["options"] = true,
+	["core"] = true,
+	["ui"] = true,
 
-require("completion")
-require("explorers")
-require("testing")
-require("treesitter")
-require("langs.python")
-require("lsp_etc")
+	["clipboard"] = true,
+	["cloud"] = true,
+	["execution"] = true,
 
-require("editing")
-require("folding")
-require("search")
-require("navigation")
+	["completion"] = true,
+	["explorers"] = true,
+	["testing"] = true,
+	["treesitter"] = true,
+	["langs.python"] = true,
+	["lsp_etc"] = true,
 
-require("telescope_etc")
-require("diff")
-require("terminal")
-require("debugging")
-require("projects")
-require("macros")
+	["editing"] = true,
+	["folding"] = true,
+	["search"] = true,
+	["navigation"] = true,
 
-require("langs.rust")
-require("langs.haskell")
-require("langs.lua_language")
+	["telescope_etc"] = true,
+	["diff"] = true,
+	["terminal"] = true,
+	["debugging"] = true,
+	["projects"] = true,
+	["macros"] = true,
 
-require("task_runner")
+	["langs.rust"] = true,
+	["langs.haskell"] = true,
+	["langs.lua_language"] = true,
 
-require("git")
-require("ai")
+	["task_runner"] = true,
 
-require("mappings") -- TODO: move out to respective files
+	["git"] = true,
+	["ai"] = true,
 
-require("tmp")
+	["mappings"] = true, -- TODO: move out to respective files
 
-if false then
+	["tmp"] = true,
+
+	["langs.xit"] = false, -- TODO
+	["langs.tex"] = false,
+	["langs.typst"] = false,
+	["langs.go"] = false,
+
+	["miscellaneous"] = false, -- TODO
+}
+for mod_name, include in pairs(config_modules) do
+	if include then
+		require(mod_name)
+	end
+end
+
+local include_experimental = false
+if include_experimental then
 	-- TODO
 	require("wezterm_send").setup()
 
@@ -191,13 +210,6 @@ if false then
 	vim.opt.runtimepath:prepend("/home/isaac/repos/consilium.nvim")
 	local consilium = require("consilium")
 	consilium.setup()
-
-	require("langs.xit") -- TODO
-	require("langs.tex")
-	require("langs.typst")
-	require("langs.go")
-
-	require("miscellaneous") -- TODO
 end
 
 utils.printv("Reached end of after_init.lua.")

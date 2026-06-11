@@ -16,6 +16,7 @@
     "go"
     "xit"
     "just"
+    "org"
   ];
 
   # tsGrammars =
@@ -50,7 +51,7 @@
         owner = "nvim-orgmode";
         repo = "tree-sitter-org";
         rev = "219c0b27fdb2c0aeb43841f23f03d6f54657f288";
-        sha256 = pkgs.lib.fakeHash; # replace with actual hash after first build
+        sha256 = "sha256-g5TZ3XTj6mUbshhJlfoKw0blr1u3qblW93cHqVucISM="; # replace with actual hash after first build
       };
       meta = {
         homepage = "https://github.com/nvim-orgmode/tree-sitter-org";

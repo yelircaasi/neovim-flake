@@ -16,3 +16,5 @@ setup_plugin("toggleterm", {
 		},
 	},
 })
+
+utils.packadd("termim")

@@ -1,9 +1,16 @@
 -- MAPPINGS ========================================================================================
 vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
+setup_plugin("which-key", function(which_key)
+	vim.o.timeout = true
+	vim.o.timeoutlen = 300
+	which_key.setup({})
+end)
+
+setup_plugin("mini.keymap")
 
 -- WAS:
 -- local map = vim.keymap.set
-if mappings_lua then
+if false then
 	-- floaterm -----------------------------------------------------------------------------------------------------------
 	vim.keymap.set("n", "<leader>ft", "<Cmd>FloatermToggle<CR>", { desc = "Toggle floaterm" })
 	vim.keymap.set("t", "<leader>ft", "<C-\\><C-n><Cmd>FloatermToggle<CR>", { desc = "Toggle floaterm" })
@@ -393,3 +400,24 @@ setup_plugin("insx", function(insx)
 	require("insx.preset.standard").setup()
 	-- insx.add(require("insx.preset.standard").setup())
 end)
+
+setup_plugin("keymap-amend-nvim", {}) -- https://github.com/anuvyklack/keymap-amend.nvim
+
+setup_plugin("unimpaired-which-key", function(_) end)
+
+-- use which-key to ncreate commands
+--[[
+t = {
+	name = "Terminal",
+	["`"] = { "<cmd>Sterm<cr>", "Horizontal Terminal" },
+	e = { "<cmd>Sterm iex<cr>", "Elixir" },
+	f = { "<cmd>Fterm<cr>", "Floating Terminal" },
+	g = { "<cmd>Fterm lazygit<cr>", "Lazygit" },
+	n = { "<cmd>Sterm node<cr>", "Node" },
+	p = { "<cmd>Sterm bpython<cr>", "Python" },
+	r = { "<cmd>Sterm irb<cr>", "Ruby" },
+	s = { "<cmd>Sterm<cr>", "Horizontal Terminal" },
+	t = { "<cmd>Tterm<cr>", "Terminal" },
+	v = { "<cmd>Vterm<cr>", "Vertical Terminal" },
+},
+--]]

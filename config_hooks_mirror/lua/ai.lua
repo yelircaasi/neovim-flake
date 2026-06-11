@@ -280,3 +280,9 @@ vim.api.nvim_create_autocmd("User", {
 		end
 	end,
 })
+
+---------------- ai -------------
+setup_plugin("avante", {}) -- https://github.com/yetone/avante.nvim
+setup_plugin("codecompanion", {}) --
+setup_plugin("llm", {})
+utils.packadd("vim-ai")

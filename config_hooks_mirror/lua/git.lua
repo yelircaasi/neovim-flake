@@ -391,6 +391,10 @@ local octo_default_config = {
 }
 setup_plugin("octo")
 
+setup_plugin("octohub", {}) -- TODO: install gh
+setup_plugin("worktrees", {})
+setup_plugin("forgit", {}) -- TODO: install delta, guihua
+
 local official_gitlab_config = {
 	statusline = {
 		enabled = false,

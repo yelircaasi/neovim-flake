@@ -919,3 +919,5 @@ setup_plugin("refactoring", function(refactoring)
 		return require("refactoring.debug").cleanup({ restore_view = true })
 	end, { desc = "Debug print clean", expr = true, remap = true })
 end)
+
+utils.packadd("error-jump")
