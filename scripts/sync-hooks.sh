@@ -69,7 +69,10 @@ sync_hooks lua/wezterm_send.lua
 sync_hooks lua/langs/init.lua
 sync_hooks lua/langs/go.lua
 sync_hooks lua/langs/haskell.lua
+sync_hooks lua/langs/json_yaml.lua
 sync_hooks lua/langs/lua_language.lua
+sync_hooks lua/langs/markdown.lua
+sync_hooks lua/langs/nix.lua
 sync_hooks lua/langs/python.lua
 sync_hooks lua/langs/rust.lua
 sync_hooks lua/langs/tex.lua

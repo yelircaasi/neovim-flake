@@ -6,6 +6,8 @@ utils.setup_plugin("flybuf", function(flybuf)
 	vim.keymap.set("n", "<leader>bf", "FlyBuf", { desc = "FlyBuf: buffer list" })
 end)
 
+setup_plugin("navigator", {})
+
 setup_plugin("smart-splits", function(ss)
 	ss.setup({
 		ignored_filetypes = { "nofile", "quickfix", "prompt" },
@@ -105,6 +107,10 @@ end)
 -- 	end,
 -- })
 
+-- FILES ==========================================================================================
+
+setup_plugin("spear", {})
+
 -- WINDOWS ========================================================================================
 
 setup_plugin("swm", function(swm)
@@ -121,8 +127,15 @@ setup_plugin("swm", function(swm)
 	map("n", "<C-l>", swm.l, { desc = "Window right" })
 end)
 
+setup_plugin("pragma", {}) -- https://github.com/DrKGD/pragma.nvim Neovim plugin for programatically setup window layouts
+
+setup_plugin("windex-nvim", {})
+
 -- BUFFERS ========================================================================================
 setup_plugin("bafa", {}) -- A minimal 🤏🏾 BufExplorer alternative
+
+setup_plugin("vuffers", {})
+setup_plugin("retrospect", {}) -- https://github.com/mrquantumcodes/retrospect.nvim A simple and lightweight buffer manager for Neovim
 
 setup_plugin("stickybuf", function(stickybuf)
 	-- Automatically pin special buffers so they can't be replaced
@@ -151,6 +164,7 @@ setup_plugin("stickybuf", function(stickybuf)
 end)
 
 -- TEXT ===========================================================================================
+setup_plugin("neowords", function(_) end) -- https://github.com/backdround/neowords.nvim Flexible and reliable hops by any type of words
 
 setup_plugin("leap", function(leap)
 	leap.opts.safe_labels = {}
@@ -472,8 +486,11 @@ setup_plugin("hop", function(hop)
 	end)
 end)
 
+setup_plugin("treemonkey", function(_) end)
+
 -- MARKS ==========================================================================================
 
+setup_plugin("whaler", {})
 setup_plugin("marks-nvim", {})
 
 -- markit is a marks extension; moving setup inside BufReadPre ensures it's
@@ -489,3 +506,12 @@ setup_plugin("markit", function(markit)
 	map("n", "m;", "Markit mark toggle<cr>", { desc = "Markit: toggle mark" })
 	map("n", "m:", "Markit mark list all<cr>", { desc = "Markit: list marks" })
 end)
+
+setup_plugin("arrow", {}) -- https://github.com/otavioschwanck/arrow.nvim  Bookmark your files, separated by project, and quickly navigate through them.
+
+-- OTHER ==========================================================================================
+
+setup_plugin("gx-extended-nvim", {})
+
+-- likely deprecated; see README
+setup_plugin("highlight-current-n-nvim", {}) -- https://github.com/rktjmp/highlight-current-n.nvim Highlights the current /, ? or * match under your cursor when pressing n or N and gets out of the way afterwards.

@@ -10,6 +10,13 @@ utils.packadd("asyncrun") -- install as lua module
 setup_plugin("schemastore", function(_) end)
 setup_plugin("render-markdown", {})
 
+-- TODO: vendor/PR to fix old LspStart command -> new Lua LSP API
+-- setup_plugin("scratch-buffer", function(scratch_buffer)
+-- 	scratch_buffer.setup(
+-- 		{ with_lsp = false }
+-- 	)
+-- end)
+
 -- TODO
 
 -- hacky, but works -> necessary due to name collision
@@ -30,19 +37,25 @@ setup_plugin("pomodoro", {})
 setup_plugin("timerly", {})
 setup_plugin("timew", {})
 setup_plugin("nomodoro", {})
+setup_plugin("sche", {}) -- https://github.com/Cassin01/sche.nvim A text-based schedule plugin for neovim
+setup_plugin("twig", {}) -- https://github.com/hugginsio/twig.nvim taskwarrior integration
 
 ---------------- pkm -------------
+setup_plugin("doing", {})
 utils.packadd("vimwiki")
 setup_plugin("obsidian", { legacy_commands = false })
 setup_plugin("orgmode", {})
 setup_plugin("Calendar", {})
 setup_plugin("zettelkasten", {})
+setup_plugin("flote", {})
 
 ---------------- performance -------------
 setup_plugin("keylab", {}) -- https://github.com/BooleanCube/keylab.nvim
 setup_plugin("nvim-apm", {})
 
 ---------------- colors -------------
+
+setup_plugin("nvim-highlight-colors", {}) -- https://github.com/brenoprata10/nvim-highlight-colors Highlight colors for neovim
 
 setup_plugin("text-to-colorscheme", {})
 setup_plugin("minty", {})
@@ -103,3 +116,56 @@ utils.packadd("vim-slime")
 
 setup_plugin("carbon-now-nvim", {})
 setup_plugin("showkeys", {}) -- https://github.com/nvzone/showkeys
+
+setup_plugin("regex-vars", {})
+setup_plugin("quicknote", {})
+
+setup_plugin("flashcards", {})
+
+setup_plugin("wastebin", {
+	url = "https://foo.bar.com",
+}) -- TODO: install https://github.com/matze/wastebin
+setup_plugin("web-tools", {})
+
+setup_plugin("live-server", function(live_server) end) -- use vim.g.live_server
+
+setup_plugin("diagflow", {})
+
+setup_plugin("paint", {})
+setup_plugin("spaceport-nvim", {})
+setup_plugin("tdo", {})
+setup_plugin("runtimetable", function(_) end)
+
+setup_plugin("api-browser", {})
+setup_plugin("regexplainer", {})
+setup_plugin("hypersonic", {}) -- https://github.com/tomiis4/hypersonic.nvim A Neovim plugin that provides an explanation for regular expressions.", {})
+
+setup_plugin("nvim-quicktype", {})
+
+setup_plugin("nvim-luaref", {}) -- https://github.com/emiasims/nvim-luaref Add a vim :help reference for lua
+
+utils.packadd("auto-pandoc")
+
+setup_plugin("date-time-inserter", {})
+setup_plugin("neowell-lua", {}) -- https://github.com/nyngwang/NeoWell.lua Well... I will fix this line later
+setup_plugin("nerdy", {})
+
+setup_plugin("Bullets", {})
+setup_plugin("nvim-lightbulb", {})
+setup_plugin("nvim-monorepos", {})
+
+setup_plugin("nvim-license", {})
+
+setup_plugin("tldr", {})
+setup_plugin("interlaced", {}) -- Neovim plugin for aligning bilingual parallel texts
+setup_plugin("http-codes", function(http_codes) end) -- use vim.g.http_codes
+setup_plugin("tldr", {})
+
+--- tracking ---
+
+setup_plugin("metrics", {}) -- tracks time spent in your editor, logs locally to sqlite3 database
+
+--- unsorted ---
+setup_plugin("Launch", {}) -- https://github.com/LunarVim/Launch.nvim Launch.nvim is modular starter for Neovim.
+setup_plugin("urlview", {}) -- https://github.com/axieax/urlview.nvim viewing all the URLs in a buffer
+setup_plugin("neoconf", {}) --  https://github.com/folke/neoconf.nvim Neovim plugin to manage global and project-local settings

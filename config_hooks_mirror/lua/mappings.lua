@@ -404,6 +404,7 @@ end)
 setup_plugin("keymap-amend-nvim", {}) -- https://github.com/anuvyklack/keymap-amend.nvim
 
 setup_plugin("unimpaired-which-key", function(_) end)
+setup_plugin("wf", {}) -- https://github.com/Cassin01/wf.nvim  A modern which-key for neovim
 
 -- use which-key to ncreate commands
 --[[
@@ -421,3 +422,8 @@ t = {
 	v = { "<cmd>Vterm<cr>", "Vertical Terminal" },
 },
 --]]
+setup_plugin("keytex", {}) -- https://github.com/cronJohn/keytex.nvim  A neovim plugin for keyboard shortcut management
+
+setup_plugin("nvim-keymapper", {})
+
+setup_plugin("keyseer", {})

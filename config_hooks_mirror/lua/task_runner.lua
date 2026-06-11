@@ -318,3 +318,4 @@ vim.keymap.set("n", "<leader>tk", taskfile_picker, { desc = "Pick Taskfile task"
 -- Python (Ruff/Flake8):** `%f:%l:%c: %m`
 -- Go (golangci-lint):** `%f:%l:%c: %m`
 -- Generic (File:Line:Msg):** `%f:%l: %m`
+setup_plugin("moonicipal", {}) -- https://github.com/idanarye/nvim-moonicipal Task runner with focus on rapidly changing personal tasks

@@ -920,4 +920,19 @@ setup_plugin("refactoring", function(refactoring)
 	end, { desc = "Debug print clean", expr = true, remap = true })
 end)
 
+setup_plugin("bqf", {})
 utils.packadd("error-jump")
+setup_plugin("qfview-nvim", {})
+
+setup_plugin("vale", {})
+setup_plugin("nvim-genghis", {}) -- https://github.com/chrisgrieser/nvim-genghis Lightweight and quick file operations without being a full-blown file manager.
+
+setup_plugin("precommit", {})
+
+setup_plugin("lint", function(lint) end)
+setup_plugin("corn", {}) -- https://github.com/RaafatTurki/corn.nvim LSP diagnostics at your corner
+setup_plugin("glance", {}) -- https://github.com/dnlhc/glance.nvim Peek preview window for LSP locations in Neovim
+setup_plugin("dmap", {}) -- nvim plugin providing a subtle overview of LSP diagnostics
+setup_plugin("strict", {}) -- https://github.com/emileferreira/nvim-strict Strict, native code style formatting plugin for Neovim. Expose deep nesting, overlong lines, trailing whitespace, trailing empty lines, todos and inconsistent indentation.
+setup_plugin("inlayhint-filler", {}) -- https://github.com/davidyz/inlayhint-filler.nvim
+setup_plugin("hlargs-nvim", {}) -- https://github.com/m-demare/hlargs.nvim Highlight arguments' definitions and usages, using Treesitter

@@ -127,6 +127,15 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 	end,
 })
 
+-------------------------------------------------------------------------------
+-- MODULES: ---------------------------------------------------------------------
+-------------------------------------------------------------------------------
+require("commons.fio")
+require("nio")
+require("nui.input")
+require("jsregexp")
+require("pathlib")
+
 vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
 local odenwald = require("odenwald")
 odenwald.setup()
@@ -160,7 +169,6 @@ local config_modules = {
 	["explorers"] = true,
 	["testing"] = true,
 	["treesitter"] = true,
-	["langs.python"] = true,
 	["lsp_etc"] = true,
 
 	["editing"] = true,
@@ -175,11 +183,8 @@ local config_modules = {
 	["projects"] = true,
 	["macros"] = true,
 
-	["langs.rust"] = true,
-	["langs.haskell"] = true,
-	["langs.lua_language"] = true,
-
 	["task_runner"] = true,
+	["replacer"] = true,
 
 	["git"] = true,
 	["ai"] = true,
@@ -188,13 +193,21 @@ local config_modules = {
 
 	["tmp"] = true,
 
-	["langs.xit"] = false, -- TODO
+	["langs.go"] = false,
+	["langs.haskell"] = true,
+	["langs.json_yaml"] = true,
+	["langs.lua_language"] = false,
+	["langs.markdown"] = false,
+	["langs.nix"] = true,
+	["langs.python"] = true,
+	["langs.rust"] = true,
 	["langs.tex"] = false,
 	["langs.typst"] = false,
-	["langs.go"] = false,
+	["langs.xit"] = false,
 
 	["miscellaneous"] = false, -- TODO
 }
+config_modules = {} -- TMP
 for mod_name, include in pairs(config_modules) do
 	if include then
 		require(mod_name)

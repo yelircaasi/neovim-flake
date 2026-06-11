@@ -8,7 +8,7 @@ Add cloud.lua
 	-------------------------------------------------------------------------------
 	-- DECIDED AGAINST: --------------------------------------------------------------
 	-------------------------------------------------------------------------------
-	
+	-- utils.packadd("vim-twig")
 	-- setup_plugin("tree-sitter-just", {})
 	-- setup_plugin("guard", {})
 	-- setup_plugin("nvim-treesitter", {})
@@ -165,6 +165,9 @@ https://github.com/calops/nix/tree/main/modules/home/programs/neovim
       and using similar setups to, consilium DSLs -> write treesitter parsers someday
 
 -[ ] install cooklang LSP and tooling
+
+https://github.com/LuxVim/nvim-luxterm
+https://github.com/luxvim/LuxVim
 
 ## Data Flow
 

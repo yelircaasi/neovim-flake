@@ -58,6 +58,7 @@ setup_plugin("nvim-web-devicons", {
 		},
 	},
 })
+setup_plugin("bye-nerdfont", {}) -- https://github.com/dullmode/bye-nerdfont.nvim
 
 setup_plugin("mini.cmdline", {
 	-- Autocompletion: show `:h 'wildmenu'` as you type
@@ -280,3 +281,21 @@ if false then
 	setup_plugin("winbar", {})
 	setup_plugin("windline", function(_) end)
 end
+
+setup_plugin("control_panel", {}) -- https://github.com/mhanberg/control-panel.nvim
+setup_plugin("output_panel", {}) --  https://github.com/mhanberg/output-panel.nvim
+
+setup_plugin("cosmic-ui", {})
+setup_plugin("fsplash", {}) -- https://github.com/jovanlanik/fsplash.nvim Show a custom splash screen in a floating window
+
+setup_plugin("smartcolumn", {})
+
+setup_plugin("vimade", {
+	recipe = { "default", { animate = true } },
+	fadelevel = 0.4,
+})
+
+setup_plugin("menu", {})
+setup_plugin("symbols", {})
+setup_plugin("reactive", {}) -- https://github.com/rasulomaroff/reactive.nvim Reactivity. Right in your neovim.
+setup_plugin("modicator", {}) -- https://github.com/mawkler/modicator.nvim Cursor line number mode indicator plugin for Neovim

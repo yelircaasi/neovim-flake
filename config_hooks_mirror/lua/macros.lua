@@ -94,3 +94,5 @@ setup_plugin("recorder", {
 	-- (See README for further explanations.)
 	dapSharedKeymaps = false,
 })
+
+setup_plugin("neocomposer-nvim", {})

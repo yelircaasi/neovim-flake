@@ -1118,3 +1118,5 @@ end)
 utils.packadd("vim-fugitive", function()
 	-- print("Installed vim-fugitive.")
 end)
+
+setup_plugin("blame", {})

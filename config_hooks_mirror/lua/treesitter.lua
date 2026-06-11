@@ -254,3 +254,5 @@ vim.treesitter.start = function(bufnr, lang)
 
 	return orig_ts_start(bufnr, lang)
 end
+
+setup_plugin("treesitter-context", {})

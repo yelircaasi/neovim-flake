@@ -1,3 +1,9 @@
+setup_plugin("inc_rename", {})
+
+setup_plugin("muren", {})
+setup_plugin("rip-substitute", {})
+setup_plugin("sad", {}) -- TODO: install sad
+
 setup_plugin("fzf-lua", function(fzf)
 	fzf.setup({
 		winopts = {
@@ -238,3 +244,29 @@ end, {
 	-- 	return {}
 	-- end,
 })
+
+setup_plugin("renamer", {})
+
+setup_plugin("search-replace", {})
+
+local rgflow_defaults = {
+	-- Set the default rip grep flags and options for when running a search via
+	-- RgFlow. Once changed via the UI, the previous search flags are used for
+	-- each subsequent search (until Neovim restarts).
+	cmd_flags = "--smart-case --fixed-strings --ignore --max-columns 200",
+
+	-- Mappings to trigger RgFlow functions
+	default_trigger_mappings = true,
+	-- These mappings are only active when the RgFlow UI (panel) is open
+	default_ui_mappings = true,
+	-- QuickFix window only mapping
+	default_quickfix_mappings = true,
+}
+setup_plugin("rgflow-nvim", rgflow_defaults)
+
+setup_plugin("ssr", {})
+setup_plugin("substitute", {})
+
+setup_plugin("actions-preview", {})
+
+setup_plugin("spider", {})
