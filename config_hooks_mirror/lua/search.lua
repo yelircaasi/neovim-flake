@@ -293,7 +293,6 @@ setup_plugin("nvim-rg", {}) -- PROBABLY NOT, BUT WORTH A TRY https://github.com/
 setup_plugin("hlsearch-nvim", {}) -- PROBABLY NOT, BUT WORTH A TRY
 setup_plugin("nvim-monorepos", {}) -- https://github.com/sajjathossain/nvim-monorepos simple telescope file finder for monorepos
 
-
 local blink_defaults = {
 	-- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
 	-- 'super-tab' for mappings similar to vscode (tab to accept)

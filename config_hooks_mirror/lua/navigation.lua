@@ -1,20 +1,12 @@
 --─────────────────────────────────────────────────────────────────────────────
---──── SORT ───────────────────────────────────────────────────────────────
+--──── FILES ──────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
-utils.setup_plugin("flybuf", function(flybuf)
-	flybuf.setup({
-		-- Show relative line numbers in the buffer list
-		rnu = true,
-	})
-	vim.keymap.set("n", "<leader>bf", "FlyBuf", { desc = "FlyBuf: buffer list" })
-end)
 
-utils.packadd("vim-wordmotion") -- PROBABLY NOT, BUT WORTH A TRY
-setup_plugin("hop", {}) -- PROBABLY NOT, BUT WORTH A TRY
-utils.packadd("clever-f.vim") -- PROBABLY NOT, BUT WORTH A TRY
+setup_plugin("spear", {})
 
-setup_plugin("navigator", {})
-
+--─────────────────────────────────────────────────────────────────────────────
+--──── WINDOWS ────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 setup_plugin("smart-splits", function(ss)
 	ss.setup({
 		ignored_filetypes = { "nofile", "quickfix", "prompt" },
@@ -37,93 +29,6 @@ setup_plugin("smart-splits", function(ss)
 	map("n", "<leader><leader>l", ss.swap_buf_right, { desc = "Swap buffer right" })
 end)
 
-setup_plugin("harpoon", function(harpoon)
-	-- harpoon-core uses the same API as harpoon2
-	harpoon.setup({})
-	local list = harpoon:list()
-
-	local map = vim.keymap.set
-	map("n", "<leader>ha", function()
-		list:add()
-	end, { desc = "Harpoon: add file" })
-	map("n", "<leader>hh", function()
-		harpoon.ui:toggle_quick_menu(list)
-	end, { desc = "Harpoon: menu" })
-	-- Quick jump to slots 1-4
-	for i = 1, 4 do
-		map("n", "<leader>" .. i, function()
-			list:select(i)
-		end, { desc = "Harpoon: jump to " .. i })
-	end
-	map("n", "<leader>hp", function()
-		list:prev()
-	end, { desc = "Harpoon: prev" })
-	map("n", "<leader>hn", function()
-		list:next()
-	end, { desc = "Harpoon: next" })
-end)
-
-setup_plugin("nvim-pasta", function(pasta)
-	pasta.setup({
-		-- Reindent pasted text to match surrounding context
-		next_key = vim.api.nvim_replace_termcodes("<C-n>", true, true, true),
-		prev_key = vim.api.nvim_replace_termcodes("<C-p>", true, true, true),
-	})
-	-- p/P are remapped by pasta automatically; C-n/C-p cycle through paste history
-end)
-
--- NOTE: beam.nvim is a cursor beam plugin for mode-based cursor shapes.
--- Most terminal emulators handle this, so only enable if yours doesn't.
-setup_plugin("beam", function(beam)
-	beam.setup({
-		cursors = {
-			normal = "block",
-			insert = "beam",
-			replace = "underline",
-			visual = "block",
-			operator = "block",
-		},
-	})
-end)
-
-setup_plugin("marks", function(marks)
-	marks.setup({
-		default_mappings = true, -- m{a-z}, m{A-Z} etc
-		builtin_marks = { ".", "<", ">", "^" },
-		cyclic = true, -- wrap around when jumping with ]' ['
-		force_write_shada = false,
-		sign_priority = { lower = 10, upper = 15, builtin = 8, bookmark = 20 },
-		bookmark_0 = {
-			sign = "⚑",
-			virt_text = "bookmark",
-		},
-	})
-
-	local map = vim.keymap.set
-	map("n", "<leader>mlb", "MarksListBuf", { desc = "Marks: list buffer marks" })
-	map("n", "<leader>mqb", "MarksQFListBuf", { desc = "Marks: list buffer marks in quickfix" })
-	-- map("n", "<leader>md", marks.delete_buf,  { desc = "Marks: delete all buffer marks" })
-end)
-
--- OLD:
--- vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
--- 	callback = function()
--- 		setup_plugin("markit", function(markit)
--- 			-- utils.packadd("pickme")
--- 		end)
--- 	end,
--- })
-
---─────────────────────────────────────────────────────────────────────────────
---──── FILES ───────────────────────────────────────────────────────────────
---─────────────────────────────────────────────────────────────────────────────
-
-setup_plugin("spear", {})
-
---─────────────────────────────────────────────────────────────────────────────
---──── WINDOWS ───────────────────────────────────────────────────────────────
---─────────────────────────────────────────────────────────────────────────────
-
 setup_plugin("swm", function(swm)
 	local map = vim.keymap.set
 	-- Window navigation: swm makes these smart about floating windows
@@ -142,10 +47,21 @@ setup_plugin("pragma", {}) -- https://github.com/DrKGD/pragma.nvim Neovim plugin
 
 setup_plugin("windex-nvim", {})
 
--- BUFFERS ========================================================================================
+--─────────────────────────────────────────────────────────────────────────────
+--──── BUFFERS ────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 setup_plugin("bafa", {}) -- A minimal 🤏🏾 BufExplorer alternative
 
+utils.setup_plugin("flybuf", function(flybuf)
+	flybuf.setup({
+		-- Show relative line numbers in the buffer list
+		rnu = true,
+	})
+	vim.keymap.set("n", "<leader>bf", "FlyBuf", { desc = "FlyBuf: buffer list" })
+end)
+
 setup_plugin("vuffers", {})
+
 setup_plugin("retrospect", {}) -- https://github.com/mrquantumcodes/retrospect.nvim A simple and lightweight buffer manager for Neovim
 
 setup_plugin("stickybuf", function(stickybuf)
@@ -177,6 +93,177 @@ end)
 --─────────────────────────────────────────────────────────────────────────────
 --──── TEXT ───────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
+
+-- NOTE: beam.nvim is a cursor beam plugin for mode-based cursor shapes.
+-- Most terminal emulators handle this, so only enable if yours doesn't.
+setup_plugin("beam", function(beam)
+	beam.setup({
+		cursors = {
+			normal = "block",
+			insert = "beam",
+			replace = "underline",
+			visual = "block",
+			operator = "block",
+		},
+	})
+end)
+
+local navigator_defaults = {
+	debug = false, -- log output, set to true and log path: ~/.cache/nvim/gh.log
+	-- slowdownd startup and some actions
+	width = 0.75, -- max width ratio (number of cols for the floating window) / (window width)
+	height = 0.3, -- max list window height, 0.3 by default
+	preview_height = 0.35, -- max height of preview windows
+	border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }, -- border style, can be one of 'none', 'single', 'double',
+	-- 'shadow', or a list of chars which defines the border
+	on_attach = function(client, bufnr) -- no longer supported for nvim >= 0.12, use your own LspAttach autocmd
+	end,
+
+	ts_fold = {
+		enable = false,
+		comment_fold = true, -- fold with comment string
+		max_lines_scan_comments = 20, -- only fold when the fold level higher than this value
+		disable_filetypes = { "help", "guihua", "text" }, -- list of filetypes which doesn't fold using treesitter
+	}, -- modified version of treesitter folding
+	default_mapping = true, -- set to false if you will remap every key
+	keymaps = { { key = "gK", func = vim.lsp.declaration, desc = "declaration" } }, -- a list of key maps
+	-- this kepmap gK will override "gD" mapping function declaration()  in default kepmap
+	-- please check mapping.lua for all keymaps
+	-- rule of overriding: if func and mode ('n' by default) is same
+	-- the key will be overridden
+	treesitter_analysis = true, -- treesitter variable context
+	treesitter_navigation = true, -- bool|table false: use lsp to navigate between symbol ']r/[r', table: a list of
+	--lang using TS navigation
+	treesitter_analysis_max_num = 100, -- how many items to run treesitter analysis
+	treesitter_analysis_condense = true, -- condense form for treesitter analysis
+	-- this value prevent slow in large projects, e.g. found 100000 reference in a project
+	transparency = 50, -- 0 ~ 100 blur the main window, 100: fully transparent, 0: opaque,  set to nil or 100 to disable it
+
+	lsp_signature_help = true, -- if you would like to hook ray-x/lsp_signature plugin in navigator
+	-- setup here. if it is nil, navigator will not init signature help
+	signature_help_cfg = nil, -- if you would like to init ray-x/lsp_signature plugin in navigator, and pass in your own config to signature help
+	icons = { -- refer to lua/navigator.lua for more icons config
+		-- requires nerd fonts or nvim-web-devicons
+		icons = true,
+		-- Code action
+		code_action_icon = "🏏", -- note: need terminal support, for those not support unicode, might crash
+		-- Diagnostics
+		diagnostic_head = "🐛",
+		diagnostic_head_severity_1 = "🈲",
+		fold = {
+			prefix = "⚡", -- icon to show before the folding need to be 2 spaces in display width
+			separator = "", -- e.g. shows   3 lines 
+		},
+	},
+	mason = false, -- Deprecated, setup LSP in your own config and use LspAttach to hook navigator mappings
+	lsp = {
+		enable = true, -- skip lsp setup, and only use treesitter in navigator.
+		-- Use this if you are not using LSP servers, and only want to enable treesitter support.
+		-- If you only want to prevent navigator from touching your LSP server configs,
+		-- use `disable_lsp = "all"` instead.
+		-- If disabled, make sure add require('navigator.lspclient.mapping').setup({bufnr=bufnr, client=client}) in your
+		-- own on_attach
+		code_action = { enable = true, sign = true, sign_priority = 40, virtual_text = true },
+		code_lens_action = { enable = true, sign = true, sign_priority = 40, virtual_text = true },
+		document_highlight = true, -- LSP reference highlight,
+		-- it might already supported by you setup, e.g. LunarVim
+		format_on_save = true, -- {true|false} set to false to disasble lsp code format on save (if you are using prettier/efm/formater etc)
+		-- table: {enable = {'lua', 'go'}, disable = {'javascript', 'typescript'}} to enable/disable specific language
+		-- enable: a whitelist of language that will be formatted on save
+		-- disable: a blacklist of language that will not be formatted on save
+		-- function: function(bufnr) return true end to enable/disable lsp format on save
+		format_options = { async = false }, -- async: disable by default, the option used in vim.lsp.buf.format({async={true|false}, name = 'xxx'})
+		disable_format_cap = { "sqlls", "lua_ls", "gopls" }, -- a list of lsp disable format capacity (e.g. if you using efm or vim-codeformat etc), empty {} by default
+		-- If you using null-ls and want null-ls format your code
+		-- you should disable all other lsp and allow only null-ls.
+		-- disable_lsp = {'pylsd', 'sqlls'},  -- prevents navigator from setting up this list of servers.
+		-- if you use your own LSP setup, and don't want navigator to setup
+		-- any LSP server for you, use `disable_lsp = "all"`.
+		-- you may need to add this to your own on_attach hook:
+		-- require('navigator.lspclient.mapping').setup({bufnr=bufnr, client=client})
+		-- for e.g. denols and tsserver you may want to enable one lsp server at a time.
+		-- default value: {}
+		diagnostic = {
+			underline = true,
+			virtual_text = { spacing = 3, source = true }, -- show virtual for diagnostic message
+			-- set to false to prefer virtual lines
+			update_in_insert = false, -- update diagnostic message in insert mode
+			severity_sort = { reverse = true },
+			float = { -- setup for floating windows style, set to false to disable floating window
+				focusable = false,
+				style = "minimal",
+				border = "rounded",
+				source = "always",
+				header = "",
+				prefix = "",
+			},
+			virtual_lines = {
+				current_line = false, -- show diagnostic only on current line
+			},
+			register = "D", -- yank the error into register
+		},
+
+		hover = {
+			enable = true,
+			-- fallback when hover failed
+			-- e.g. if filetype is go, try godoc
+			go = function()
+				local w = vim.fn.expand("<cWORD>")
+				vim.cmd("GoDoc " .. w)
+			end,
+			-- if python, do python doc
+			python = function()
+				-- run pydoc, behaviours defined in lua/navigator.lua
+			end,
+			default = function()
+				-- fallback apply to all file types not been specified above
+				-- local w = vim.fn.expand('<cWORD>')
+				-- vim.lsp.buf.workspace_symbol(w)
+			end,
+		},
+
+		diagnostic_scrollbar_sign = { "▃", "▆", "█" }, -- experimental:  diagnostic status in scroll bar area; set to false to disable the diagnostic sign,
+		--                for other style, set to {'╍', 'ﮆ'} or {'-', '='}
+		diagnostic_virtual_text = true, -- show virtual for diagnostic message
+		diagnostic_update_in_insert = false, -- update diagnostic message in insert mode
+		display_diagnostic_qf = true, -- always show quickfix if there are diagnostic errors, set to false if you want to ignore it
+		-- set to 'trouble' to show diagnostcs in Trouble
+		ctags = {
+			cmd = "ctags",
+			tagfile = "tags",
+			options = "-R --exclude=.git --exclude=node_modules --exclude=test --exclude=vendor --excmd=number",
+		},
+		-- setup LSP in your own config (nvim 0.12+), then hook navigator in LspAttach
+		-- refer to :help lsp and nvim-lspconfig docs for more info
+		servers = { "cmake", "ltex" }, -- by default empty, and it should load all LSP clients available based on filetype
+		-- but if you want navigator load  e.g. `cmake` and `ltex` for you , you
+		-- can put them in the `servers` list and navigator will auto load them.
+		-- you could still specify the custom config  like this
+		-- cmake = {filetypes = {'cmake', 'makefile'}, single_file_support = false},
+	},
+}
+setup_plugin("navigator", {}) -- https://github.com/ray-x/navigator.lua
+
+utils.packadd("vim-wordmotion") -- PROBABLY NOT, BUT WORTH A TRY
+
+utils.packadd("clever-f.vim") -- PROBABLY NOT, BUT WORTH A TRY
+
+-- https://github.com/smoka7/hop.nvim
+setup_plugin("hop", function(hop)
+	local directions = require("hop.hint").HintDirection
+	vim.keymap.set("", "f", function()
+		hop.hint_char1({ direction = directions.AFTER_CURSOR, current_line_only = true })
+	end, { remap = true })
+	vim.keymap.set("", "F", function()
+		hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true })
+	end, { remap = true })
+	vim.keymap.set("", "t", function()
+		hop.hint_char1({ direction = directions.AFTER_CURSOR, current_line_only = true, hint_offset = -1 })
+	end, { remap = true })
+	vim.keymap.set("", "T", function()
+		hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 })
+	end, { remap = true })
+end) -- PROBABLY NOT, BUT WORTH A TRY
 
 local mini_jump_defaults = {
 	-- Module mappings. Use `''` (empty string) to disable one.
@@ -586,6 +673,51 @@ setup_plugin("treemonkey", function(_) end)
 
 setup_plugin("whaler", {})
 setup_plugin("marks-nvim", {})
+
+setup_plugin("harpoon", function(harpoon)
+	-- harpoon-core uses the same API as harpoon2
+	harpoon.setup({})
+	local list = harpoon:list()
+
+	local map = vim.keymap.set
+	map("n", "<leader>ha", function()
+		list:add()
+	end, { desc = "Harpoon: add file" })
+	map("n", "<leader>hh", function()
+		harpoon.ui:toggle_quick_menu(list)
+	end, { desc = "Harpoon: menu" })
+	-- Quick jump to slots 1-4
+	for i = 1, 4 do
+		map("n", "<leader>" .. i, function()
+			list:select(i)
+		end, { desc = "Harpoon: jump to " .. i })
+	end
+	map("n", "<leader>hp", function()
+		list:prev()
+	end, { desc = "Harpoon: prev" })
+	map("n", "<leader>hn", function()
+		list:next()
+	end, { desc = "Harpoon: next" })
+end)
+
+setup_plugin("marks", function(marks)
+	marks.setup({
+		default_mappings = true, -- m{a-z}, m{A-Z} etc
+		builtin_marks = { ".", "<", ">", "^" },
+		cyclic = true, -- wrap around when jumping with ]' ['
+		force_write_shada = false,
+		sign_priority = { lower = 10, upper = 15, builtin = 8, bookmark = 20 },
+		bookmark_0 = {
+			sign = "⚑",
+			virt_text = "bookmark",
+		},
+	})
+
+	local map = vim.keymap.set
+	map("n", "<leader>mlb", "MarksListBuf", { desc = "Marks: list buffer marks" })
+	map("n", "<leader>mqb", "MarksQFListBuf", { desc = "Marks: list buffer marks in quickfix" })
+	-- map("n", "<leader>md", marks.delete_buf,  { desc = "Marks: delete all buffer marks" })
+end)
 
 -- markit is a marks extension; moving setup inside BufReadPre ensures it's
 -- ready before any buffer is fully loaded. Flatten into top-level if you

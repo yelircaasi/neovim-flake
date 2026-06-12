@@ -134,7 +134,9 @@ neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
 - [ ] ********* https://git.laack.co/flashcards.nvim/log.html
 
 https://github.com/h4ckm1n-dev/kube-utils-nvim
+https://github.com/numtostr/navigator.nvim
 
+https://github.com/GCBallesteros/NotebookNavigator.nvim/
 https://github.com/GR3YH4TT3R93/licenses.nvim
 https://github.com/tjdevries/present.nvim
 https://github.com/rareitems/anki.nvim

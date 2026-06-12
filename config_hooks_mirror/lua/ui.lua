@@ -19,36 +19,42 @@ setup_plugin("menu", {})
 setup_plugin("symbols", {})
 
 -- TODO: maybe use aerial instead of navbuddy
-setup_plugin("aerial", function(aerial) -- https://github.com/stevearc/aerial.nvim | Neovim plugin for a code outline window
-	aerial.setup({
-		layout = {
-			min_width = 30,
-			default_direction = "prefer_right",
-		},
-		attach_mode = "window",
-		close_automatic_events = {
-			"unsupported",
-			"switch_buffer",
-		},
-	})
+setup_plugin(
+	"aerial",
+	function(aerial) -- https://github.com/stevearc/aerial.nvim | Neovim plugin for a code outline window
+		aerial.setup({
+			layout = {
+				min_width = 30,
+				default_direction = "prefer_right",
+			},
+			attach_mode = "window",
+			close_automatic_events = {
+				"unsupported",
+				"switch_buffer",
+			},
+		})
 
-	vim.keymap.set("n", "<leader>o", "<cmd>AerialToggle<cr>")
-	vim.keymap.set("n", "{", "<cmd>AerialPrev<cr>")
-	vim.keymap.set("n", "}", "<cmd>AerialNext<cr>")
-end)
+		vim.keymap.set("n", "<leader>o", "<cmd>AerialToggle<cr>")
+		vim.keymap.set("n", "{", "<cmd>AerialPrev<cr>")
+		vim.keymap.set("n", "}", "<cmd>AerialNext<cr>")
+	end
+)
 
 -- utils.packadd("nui") -- TODO: comment out after next build
-setup_plugin("nvim-navbuddy", function(navbuddy) -- https://github.com/SmiteshP/nvim-navbuddy | A simple popup display that provides breadcrumbs feature using LSP server
-	navbuddy.setup({
-		lsp = {
-			auto_attach = true,
-		},
-	})
+setup_plugin(
+	"nvim-navbuddy",
+	function(navbuddy) -- https://github.com/SmiteshP/nvim-navbuddy | A simple popup display that provides breadcrumbs feature using LSP server
+		navbuddy.setup({
+			lsp = {
+				auto_attach = true,
+			},
+		})
 
-	vim.keymap.set("n", "<leader>nb", function()
-		navbuddy.open()
-	end)
-end)
+		vim.keymap.set("n", "<leader>nb", function()
+			navbuddy.open()
+		end)
+	end
+)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── lines, bars ──────────────────────────────────────────────────────────────────
@@ -158,7 +164,6 @@ setup_plugin("mini.cmdline", {
 	},
 })
 
-
 --─────────────────────────────────────────────────────────────────────────────
 --──── output, notification ───────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
@@ -264,7 +269,6 @@ setup_plugin("nvim-web-devicons", {
 	},
 })
 setup_plugin("bye-nerdfont", {}) -- https://github.com/dullmode/bye-nerdfont.nvim
-
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── focus ──────────────────────────────────────────────────────────────────

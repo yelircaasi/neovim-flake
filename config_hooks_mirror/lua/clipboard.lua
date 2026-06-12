@@ -118,6 +118,16 @@ setup_plugin("pasta", function(pasta)
 	pasta_config.indent_fix = true
 end)
 
+-- TODO: resolve and remove duplicate (?)
+setup_plugin("nvim-pasta", function(pasta)
+	pasta.setup({
+		-- Reindent pasted text to match surrounding context
+		next_key = vim.api.nvim_replace_termcodes("<C-n>", true, true, true),
+		prev_key = vim.api.nvim_replace_termcodes("<C-p>", true, true, true),
+	})
+	-- p/P are remapped by pasta automatically; C-n/C-p cycle through paste history
+end)
+
 --─────────────────────────────────────────────────────────────────────────────
 --──── wastebin ───────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────

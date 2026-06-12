@@ -62,6 +62,7 @@ setup_plugin("dashboard", {})
 
 setup_plugin("fsplash", {}) -- https://github.com/jovanlanik/fsplash.nvim Show a custom splash screen in a floating window
 
+setup_plugin("drop", {}) -- https://github.com/folke/drop.nvim  Fun little plugin that can be used as a screensaver and on your dashboard
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── pkm ────────────────────────────────────────────────────────────────────
@@ -131,10 +132,6 @@ setup_plugin("paint", {})
 
 setup_plugin("carbon-now-nvim", {})
 setup_plugin("showkeys", {}) -- https://github.com/nvzone/showkeys
-
---─────────────────────────────────────────────────────────────────────────────
---──── web utils ──────────────────────────────────────────────────────────────
---─────────────────────────────────────────────────────────────────────────────
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── regex ──────────────────────────────────────────────────────────────────
