@@ -1,55 +1,27 @@
--- TODO: vendor/PR to fix old LspStart command -> new Lua LSP API
--- setup_plugin("scratch-buffer", function(scratch_buffer)
--- 	scratch_buffer.setup(
--- 		{ with_lsp = false }
--- 	)
--- end)
+--─────────────────────────────────────────────────────────────────────────────
+--──── to vendor ────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+setup_plugin("Launch", {}) -- https://github.com/LunarVim/Launch.nvim Launch.nvim is modular starter for Neovim.
+setup_plugin("minimal-narrow-region", {})
+setup_plugin("telemake", {})
+setup_plugin("nvim-api-wrappers", {})
+setup_plugin("k8vim", {})
+setup_plugin("telemake", {})
+setup_plugin("virtcolumn", {})
+setup_plugin("wezterm-nvim", {})
+setup_plugin("AdvancedNewFile", {}) -- https://github.com/Mohammed-Taher/AdvancedNewFile.nvim
+setup_plugin("spread", {}) -- (uses nvim-treesitter)
+setup_plugin("fsread", {})
+setup_plugin("tracebundler", {})
+setup_plugin("present", {}) -- https://github.com/chaitanyabsprip/present.nvim Presentation plugin for neovim written in lua
+-- https://github.com/letieu/wezterm-move.nvim
+-- https://github.com/mawkler/move-mode.nvim
 
--------------------------------------------------------------------------------
--- PROBABLY NOT, BUT WORTH A TRY: ------------------------------------------------
--------------------------------------------------------------------------------
+--─────────────────────────────────────────────────────────────────────────────
+--──── live preview ───────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("whichkey_setup", {}) -- PROBABLY NOT, BUT WORTH A TRY
-setup_plugin("ts_context_commentstring", {}) -- PROBABLY NOT, BUT WORTH A TRY
-utils.packadd("vim-wordmotion") -- PROBABLY NOT, BUT WORTH A TRY
-setup_plugin("hop", {}) -- PROBABLY NOT, BUT WORTH A TRY
-utils.packadd("clever-f.vim") -- PROBABLY NOT, BUT WORTH A TRY
-setup_plugin("better-escape", {}) -- PROBABLY NOT, BUT WORTH A TRY
-setup_plugin("hlsearch-nvim", {}) -- PROBABLY NOT, BUT WORTH A TRY
-utils.packadd("vim-edgemotion") -- PROBABLY NOT, BUT WORTH A TRY
-setup_plugin("notify", {}) -- PROBABLY NOT, BUT WORTH A TRY (== nvim-notify ?)
-setup_plugin("nvim-teal-maker", {}) -- PROBABLY NOT, BUT WORTH A TRY
-setup_plugin("nvim-rg", {}) -- PROBABLY NOT, BUT WORTH A TRY https://github.com/duane9/nvim-rg
-setup_plugin("homerows", {}) -- PROBABLY NOT, BUT WORTH A TRY https://github.com/unode/homerow.vim/blob/master/autoload/homerow.vim
-
-utils.packadd("vim-multiple-cursors") -- PROBABLY NOT, BUT WORTH A TRY
-
-setup_plugin("savior", {}) -- PROBABLY NOT, BUT WORTH A TRY
-utils.packadd("vim-auto-save") -- PROBABLY NOT, BUT WORTH A TRY
-
--------------------------------------------------------------------------------
--- DEFERRED: ---------------------------------------------------------------------
--------------------------------------------------------------------------------
 setup_plugin("knap", {}) -- https://github.com/frabjous/knap Neovim plugin for creating live-updating-as-you-type previews of LaTeX, markdown, and other files in the viewer of your choice.
-setup_plugin("zpragmatic", {}) -- https://github.com/muhammadzkralla/zpragmatic.nvim  prompts you with alert dialog questions whenever you attempt to save changes in a file
-setup_plugin("volt", function(_) end) -- https://github.com/nvzone/volt  Create blazing fast & beautiful reactive UI in Neovim
-setup_plugin("xkbswitch", {})
-setup_plugin("cyrillic", {})
-setup_plugin("present", {})
-setup_plugin("cmdTree", {}) -- https://github.com/CWood-sdf/cmdTree.nvim  Declaratively make your neovim user commands
-setup_plugin("quicknote", {})
-setup_plugin("flashcards", {})
-
-setup_plugin("wastebin", {
-	url = "https://foo.bar.com",
-}) -- TODO: install https://github.com/matze/wastebin
-
-setup_plugin("nvim-quicktype", {})
-setup_plugin("Bullets", {})
-setup_plugin("nvim-lightbulb", {})
-setup_plugin("nvim-monorepos", {})
-setup_plugin("nvim-license", {})
-setup_plugin("neowell-lua", {}) -- https://github.com/nyngwang/NeoWell.lua Well... I will fix this line later
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── nvim-/lua-related ───────────────────────────────────────────────────────
@@ -57,6 +29,8 @@ setup_plugin("neowell-lua", {}) -- https://github.com/nyngwang/NeoWell.lua Well.
 
 setup_plugin("runtimetable", function(_) end)
 setup_plugin("structlog", {})
+setup_plugin("nvim-teal-maker", {}) -- PROBABLY NOT, BUT WORTH A TRY
+setup_plugin("cmdTree", {}) -- https://github.com/CWood-sdf/cmdTree.nvim  Declaratively make your neovim user commands
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── timer, time tracking ───────────────────────────────────────────────────────
@@ -71,7 +45,7 @@ setup_plugin("sche", {}) -- https://github.com/Cassin01/sche.nvim A text-based s
 setup_plugin("twig", {}) -- https://github.com/hugginsio/twig.nvim taskwarrior integration
 
 --─────────────────────────────────────────────────────────────────────────────
---──── dashboard ───────────────────────────────────────────────────────────────
+--──── dashboard/startpage ────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 -- hacky, but works -> necessary due to name collision
@@ -87,7 +61,7 @@ setup_plugin("twig", {}) -- https://github.com/hugginsio/twig.nvim taskwarrior i
 setup_plugin("dashboard", {})
 
 --─────────────────────────────────────────────────────────────────────────────
---──── pkm ──────────────────────────────────────────────────────────────────
+--──── pkm ────────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("doing", {})
@@ -98,6 +72,12 @@ setup_plugin("Calendar", {})
 setup_plugin("zettelkasten", {})
 setup_plugin("flote", {})
 setup_plugin("tdo", {})
+-- TODO: vendor/PR to fix old LspStart command -> new Lua LSP API
+setup_plugin("scratch-buffer", function(scratch_buffer)
+	scratch_buffer.setup({ with_lsp = false })
+end)
+setup_plugin("neowell-lua", {}) -- https://github.com/nyngwang/NeoWell.lua Well... I will fix this line later
+setup_plugin("quicknote", {}) -- https://github.com/RutaTang/quicknote.nvim Quickly take notes, in-place
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── diagrams ──────────────────────────────────────────────────────────────
@@ -171,10 +151,11 @@ setup_plugin("nvim-luaref", {}) -- https://github.com/emiasims/nvim-luaref Add a
 utils.packadd("auto-pandoc")
 
 --─────────────────────────────────────────────────────────────────────────────
---──── fonts, characters ──────────────────────────────────────────────────────────────
+--──── fonts, characters, non-english, etc. ───────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 setup_plugin("nerdy", {})
-
+setup_plugin("cyrillic", {})
+setup_plugin("xkbswitch", {})
 --─────────────────────────────────────────────────────────────────────────────
 --──── web utils ──────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
@@ -196,17 +177,13 @@ setup_plugin("keylab", {}) -- https://github.com/BooleanCube/keylab.nvim
 setup_plugin("nvim-apm", {}) -- https://github.com/pseudocc/nvim-apm calculate your APM, also show your key strokes in a buffer.
 
 --─────────────────────────────────────────────────────────────────────────────
---──── unsorted ───────────────────────────────────────────────────────────────
---─────────────────────────────────────────────────────────────────────────────
-setup_plugin("Launch", {}) -- https://github.com/LunarVim/Launch.nvim Launch.nvim is modular starter for Neovim.
-setup_plugin("urlview", {}) -- https://github.com/axieax/urlview.nvim viewing all the URLs in a buffer
-setup_plugin("neoconf", {}) --  https://github.com/folke/neoconf.nvim Neovim plugin to manage global and project-local settings
-
---─────────────────────────────────────────────────────────────────────────────
 --──── other ───────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
+setup_plugin("nvim-quicktype", {}) -- https://github.com/midoBB/nvim-quicktype Generate types from JSON all inside Neovim
 setup_plugin("interlaced", {}) -- Neovim plugin for aligning bilingual parallel texts
 setup_plugin("nvmm", {}) -- nvim-mail-merge
-setup_plugin("firenvim", function(_) end)
-setup_plugin("qalc", {})
+setup_plugin("firenvim", function(_) end) -- https://github.com/glacambre/firenvim Embed Neovim in Chrome, Firefox & others.
+setup_plugin("qalc", {}) -- https://github.com/Apeiros-46B/qalc.nvim Neovim-integrated calculator based on Qalculate
+setup_plugin("flashcards", {}) -- https://github.com/alex-laycalvert/flashcards.nvim
+setup_plugin("nvim-license", {}) -- https://github.com/cfrt-dev/license.nvim

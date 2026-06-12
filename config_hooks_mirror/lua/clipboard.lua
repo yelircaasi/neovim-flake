@@ -16,3 +16,7 @@ setup_plugin("pasta", function(pasta)
 	require("pasta").config.indent_key = vim.keycode(",")
 	require("pasta").config.indent_fix = true
 end)
+
+setup_plugin("wastebin", {
+	url = "https://foo.bar.com",
+}) -- TODO: install https://github.com/matze/wastebin

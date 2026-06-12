@@ -68,18 +68,7 @@ Resolve neorg dependencies
 neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
 
 - VENDOR: -----------------------------------------------------------------------
-  - https://github.com/letieu/wezterm-move.nvim
-  - minimal-narrow-region
-  - nvim-api-wrappers
-  - k8vim
-  - telemake
-  - virtcolumn
-  - wezterm-nvim
-  - AdvancedNewFile  | https://github.com/Mohammed-Taher/AdvancedNewFile.nvim
-  - spread  (uses nvim-treesitter)
-  - fsread
-  - tracebundler
-  - https://github.com/mawkler/move-mode.nvim
+  see miscellaneous.lua
 
 - set up with at least minimal config: ------------------------------------------
   - [x] mypy
@@ -122,6 +111,7 @@ neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
 - https://github.com/skanehira/k8s.vim
 - https://github.com/m00qek/baleia.nvim
 - https://www.reddit.com/r/rust/comments/1efj1ci/is_it_possible_to_use_clippy_with_nvim_and_get/
+- [ ] https://github.com/bullets-vim/bullets.vim
 
 - xit rewrite
 - wezterm_send
@@ -141,7 +131,11 @@ neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
       make each into own derivation? -> pass through as output packages
 - [ ] go through, clean up and pare down notes
 - [ ] get Python LSP running properly
+- [ ] ********* https://git.laack.co/flashcards.nvim/log.html
 
+https://github.com/GR3YH4TT3R93/licenses.nvim
+https://github.com/tjdevries/present.nvim
+https://github.com/rareitems/anki.nvim
 https://github.com/idris-community/idris2-nvim
 
 https://ayats.org/blog/neovim-wrapper

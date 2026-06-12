@@ -1,3 +1,6 @@
+--─────────────────────────────────────────────────────────────────────────────
+--──── SORT ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 utils.setup_plugin("flybuf", function(flybuf)
 	flybuf.setup({
 		-- Show relative line numbers in the buffer list
@@ -5,6 +8,10 @@ utils.setup_plugin("flybuf", function(flybuf)
 	})
 	vim.keymap.set("n", "<leader>bf", "FlyBuf", { desc = "FlyBuf: buffer list" })
 end)
+
+utils.packadd("vim-wordmotion") -- PROBABLY NOT, BUT WORTH A TRY
+setup_plugin("hop", {}) -- PROBABLY NOT, BUT WORTH A TRY
+utils.packadd("clever-f.vim") -- PROBABLY NOT, BUT WORTH A TRY
 
 setup_plugin("navigator", {})
 
@@ -107,11 +114,15 @@ end)
 -- 	end,
 -- })
 
--- FILES ==========================================================================================
+--─────────────────────────────────────────────────────────────────────────────
+--──── FILES ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("spear", {})
 
--- WINDOWS ========================================================================================
+--─────────────────────────────────────────────────────────────────────────────
+--──── WINDOWS ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("swm", function(swm)
 	local map = vim.keymap.set
@@ -163,7 +174,9 @@ setup_plugin("stickybuf", function(stickybuf)
 	stickybuf.setup(cfg)
 end)
 
--- TEXT ===========================================================================================
+--─────────────────────────────────────────────────────────────────────────────
+--──── TEXT ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
 local mini_jump_defaults = {
 	-- Module mappings. Use `''` (empty string) to disable one.
@@ -567,7 +580,9 @@ end)
 
 setup_plugin("treemonkey", function(_) end)
 
--- MARKS ==========================================================================================
+--─────────────────────────────────────────────────────────────────────────────
+--──── MARKS ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("whaler", {})
 setup_plugin("marks-nvim", {})
@@ -588,9 +603,19 @@ end)
 
 setup_plugin("arrow", {}) -- https://github.com/otavioschwanck/arrow.nvim  Bookmark your files, separated by project, and quickly navigate through them.
 
--- OTHER ==========================================================================================
+utils.packadd("vim-edgemotion") -- PROBABLY NOT, BUT WORTH A TRY
 
-setup_plugin("gx-extended-nvim", {})
+--─────────────────────────────────────────────────────────────────────────────
+--──── URL-RELATED ────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+setup_plugin("gx-extended-nvim", {}) -- gx-extended.nvim supercharges Neovim's built-in gx command. Press gx on anything — package names, import statements, issue numbers, commit hashes, and more — and it opens the right URL in your browser.
+
+setup_plugin("urlview", {}) -- https://github.com/axieax/urlview.nvim viewing all the URLs in a buffer
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── OTHER ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
 -- likely deprecated; see README
 setup_plugin("highlight-current-n-nvim", {}) -- https://github.com/rktjmp/highlight-current-n.nvim Highlights the current /, ? or * match under your cursor when pressing n or N and gets out of the way afterwards.

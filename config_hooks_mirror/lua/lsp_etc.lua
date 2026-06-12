@@ -1,3 +1,5 @@
+-- TODO: Divide up by language and keep only the global (cross-language) configuration here.
+
 -- TODO: set up pylsp-rope for refactoring
 -- LSP ========================================================================================
 
@@ -937,3 +939,5 @@ setup_plugin("strict", {}) -- https://github.com/emileferreira/nvim-strict Stric
 setup_plugin("inlayhint-filler", {}) -- https://github.com/davidyz/inlayhint-filler.nvim
 setup_plugin("hlargs-nvim", {}) -- https://github.com/m-demare/hlargs.nvim Highlight arguments' definitions and usages, using Treesitter
 setup_plugin("lsp_signature", {}) -- PROBABLY NOT, BUT WORTH A TRY
+
+setup_plugin("nvim-lightbulb", {}) -- https://github.com/kosayoda/nvim-lightbulb VSCode 💡 for neovim's built-in LSP.

@@ -299,3 +299,5 @@ setup_plugin("menu", {})
 setup_plugin("symbols", {})
 setup_plugin("reactive", {}) -- https://github.com/rasulomaroff/reactive.nvim Reactivity. Right in your neovim.
 setup_plugin("modicator", {}) -- https://github.com/mawkler/modicator.nvim Cursor line number mode indicator plugin for Neovim
+setup_plugin("volt", function(_) end) -- https://github.com/nvzone/volt  Create blazing fast & beautiful reactive UI in Neovim
+setup_plugin("notify", {}) -- PROBABLY NOT, BUT WORTH A TRY (== nvim-notify ?)

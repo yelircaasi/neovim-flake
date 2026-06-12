@@ -427,3 +427,7 @@ setup_plugin("keytex", {}) -- https://github.com/cronJohn/keytex.nvim  A neovim 
 setup_plugin("nvim-keymapper", {})
 
 setup_plugin("keyseer", {})
+setup_plugin("homerows", {}) -- PROBABLY NOT, BUT WORTH A TRY https://github.com/unode/homerow.vim/blob/master/autoload/homerow.vim
+
+setup_plugin("whichkey_setup", {}) -- PROBABLY NOT, BUT WORTH A TRY
+setup_plugin("better-escape", {}) -- https://github.com/max397574/better-escape.nvim Map keys without delay when typing

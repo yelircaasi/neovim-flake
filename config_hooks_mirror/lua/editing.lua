@@ -143,10 +143,21 @@ vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
 	end,
 })
 
+setup_plugin("ts_context_commentstring", {}) -- MAYBE NOT, BUT WORTH A TRY - https://github.com/JoosepAlviste/nvim-ts-context-commentstring  Neovim treesitter plugin for setting the commentstring based on the cursor location in a file.
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── saving ─────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+setup_plugin("savior", {}) -- PROBABLY NOT, BUT WORTH A TRY
+utils.packadd("vim-auto-save") -- PROBABLY NOT, BUT WORTH A TRY
+setup_plugin("zpragmatic", {}) -- https://github.com/muhammadzkralla/zpragmatic.nvim  prompts you with alert dialog questions whenever you attempt to save changes in a file
+
 --─────────────────────────────────────────────────────────────────────────────
 --──── multicursor ────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 setup_plugin("multicursors", {})
+utils.packadd("vim-multiple-cursors") -- PROBABLY NOT, BUT WORTH A TRY
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── semantic features ──────────────────────────────────────────────────────
@@ -166,6 +177,29 @@ setup_plugin("treesj", function(treesj)
 
 	vim.keymap.set("n", "gS", treesj.toggle)
 end)
+
+local bullets_defaults = {
+  'kaymmm/bullets.nvim',
+  opts = {
+    colon_indent = true,
+    delete_last_bullet = true,
+    empty_buffers = true,
+    file_types = { 'markdown', 'text', 'gitcommit' },
+    line_spacing = 1,
+    mappings = true,
+    outline_levels = {'ROM','ABC', 'num', 'abc', 'rom', 'std*', 'std-', 'std+'},
+    renumber = true,
+    alpha = {
+      len = 2,
+    },
+    checkbox = {
+      nest = true,
+      markers = ' .oOx',
+      toggle_partials = true,
+    },
+  }
+}
+setup_plugin("Bullets", {})
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── sorting ─────────────────────────────────────────────────────────────────

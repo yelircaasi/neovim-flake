@@ -271,3 +271,6 @@ setup_plugin("actions-preview", {})
 
 setup_plugin("spider", {})
 setup_plugin("improved-search-nvim", {}) -- PROBABLY NOT, BUT WORTH A TRY
+setup_plugin("nvim-rg", {}) -- PROBABLY NOT, BUT WORTH A TRY https://github.com/duane9/nvim-rg
+setup_plugin("hlsearch-nvim", {}) -- PROBABLY NOT, BUT WORTH A TRY
+setup_plugin("nvim-monorepos", {}) -- https://github.com/sajjathossain/nvim-monorepos simple telescope file finder for monorepos
