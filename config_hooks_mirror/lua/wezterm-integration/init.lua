@@ -7,14 +7,13 @@ local map = vim.keymap.set
 local M = {}
 
 M.opts = {
-			create_keymaps = true,
-			prefix_send = "<leader>w",
-			prefix_run = "<leader>r",
-		}
+	create_keymaps = true,
+	prefix_send = "<leader>w",
+	prefix_run = "<leader>r",
+}
 
 -- ─── public API ───────────────────────────────────────────────────────────────
 
---- Options accepted by send_selection / send_text:
 ---@class WeztermIntegrationOpts
 ---@field direction?   "Left"|"Right"|"Up"|"Down"|"Next"|"Prev"
 ---@field match?       string   Pattern matched against pane title / cwd

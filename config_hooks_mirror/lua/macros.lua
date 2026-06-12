@@ -1,8 +1,9 @@
---[ [
--- utils.get_plugin("sqlite") TODO: why doesn't this work?
-vim.cmd(":packadd sqlite")
-require("sqlite")
-setup_plugin("NeoComposer", {
+local function get_sqlite() -- TODO: move to utils? move sqlite to modules?
+	vim.cmd(":packadd sqlite")
+	return require("sqlite")
+end
+
+local neocomposer_defaults = {
 	notify = true,
 	delay_timer = 150,
 	queue_most_recent = false,
@@ -30,14 +31,21 @@ setup_plugin("NeoComposer", {
 		cycle_prev = "<c-p>",
 		toggle_macro_menu = "<m-q>",
 	},
-})
--- ]]
-setup_plugin("nvim-macros", {
+}
+get_sqlite()
+setup_plugin("NeoComposer", function(neocomposer)
+	neocomposer.setup(neocomposer_defaults)
+end)
+setup_plugin("neocomposer-nvim", {}) -- TODO: resolve & remove duplication
+
+local nvim_macros_defaults = {
 	json_file_path = "./macros.json",
 	default_macro_register = "a",
 	json_formatter = "jq",
-})
-setup_plugin("recorder", {
+}
+setup_plugin("nvim-macros", nvim_macros_defaults)
+
+local recorder_defaults = {
 	-- Named registers where macros are saved (single lowercase letters only).
 	-- The first register is the default register used as macro-slot after
 	-- startup.
@@ -93,6 +101,5 @@ setup_plugin("recorder", {
 	-- [experimental] partially share keymaps with nvim-dap.
 	-- (See README for further explanations.)
 	dapSharedKeymaps = false,
-})
-
-setup_plugin("neocomposer-nvim", {})
+}
+setup_plugin("recorder", recorder_defaults)

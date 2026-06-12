@@ -1119,4 +1119,5 @@ utils.packadd("vim-fugitive", function()
 	-- print("Installed vim-fugitive.")
 end)
 
-setup_plugin("blame", {})
+local blame_defaults = {} -- TODO
+setup_plugin("blame", blame_defaults)

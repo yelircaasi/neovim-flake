@@ -1,5 +1,5 @@
 --─────────────────────────────────────────────────────────────────────────────
---──── to vendor ────────────────────────────────────────────────────────────
+--──── to vendor ──────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 setup_plugin("Launch", {}) -- https://github.com/LunarVim/Launch.nvim Launch.nvim is modular starter for Neovim.
 setup_plugin("minimal-narrow-region", {})
@@ -18,13 +18,13 @@ setup_plugin("present", {}) -- https://github.com/chaitanyabsprip/present.nvim P
 -- https://github.com/mawkler/move-mode.nvim
 
 --─────────────────────────────────────────────────────────────────────────────
---──── live preview ───────────────────────────────────────────────────────
+--──── live preview ───────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("knap", {}) -- https://github.com/frabjous/knap Neovim plugin for creating live-updating-as-you-type previews of LaTeX, markdown, and other files in the viewer of your choice.
 
 --─────────────────────────────────────────────────────────────────────────────
---──── nvim-/lua-related ───────────────────────────────────────────────────────
+--──── nvim-/lua-related ──────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("runtimetable", function(_) end)
@@ -33,7 +33,7 @@ setup_plugin("nvim-teal-maker", {}) -- PROBABLY NOT, BUT WORTH A TRY
 setup_plugin("cmdTree", {}) -- https://github.com/CWood-sdf/cmdTree.nvim  Declaratively make your neovim user commands
 
 --─────────────────────────────────────────────────────────────────────────────
---──── timer, time tracking ───────────────────────────────────────────────────────
+--──── timer, time tracking ───────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("pommodoro-clock", {})
@@ -80,7 +80,7 @@ setup_plugin("neowell-lua", {}) -- https://github.com/nyngwang/NeoWell.lua Well.
 setup_plugin("quicknote", {}) -- https://github.com/RutaTang/quicknote.nvim Quickly take notes, in-place
 
 --─────────────────────────────────────────────────────────────────────────────
---──── diagrams ──────────────────────────────────────────────────────────────
+--──── diagrams ───────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("better-digraphs", function(_) end)
@@ -88,7 +88,7 @@ setup_plugin("better-digraphs", function(_) end)
 setup_plugin("diagflow", {})
 
 --─────────────────────────────────────────────────────────────────────────────
---──── colors ──────────────────────────────────────────────────────────────
+--──── colors ─────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("nvim-highlight-colors", {}) -- https://github.com/brenoprata10/nvim-highlight-colors Highlight colors for neovim
@@ -123,7 +123,7 @@ setup_plugin("mini.hipatterns", mini_hipatterns_defaults)
 setup_plugin("paint", {})
 
 --─────────────────────────────────────────────────────────────────────────────
---──── recording/display ──────────────────────────────────────────────────────────────
+--──── recording/display ──────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("carbon-now-nvim", {})
@@ -134,14 +134,14 @@ setup_plugin("showkeys", {}) -- https://github.com/nvzone/showkeys
 --─────────────────────────────────────────────────────────────────────────────
 
 --─────────────────────────────────────────────────────────────────────────────
---──── regex ──────────────────────────────────────────────────────────────
+--──── regex ──────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 setup_plugin("hypersonic", {}) -- https://github.com/tomiis4/hypersonic.nvim A Neovim plugin that provides an explanation for regular expressions.", {})
 setup_plugin("regex-vars", {})
 setup_plugin("regexplainer", {})
 
 --─────────────────────────────────────────────────────────────────────────────
---──── docs ──────────────────────────────────────────────────────────────
+--──── docs ───────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("tldr", {})
@@ -169,7 +169,7 @@ setup_plugin("api-browser", {})
 setup_plugin("spaceport-nvim", {})
 
 --─────────────────────────────────────────────────────────────────────────────
---──── tracking/performance ───────────────────────────────────────────────────────────────
+--──── tracking/performance ───────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("metrics", {}) -- tracks time spent in your editor, logs locally to sqlite3 database
@@ -177,7 +177,7 @@ setup_plugin("keylab", {}) -- https://github.com/BooleanCube/keylab.nvim
 setup_plugin("nvim-apm", {}) -- https://github.com/pseudocc/nvim-apm calculate your APM, also show your key strokes in a buffer.
 
 --─────────────────────────────────────────────────────────────────────────────
---──── other ───────────────────────────────────────────────────────────────
+--──── other ──────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("nvim-quicktype", {}) -- https://github.com/midoBB/nvim-quicktype Generate types from JSON all inside Neovim

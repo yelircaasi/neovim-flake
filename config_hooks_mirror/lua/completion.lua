@@ -1,4 +1,4 @@
-local setup_luasnip = function()
+local function setup_luasnip()
 	vim.cmd(":packadd luasnip")
 	local ls = require("luasnip")
 
@@ -45,7 +45,8 @@ local setup_luasnip = function()
 end
 setup_luasnip()
 
-setup_plugin("nvim-cmp", function()
+-- TODO: clean up, check whether name is "cmp" or "nvim-cmp"
+local function setup_nvim_cmp()
 	utils.packadd("cmp-nvim-lsp")
 	utils.packadd("cmp-buffer")
 	utils.packadd("cmp-path")
@@ -54,6 +55,7 @@ setup_plugin("nvim-cmp", function()
 
 	vim.lsp.config("*", { capabilities = require("cmp_nvim_lsp").default_capabilities() })
 	vim.api.nvim_set_hl(0, "CmpGhostText", { link = "Comment", default = true })
+	utils.packadd("cmp")
 	local cmp = require("cmp")
 	local defaults = require("cmp.config.default")()
 	local auto_select = true
@@ -149,7 +151,8 @@ setup_plugin("nvim-cmp", function()
 		},
 		sorting = defaults.sorting,
 	}
-end)
+end
+setup_nvim_cmp()
 
 -- FROM LAZY (?): opts_extend = { "sources.default" }
 setup_plugin("blink", {
