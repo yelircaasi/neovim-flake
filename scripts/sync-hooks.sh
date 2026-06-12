@@ -12,7 +12,7 @@ function sync_hooks() {
     B="$HOME/repos/neovim-flake/config_hooks_mirror/$1"
 
     if [[ ! -f "$A" && ! -f "$B" ]]; then
-    echo "Error: neither file exists."
+    echo "Error: neither file exists: $A, $B."
     exit 1
     elif [[ ! -f "$A" ]]; then
     echo "$B -> $A"
