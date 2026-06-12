@@ -68,7 +68,8 @@ Resolve neorg dependencies
 neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
 
 - VENDOR: -----------------------------------------------------------------------
-
+  - https://github.com/letieu/wezterm-move.nvim
+  - minimal-narrow-region
   - nvim-api-wrappers
   - k8vim
   - telemake
@@ -78,6 +79,7 @@ neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
   - spread  (uses nvim-treesitter)
   - fsread
   - tracebundler
+  - https://github.com/mawkler/move-mode.nvim
 
 - set up with at least minimal config: ------------------------------------------
   - [x] mypy
@@ -159,7 +161,8 @@ https://github.com/calops/nix/tree/main/modules/home/programs/neovim
 [ ] https://github.com/cwfryer/neovim-flake/
 [ ] https://github.com/rockerBOO/awesome-neovim?tab=readme-ov-file#plugin-template
 
-[ ] https://github.com/tpope/vim-unimpaired/
+- [ ] https://github.com/tpope/vim-unimpaired/
+- [ ] https://github.com/fedepujol/move.nvim
 
 - [ ] add custom syntax highlighting (later maybe even LSPs) for pictrix and kleidoukhos DSLs: analogous to,
       and using similar setups to, consilium DSLs -> write treesitter parsers someday

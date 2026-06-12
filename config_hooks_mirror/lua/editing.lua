@@ -18,30 +18,188 @@
 -- indentmini
 --]]
 
---=================================================================================================
---SORT
-setup_plugin("dotdot", {}) -- https://codeberg.org/hernandez/dotdot.nvim lets you search for and execute commands with a press of ..
-
-setup_plugin("ax") -- https://github.com/mikeslattery/ax.nvim  Delete all the things!
-
-setup_plugin("sibling-swap-nvim", {}) -- https://github.com/Wansmer/sibling-swap.nvim
-
-setup_plugin("wrapping", {})
-setup_plugin("wrapping-paper", {})
-utils.packadd("vim-caser") -- cycle a word through snake_case, camelCase, PascalCase, SCREAMING_SNAKE
-
-setup_plugin("splitjoin", {})
-setup_plugin("minimal-narrow-region", function(_) end)
-
-setup_plugin("move-nvim", {})
-setup_plugin("moveline", function(moveline) end)
-setup_plugin("multicursors", {})
-utils.packadd("illuminate") -- https://github.com/rrethy/vim-illuminate
-
 -- SETUP ==========================================================================================
 
--- values ---------------------------------------------------------------------
+--─────────────────────────────────────────────────────────────────────────────
+--──── comments ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+utils.packadd("vim-commentary", function()
+	-- no configuration needed
+end)
+
+local comment_defaults = {
+	---Add a space b/w comment and the line
+	padding = true,
+	---Whether the cursor should stay at its position
+	sticky = true,
+	---Lines to be ignored while (un)comment
+	ignore = nil,
+	---LHS of toggle mappings in NORMAL mode
+	toggler = {
+		---Line-comment toggle keymap
+		line = "gcc",
+		---Block-comment toggle keymap
+		block = "gbc",
+	},
+	---LHS of operator-pending mappings in NORMAL and VISUAL mode
+	opleader = {
+		---Line-comment keymap
+		line = "gc",
+		---Block-comment keymap
+		block = "gb",
+	},
+	---LHS of extra mappings
+	extra = {
+		---Add comment on the line above
+		above = "gcO",
+		---Add comment on the line below
+		below = "gco",
+		---Add comment at the end of line
+		eol = "gcA",
+	},
+	---Enable keybindings
+	---NOTE: If given `false` then the plugin won't create any mappings
+	mappings = {
+		---Operator-pending mapping; `gcc` `gbc` `gc[count]{motion}` `gb[count]{motion}`
+		basic = true,
+		---Extra mapping; `gco`, `gcO`, `gcA`
+		extra = true,
+	},
+	---Function to call before (un)comment
+	pre_hook = nil,
+	---Function to call after (un)comment
+	post_hook = nil,
+}
+setup_plugin("Comment", comment_defaults)
+
+local todo_comments_defaults = {
+	signs = true, -- show icons in the signs column
+	sign_priority = 8, -- sign priority
+	-- keywords recognized as todo comments
+	keywords = {
+		FIX = {
+			icon = " ", -- icon used for the sign, and in search results
+			color = "error", -- can be a hex color, or a named color (see below)
+			alt = { "FIXME", "BUG", "FIXIT", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
+			-- signs = false, -- configure signs for some keywords individually
+		},
+		TODO = { icon = " ", color = "info" },
+		HACK = { icon = " ", color = "warning" },
+		WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
+		PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
+		NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
+		TEST = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" } },
+	},
+	gui_style = {
+		fg = "NONE", -- The gui style to use for the fg highlight group.
+		bg = "BOLD", -- The gui style to use for the bg highlight group.
+	},
+	merge_keywords = true, -- when true, custom keywords will be merged with the defaults
+	-- highlighting of the line containing the todo comment
+	-- * before: highlights before the keyword (typically comment characters)
+	-- * keyword: highlights of the keyword
+	-- * after: highlights after the keyword (todo text)
+	highlight = {
+		multiline = true, -- enable multine todo comments
+		multiline_pattern = "^.", -- lua pattern to match the next multiline from the start of the matched keyword
+		multiline_context = 10, -- extra lines that will be re-evaluated when changing a line
+		before = "", -- "fg" or "bg" or empty
+		keyword = "wide", -- "fg", "bg", "wide", "wide_bg", "wide_fg" or empty. (wide and wide_bg is the same as bg, but will also highlight surrounding characters, wide_fg acts accordingly but with fg)
+		after = "fg", -- "fg" or "bg" or empty
+		pattern = [[.*<(KEYWORDS)\s*:]], -- pattern or table of patterns, used for highlighting (vim regex)
+		comments_only = true, -- uses treesitter to match keywords in comments only
+		max_line_len = 400, -- ignore lines longer than this
+		exclude = {}, -- list of file types to exclude highlighting
+	},
+	-- list of named colors where we try to extract the guifg from the
+	-- list of highlight groups or use the hex color if hl not found as a fallback
+	colors = {
+		error = { "DiagnosticError", "ErrorMsg", "#DC2626" },
+		warning = { "DiagnosticWarn", "WarningMsg", "#FBBF24" },
+		info = { "DiagnosticInfo", "#2563EB" },
+		hint = { "DiagnosticHint", "#10B981" },
+		default = { "Identifier", "#7C3AED" },
+		test = { "Identifier", "#FF00FF" },
+	},
+	search = {
+		command = "rg",
+		args = {
+			"--color=never",
+			"--no-heading",
+			"--with-filename",
+			"--line-number",
+			"--column",
+		},
+		-- regex that will be used to match keywords.
+		-- don't replace the (KEYWORDS) placeholder
+		pattern = [[\b(KEYWORDS):]], -- ripgrep regex
+		-- pattern = [[\b(KEYWORDS)\b]], -- match without the extra colon. You'll likely get false positives
+	},
+}
+vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
+	callback = function()
+		setup_plugin("todo-comments", todo_comments_defaults)
+	end,
+})
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── multicursor ────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+setup_plugin("multicursors", {})
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── semantic features ──────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+utils.packadd("illuminate") -- https://github.com/rrethy/vim-illuminate (Neo)Vim plugin for automatically highlighting other uses of the word under the cursor using either LSP, Tree-sitter, or regex matching.
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── sequences ─────────────────────────────────────────────────────────────-
+--─────────────────────────────────────────────────────────────────────────────
+setup_plugin("splitjoin", {}) -- https://github.com/bennypowers/splitjoin.nvim Split or join list-like syntax constructs
+
+setup_plugin("treesj", function(treesj)
+	treesj.setup({
+		use_default_keymaps = false,
+		max_join_length = 120,
+	})
+
+	vim.keymap.set("n", "gS", treesj.toggle)
+end)
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── sorting ─────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+setup_plugin("sort", {})
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── deletion ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+setup_plugin("ax") -- https://github.com/mikeslattery/ax.nvim  Delete all the things!
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── casing ─────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+utils.packadd("vim-caser") -- cycle a word through snake_case, camelCase, PascalCase, SCREAMING_SNAKE
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── wrapping ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+setup_plugin("wrapping", {}) -- https://github.com/andrewferrier/wrapping.nvim Plugin to make it easier to switch between 'soft' and 'hard' line wrapping in NeoVim
+setup_plugin("wrapping-paper", {}) -- https://github.com/benlubas/wrapping-paper.nvim Simple plugin which simulates wrapping a single line at a time using floating windows and virtual text trickery
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── command helpers ────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+setup_plugin("dotdot", {}) -- https://codeberg.org/hernandez/dotdot.nvim lets you search for and execute commands with a press of ..
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── values ─────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 utils.packadd("vim-abolish") -- https://github.com/tpope/vim-abolish abolish.vim: Work with several variants of a word at once
+
+setup_plugin("date-time-inserter", {})
 
 -- likely strictly dominated by dial
 utils.packadd("switch.vim") --  A simple Vim plugin to switch segments of text with predefined replacements
@@ -120,23 +278,98 @@ utils.packadd("nvim-various-textobjs", function()
 	})
 end)
 
--- comments -------------------------------------------------------------------
-utils.packadd("vim-commentary", function()
-	-- no configuration needed
+--─────────────────────────────────────────────────────────────────────────────
+--──── text movement ──────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+setup_plugin("moveline", function(moveline) end)
+
+setup_plugin("sibling-swap-nvim", {}) -- https://github.com/Wansmer/sibling-swap.nvim
+
+local move_defaults = {
+	line = {
+		enable = true, -- Enables line movement
+		indent = true, -- Toggles indentation
+	},
+	block = {
+		enable = true, -- Enables block movement
+		indent = true, -- Toggles indentation
+	},
+	word = {
+		enable = true, -- Enables word movement
+	},
+	char = {
+		enable = false, -- Enables char movement
+	},
+}
+setup_plugin("move", function(move)
+	move.setup(move_defaults)
+
+	local opts = { noremap = true, silent = true }
+	-- Normal-mode commands
+	vim.keymap.set("n", "<A-j>", ":MoveLine(1)<CR>", opts)
+	vim.keymap.set("n", "<A-k>", ":MoveLine(-1)<CR>", opts)
+	vim.keymap.set("n", "<A-h>", ":MoveHChar(-1)<CR>", opts)
+	vim.keymap.set("n", "<A-l>", ":MoveHChar(1)<CR>", opts)
+	vim.keymap.set("n", "<leader>wf", ":MoveWord(1)<CR>", opts)
+	vim.keymap.set("n", "<leader>wb", ":MoveWord(-1)<CR>", opts)
+
+	-- Visual-mode commands
+	vim.keymap.set("v", "<A-j>", ":MoveBlock(1)<CR>", opts)
+	vim.keymap.set("v", "<A-k>", ":MoveBlock(-1)<CR>", opts)
+	vim.keymap.set("v", "<A-h>", ":MoveHBlock(-1)<CR>", opts)
+	vim.keymap.set("v", "<A-l>", ":MoveHBlock(1)<CR>", opts)
 end)
 
-setup_plugin("treesj", function(treesj)
-	treesj.setup({
-		use_default_keymaps = false,
-		max_join_length = 120,
-	})
-
-	vim.keymap.set("n", "gS", treesj.toggle)
-end)
-
--- selection ------------------------------------------------------------------
+--─────────────────────────────────────────────────────────────────────────────
+--──── selection ─────────────────────────────────────────────────────────────-
+--─────────────────────────────────────────────────────────────────────────────
 setup_plugin("wildfire", {})
--- pairs ----------------------------------------------------------------------
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── pairs ──────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+local mini_surround_defaults = {
+	-- Add custom surroundings to be used on top of builtin ones. For more
+	-- information with examples, see `:h MiniSurround.config`.
+	custom_surroundings = nil,
+
+	-- Duration (in ms) of highlight when calling `MiniSurround.highlight()`
+	highlight_duration = 500,
+
+	-- Module mappings. Use `''` (empty string) to disable one.
+	mappings = {
+		add = "sa", -- Add surrounding in Normal and Visual modes
+		delete = "sd", -- Delete surrounding
+		find = "sf", -- Find surrounding (to the right)
+		find_left = "sF", -- Find surrounding (to the left)
+		highlight = "sh", -- Highlight surrounding
+		replace = "sr", -- Replace surrounding
+
+		suffix_last = "l", -- Suffix to search with "prev" method
+		suffix_next = "n", -- Suffix to search with "next" method
+	},
+
+	-- Number of lines within which surrounding is searched
+	n_lines = 20,
+
+	-- Whether to respect selection type:
+	-- - Place surroundings on separate lines in linewise mode.
+	-- - Place surroundings on each line in blockwise mode.
+	respect_selection_type = false,
+
+	-- How to search for surrounding (first inside current line, then inside
+	-- neighborhood). One of 'cover', 'cover_or_next', 'cover_or_prev',
+	-- 'cover_or_nearest', 'next', 'prev', 'nearest'. For more details,
+	-- see `:h MiniSurround.config`.
+	search_method = "cover",
+
+	-- Whether to disable showing non-error feedback
+	-- This also affects (purely informational) helper messages shown after
+	-- idle time if user input is required.
+	silent = false,
+}
+setup_plugin("mini.surround", mini_surround_defaults)
 
 setup_plugin("sentiment-nvim", {}) -- archived
 setup_plugin("ultimate-autopair-nvim", {}) -- use?
@@ -212,7 +445,66 @@ local mini_pairs_defaults = {
 }
 setup_plugin("mini.pairs", mini_pairs_defaults)
 
--- indentation and alignment --------------------------------------------------
+--─────────────────────────────────────────────────────────────────────────────
+--──── indentation and alignment ──────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+local mini_indentscope_defaults = {
+	-- Draw options
+	draw = {
+		-- Delay (in ms) between event and start of drawing scope indicator
+		delay = 100,
+
+		-- Animation rule for scope's first drawing. A function which, given
+		-- next and total step numbers, returns wait time (in ms). See
+		-- |MiniIndentscope.gen_animation| for builtin options. To disable
+		-- animation, use `require('mini.indentscope').gen_animation.none()`.
+		-- animation = --<function: implements constant 20ms between steps>,
+
+		-- Whether to auto draw scope: return `true` to draw, `false` otherwise.
+		-- Default draws only fully computed scope (see `options.n_lines`).
+		predicate = function(scope)
+			return not scope.body.is_incomplete
+		end,
+
+		-- Symbol priority. Increase to display on top of more symbols.
+		priority = 2,
+	},
+
+	-- Module mappings. Use `''` (empty string) to disable one.
+	mappings = {
+		-- Textobjects
+		object_scope = "ii",
+		object_scope_with_border = "ai",
+
+		-- Motions (jump to respective border line; if not present - body line)
+		goto_top = "[i",
+		goto_bottom = "]i",
+	},
+
+	-- Options which control scope computation
+	options = {
+		-- Type of scope's border: which line(s) with smaller indent to
+		-- categorize as border. Can be one of: 'both', 'top', 'bottom', 'none'.
+		border = "both",
+
+		-- Whether to use cursor column when computing reference indent.
+		-- Useful to see incremental scopes with horizontal cursor movements.
+		indent_at_cursor = true,
+
+		-- Maximum number of lines above or below within which scope is computed
+		n_lines = 10000,
+
+		-- Whether to first check input line to be a border of adjacent scope.
+		-- Use it if you want to place cursor on function header to get scope of
+		-- its body.
+		try_as_border = false,
+	},
+
+	-- Which character to use for drawing scope indicator
+	symbol = "╎",
+}
+setup_plugin("mini.indentscope", mini_indentscope_defaults)
 
 setup_plugin("anydent", function(anydent) end)
 
@@ -275,202 +567,6 @@ local mini_align_defaults = {
 }
 setup_plugin("mini.align", mini_align_defaults)
 
-local mini_hipatterns_defaults = {
-	-- Table with highlighters (see |MiniHipatterns.config| for more details).
-	-- Nothing is defined by default. Add manually for visible effect.
-	highlighters = {},
-
-	-- Delays (in ms) defining asynchronous highlighting process
-	delay = {
-		-- How much to wait for update after every text change
-		text_change = 200,
-
-		-- How much to wait for update after window scroll
-		scroll = 50,
-	},
-}
-setup_plugin("mini.hipatterns", mini_hipatterns_defaults)
-
-local mini_jump_defaults = {
-	-- Module mappings. Use `''` (empty string) to disable one.
-	mappings = {
-		forward = "f",
-		backward = "F",
-		forward_till = "t",
-		backward_till = "T",
-		repeat_jump = ";",
-	},
-
-	-- Delay values (in ms) for different functionalities. Set any of them to
-	-- a very big number (like 10^7) to virtually disable.
-	delay = {
-		-- Delay between jump and highlighting all possible jumps
-		highlight = 250,
-
-		-- Delay between jump and automatic stop if idle (no jump is done)
-		idle_stop = 10000000,
-	},
-
-	-- Whether to disable showing non-error feedback
-	-- This also affects (purely informational) helper messages shown after
-	-- idle time if user input is required.
-	silent = false,
-}
-setup_plugin("mini.jump", mini_jump_defaults)
-
-local mini_jump2d_defaults = {
-	-- Function producing jump spots (byte indexed) for a particular line.
-	-- For more information see |MiniJump2d.start()|.
-	-- If `nil` (default) - use |MiniJump2d.default_spotter()|
-	spotter = nil,
-
-	-- Characters used for labels of jump spots (in supplied order)
-	labels = "abcdefghijklmnopqrstuvwxyz",
-
-	-- Options for visual effects
-	view = {
-		-- Whether to dim lines with at least one jump spot
-		dim = false,
-
-		-- How many steps ahead to show. Set to big number to show all steps.
-		n_steps_ahead = 0,
-	},
-
-	-- Which lines are used for computing spots
-	allowed_lines = {
-		blank = true, -- Blank line (not sent to spotter even if `true`)
-		cursor_before = true, -- Lines before cursor line
-		cursor_at = true, -- Cursor line
-		cursor_after = true, -- Lines after cursor line
-		fold = true, -- Start of fold (not sent to spotter even if `true`)
-	},
-
-	-- Which windows from current tabpage are used for visible lines
-	allowed_windows = {
-		current = true,
-		not_current = true,
-	},
-
-	-- Functions to be executed at certain events
-	hooks = {
-		before_start = nil, -- Before jump start
-		after_jump = nil, -- After jump was actually done
-	},
-
-	-- Module mappings. Use `''` (empty string) to disable one.
-	mappings = {
-		start_jumping = "<CR>",
-	},
-
-	-- Whether to disable showing non-error feedback
-	-- This also affects (purely informational) helper messages shown after
-	-- idle time if user input is required.
-	silent = false,
-}
-setup_plugin("mini.jump2d", mini_jump2d_defaults)
-
-local mini_surround_defaults = {
-	-- Add custom surroundings to be used on top of builtin ones. For more
-	-- information with examples, see `:h MiniSurround.config`.
-	custom_surroundings = nil,
-
-	-- Duration (in ms) of highlight when calling `MiniSurround.highlight()`
-	highlight_duration = 500,
-
-	-- Module mappings. Use `''` (empty string) to disable one.
-	mappings = {
-		add = "sa", -- Add surrounding in Normal and Visual modes
-		delete = "sd", -- Delete surrounding
-		find = "sf", -- Find surrounding (to the right)
-		find_left = "sF", -- Find surrounding (to the left)
-		highlight = "sh", -- Highlight surrounding
-		replace = "sr", -- Replace surrounding
-
-		suffix_last = "l", -- Suffix to search with "prev" method
-		suffix_next = "n", -- Suffix to search with "next" method
-	},
-
-	-- Number of lines within which surrounding is searched
-	n_lines = 20,
-
-	-- Whether to respect selection type:
-	-- - Place surroundings on separate lines in linewise mode.
-	-- - Place surroundings on each line in blockwise mode.
-	respect_selection_type = false,
-
-	-- How to search for surrounding (first inside current line, then inside
-	-- neighborhood). One of 'cover', 'cover_or_next', 'cover_or_prev',
-	-- 'cover_or_nearest', 'next', 'prev', 'nearest'. For more details,
-	-- see `:h MiniSurround.config`.
-	search_method = "cover",
-
-	-- Whether to disable showing non-error feedback
-	-- This also affects (purely informational) helper messages shown after
-	-- idle time if user input is required.
-	silent = false,
-}
-setup_plugin("mini.surround", mini_surround_defaults)
-
-local mini_indentscope_defaults = {
-	-- Draw options
-	draw = {
-		-- Delay (in ms) between event and start of drawing scope indicator
-		delay = 100,
-
-		-- Animation rule for scope's first drawing. A function which, given
-		-- next and total step numbers, returns wait time (in ms). See
-		-- |MiniIndentscope.gen_animation| for builtin options. To disable
-		-- animation, use `require('mini.indentscope').gen_animation.none()`.
-		-- animation = --<function: implements constant 20ms between steps>,
-
-		-- Whether to auto draw scope: return `true` to draw, `false` otherwise.
-		-- Default draws only fully computed scope (see `options.n_lines`).
-		predicate = function(scope)
-			return not scope.body.is_incomplete
-		end,
-
-		-- Symbol priority. Increase to display on top of more symbols.
-		priority = 2,
-	},
-
-	-- Module mappings. Use `''` (empty string) to disable one.
-	mappings = {
-		-- Textobjects
-		object_scope = "ii",
-		object_scope_with_border = "ai",
-
-		-- Motions (jump to respective border line; if not present - body line)
-		goto_top = "[i",
-		goto_bottom = "]i",
-	},
-
-	-- Options which control scope computation
-	options = {
-		-- Type of scope's border: which line(s) with smaller indent to
-		-- categorize as border. Can be one of: 'both', 'top', 'bottom', 'none'.
-		border = "both",
-
-		-- Whether to use cursor column when computing reference indent.
-		-- Useful to see incremental scopes with horizontal cursor movements.
-		indent_at_cursor = true,
-
-		-- Maximum number of lines above or below within which scope is computed
-		n_lines = 10000,
-
-		-- Whether to first check input line to be a border of adjacent scope.
-		-- Use it if you want to place cursor on function header to get scope of
-		-- its body.
-		try_as_border = false,
-	},
-
-	-- Which character to use for drawing scope indicator
-	symbol = "╎",
-}
-setup_plugin("mini.indentscope", mini_indentscope_defaults)
-
--- sorting ---------------------------------------------------------------------
-
-setup_plugin("sort", {})
 -- AUTOCOMMANDS ===================================================================================
 
 vim.api.nvim_create_autocmd("FileType", {
@@ -479,75 +575,5 @@ vim.api.nvim_create_autocmd("FileType", {
 		vim.keymap.set("n", "q", "<cmd>quit<cr>", {
 			buffer = ev.buf,
 		})
-	end,
-})
-
-local todo_comments_defaults = {
-	signs = true, -- show icons in the signs column
-	sign_priority = 8, -- sign priority
-	-- keywords recognized as todo comments
-	keywords = {
-		FIX = {
-			icon = " ", -- icon used for the sign, and in search results
-			color = "error", -- can be a hex color, or a named color (see below)
-			alt = { "FIXME", "BUG", "FIXIT", "ISSUE" }, -- a set of other keywords that all map to this FIX keywords
-			-- signs = false, -- configure signs for some keywords individually
-		},
-		TODO = { icon = " ", color = "info" },
-		HACK = { icon = " ", color = "warning" },
-		WARN = { icon = " ", color = "warning", alt = { "WARNING", "XXX" } },
-		PERF = { icon = " ", alt = { "OPTIM", "PERFORMANCE", "OPTIMIZE" } },
-		NOTE = { icon = " ", color = "hint", alt = { "INFO" } },
-		TEST = { icon = "⏲ ", color = "test", alt = { "TESTING", "PASSED", "FAILED" } },
-	},
-	gui_style = {
-		fg = "NONE", -- The gui style to use for the fg highlight group.
-		bg = "BOLD", -- The gui style to use for the bg highlight group.
-	},
-	merge_keywords = true, -- when true, custom keywords will be merged with the defaults
-	-- highlighting of the line containing the todo comment
-	-- * before: highlights before the keyword (typically comment characters)
-	-- * keyword: highlights of the keyword
-	-- * after: highlights after the keyword (todo text)
-	highlight = {
-		multiline = true, -- enable multine todo comments
-		multiline_pattern = "^.", -- lua pattern to match the next multiline from the start of the matched keyword
-		multiline_context = 10, -- extra lines that will be re-evaluated when changing a line
-		before = "", -- "fg" or "bg" or empty
-		keyword = "wide", -- "fg", "bg", "wide", "wide_bg", "wide_fg" or empty. (wide and wide_bg is the same as bg, but will also highlight surrounding characters, wide_fg acts accordingly but with fg)
-		after = "fg", -- "fg" or "bg" or empty
-		pattern = [[.*<(KEYWORDS)\s*:]], -- pattern or table of patterns, used for highlighting (vim regex)
-		comments_only = true, -- uses treesitter to match keywords in comments only
-		max_line_len = 400, -- ignore lines longer than this
-		exclude = {}, -- list of file types to exclude highlighting
-	},
-	-- list of named colors where we try to extract the guifg from the
-	-- list of highlight groups or use the hex color if hl not found as a fallback
-	colors = {
-		error = { "DiagnosticError", "ErrorMsg", "#DC2626" },
-		warning = { "DiagnosticWarn", "WarningMsg", "#FBBF24" },
-		info = { "DiagnosticInfo", "#2563EB" },
-		hint = { "DiagnosticHint", "#10B981" },
-		default = { "Identifier", "#7C3AED" },
-		test = { "Identifier", "#FF00FF" },
-	},
-	search = {
-		command = "rg",
-		args = {
-			"--color=never",
-			"--no-heading",
-			"--with-filename",
-			"--line-number",
-			"--column",
-		},
-		-- regex that will be used to match keywords.
-		-- don't replace the (KEYWORDS) placeholder
-		pattern = [[\b(KEYWORDS):]], -- ripgrep regex
-		-- pattern = [[\b(KEYWORDS)\b]], -- match without the extra colon. You'll likely get false positives
-	},
-}
-vim.api.nvim_create_autocmd({ "BufReadPre", "BufNewFile" }, {
-	callback = function()
-		setup_plugin("todo-comments", todo_comments_defaults)
 	end,
 })

@@ -936,3 +936,4 @@ setup_plugin("dmap", {}) -- nvim plugin providing a subtle overview of LSP diagn
 setup_plugin("strict", {}) -- https://github.com/emileferreira/nvim-strict Strict, native code style formatting plugin for Neovim. Expose deep nesting, overlong lines, trailing whitespace, trailing empty lines, todos and inconsistent indentation.
 setup_plugin("inlayhint-filler", {}) -- https://github.com/davidyz/inlayhint-filler.nvim
 setup_plugin("hlargs-nvim", {}) -- https://github.com/m-demare/hlargs.nvim Highlight arguments' definitions and usages, using Treesitter
+setup_plugin("lsp_signature", {}) -- PROBABLY NOT, BUT WORTH A TRY

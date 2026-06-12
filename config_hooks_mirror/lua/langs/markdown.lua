@@ -1,2 +1,5 @@
 setup_plugin("FeMaco", {})
 setup_plugin("otter", {})
+setup_plugin("render-markdown", {})
+-- OLD utils.packadd("markdown-preview")
+setup_plugin("mkdp", {})

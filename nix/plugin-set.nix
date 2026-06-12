@@ -302,7 +302,7 @@ in rec {
       };
       meta.homepage = "https://github.com/Wansmer/sibling-swap.nvim";
     };
-    move-nvim = pkgs.vimUtils.buildVimPlugin {
+    move = pkgs.vimUtils.buildVimPlugin {
       pname = "move.nvim";
       version = "2023-04-21";
       src = pkgs.fetchFromGitHub {

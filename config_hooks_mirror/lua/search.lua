@@ -270,3 +270,4 @@ setup_plugin("substitute", {})
 setup_plugin("actions-preview", {})
 
 setup_plugin("spider", {})
+setup_plugin("improved-search-nvim", {}) -- PROBABLY NOT, BUT WORTH A TRY
