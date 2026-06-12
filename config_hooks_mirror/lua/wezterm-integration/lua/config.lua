@@ -1,5 +1,6 @@
 M = {}
 
+---@enum Directions
 M.directions = {
 	h = "Left",
 	l = "Right",

@@ -2,7 +2,15 @@ local helpers = require("helpers")
 local wez = require("wezterm-interaction")
 local selection = require("selection")
 
+local map = vim.keymap.set
+
 local M = {}
+
+M.opts = {
+			keymaps = true,
+			prefix_send = "<leader>w",
+			prefix_run = "<leader>r",
+		}
 
 -- ─── public API ───────────────────────────────────────────────────────────────
 
@@ -90,7 +98,7 @@ function M.send_selection(opts)
 	M.send_text(text, opts)
 end
 
-function M.vmap_send(key, directions)
+local function vmap_send(key, directions)
 	local lhs = prefix_send .. key
 	local direction = directions[key]
 	local direction_lower = string.lower(direction)
@@ -99,10 +107,10 @@ function M.vmap_send(key, directions)
 		M.send_selection({ direction = direction })
 	end
 	local desc = "Send selection: WezTerm pane (" .. direction_lower .. ")"
-	vim.keymap.set("v", lhs, rhs, { desc = desc }) --, silent = true })
+	map("v", lhs, rhs, { desc = desc }) --, silent = true })
 end
 
-function M.nmap_send(key, directions)
+local function nmap_send(key, directions)
 	local lhs = prefix_send .. key
 	local direction = directions[key]
 	local direction_lower = string.lower(direction)
@@ -112,10 +120,10 @@ function M.nmap_send(key, directions)
 		M.send_text(text, { direction = direction })
 	end
 	local desc = "Send current block: WezTerm pane (" .. direction_lower .. ")"
-	vim.keymap.set("n", lhs, rhs, { desc = desc }) --, silent = true })
+	map("n", lhs, rhs, { desc = desc }) --, silent = true })
 end
 
-function M.map_run(key, directions)
+local function map_run(key, directions)
 	local lhs = prefix_send .. key
 	local direction = directions[key]
 	local direction_lower = string.lower(direction)
@@ -124,10 +132,10 @@ function M.map_run(key, directions)
 		M.send_selection({ direction = direction })
 	end
 	local desc = "Running current file: WezTerm pane (" .. direction_lower .. ")"
-	vim.keymap.set({ "n", "v" }, lhs, rhs, { desc = desc }) --, silent = true })
+	map({ "n", "v" }, lhs, rhs, { desc = desc }) --, silent = true })
 end
 
-function M.make_current_file_command(opts)
+local function make_current_file_command(opts)
 	opts = opts or {}
 	local file_path = vim.api.nvim_buf_get_name(0)
 	local file_type = vim.bo.filetype
@@ -192,7 +200,7 @@ function M.run_current_file(opts)
 	end
 end
 
-function M.get_output(opts)
+function M.retrieve_output(opts)
 	opts = opts or {}
 
 	-- Resolve which pane to read from: explicit id, direction, match, or the
@@ -251,36 +259,28 @@ function M.setup(config)
 	else
 		print("TODO")
 
-		opts = vim.tbl_deep_extend("force", {
-			keymaps = true,
-			prefix_send = "<leader>w",
-			prefix_run = "<leader>r",
-		}, opts or {})
+		M.opts = vim.tbl_deep_extend("force", M.opts, config or {})
 
-		if not opts.keymaps then
+		if not M.opts.keymaps then
 			return
 		end
 
-		local prefix_send = opts.prefix_send
-		local prefix_run = opts.prefix_run
+		local prefix_send = M.opts.prefix_send
+		local prefix_run = M.opts.prefix_run
 
 		for _, k in pairs({ "h", "j", "k", "l", "n", "p" }) do
 			map_send_visual(k)
 			map_run(k)
 		end
 
-		vim.keymap.set("v", prefix_send .. "w", function()
+		map("v", prefix_send .. "w", function()
 			M.send_selection({ pick = true })
 		end, { desc = "Send selection: pick WezTerm pane", silent = true })
 
-		vim.keymap.set("v", prefix_run .. "r", function()
+		map("v", prefix_run .. "r", function()
 			M.send_selection({ pick = true })
 		end, { desc = "Run file: pick WezTerm pane", silent = true })
 	end
 end
 
 return M
-
--- TODO: send line if in normal mode -> use treesitter to get block?
--- TODO: package as plugin and call it wezterm-native.nvim
--- TODO: add guard to detect whether in wezterm; no-op if not
