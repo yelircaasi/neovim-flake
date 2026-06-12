@@ -45,7 +45,7 @@ setup_plugin("sche", {}) -- https://github.com/Cassin01/sche.nvim A text-based s
 setup_plugin("twig", {}) -- https://github.com/hugginsio/twig.nvim taskwarrior integration
 
 --─────────────────────────────────────────────────────────────────────────────
---──── dashboard/startpage ────────────────────────────────────────────────────
+--──── dashboard/startpage/splash ─────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 -- hacky, but works -> necessary due to name collision
@@ -59,6 +59,9 @@ setup_plugin("twig", {}) -- https://github.com/hugginsio/twig.nvim taskwarrior i
 -- setup_plugin_explicit("dashboard-nvim", "dashboard", {})
 
 setup_plugin("dashboard", {})
+
+setup_plugin("fsplash", {}) -- https://github.com/jovanlanik/fsplash.nvim Show a custom splash screen in a floating window
+
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── pkm ────────────────────────────────────────────────────────────────────

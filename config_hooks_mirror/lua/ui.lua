@@ -1,3 +1,208 @@
+--─────────────────────────────────────────────────────────────────────────────
+--──── columns ────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+setup_plugin("smartcolumn", {})
+
+setup_plugin("statuscol", {})
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── menus, selection ───────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+setup_plugin("menu", {})
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── outline ────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+setup_plugin("symbols", {})
+
+-- TODO: maybe use aerial instead of navbuddy
+setup_plugin("aerial", function(aerial) -- https://github.com/stevearc/aerial.nvim | Neovim plugin for a code outline window
+	aerial.setup({
+		layout = {
+			min_width = 30,
+			default_direction = "prefer_right",
+		},
+		attach_mode = "window",
+		close_automatic_events = {
+			"unsupported",
+			"switch_buffer",
+		},
+	})
+
+	vim.keymap.set("n", "<leader>o", "<cmd>AerialToggle<cr>")
+	vim.keymap.set("n", "{", "<cmd>AerialPrev<cr>")
+	vim.keymap.set("n", "}", "<cmd>AerialNext<cr>")
+end)
+
+-- utils.packadd("nui") -- TODO: comment out after next build
+setup_plugin("nvim-navbuddy", function(navbuddy) -- https://github.com/SmiteshP/nvim-navbuddy | A simple popup display that provides breadcrumbs feature using LSP server
+	navbuddy.setup({
+		lsp = {
+			auto_attach = true,
+		},
+	})
+
+	vim.keymap.set("n", "<leader>nb", function()
+		navbuddy.open()
+	end)
+end)
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── lines, bars ──────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+setup_plugin("lualine", {
+	inactive_sections = {
+		lualine_a = {},
+		lualine_b = {},
+		lualine_c = {},
+		lualine_x = {},
+		lualine_y = {},
+		lualine_z = {},
+	},
+})
+
+setup_plugin("dropbar", function(dropbar)
+	dropbar.setup({
+		-- bar = {
+		-- 	padding = {
+		-- 		left = 1,
+		-- 		right = 1,
+		-- 	},
+		-- },
+	})
+
+	vim.ui.select = require("dropbar.utils.menu").select
+
+	vim.keymap.set("n", "<leader>;", function()
+		require("dropbar.api").pick()
+	end)
+
+	vim.keymap.set("n", "[;", function()
+		require("dropbar.api").goto_context_start()
+	end)
+
+	vim.keymap.set("n", "];", function()
+		require("dropbar.api").select_next_context()
+	end)
+end)
+
+setup_plugin("nvim-navic", {})
+setup_plugin("bufferline", {})
+
+---------------- alternative lines -------------
+if false then
+	setup_plugin("cokeline", {})
+	setup_plugin("galaxyline", function(_) end)
+	setup_plugin("heirline", {})
+	setup_plugin("heirline-components", {})
+	setup_plugin("nougat", function(_) end)
+	setup_plugin("staline", {})
+	setup_plugin("tabby", {})
+	setup_plugin("minibar", {})
+	setup_plugin("winbar", {})
+	setup_plugin("windline", function(_) end)
+end
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── command interface ──────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+setup_plugin("cmdbuf", {}) -- https://github.com/notomo/cmdbuf.nvim -- PROBABLY NOT, BUT WORTH A TRY
+
+setup_plugin("mini.cmdline", {
+	-- Autocompletion: show `:h 'wildmenu'` as you type
+	autocomplete = {
+		enable = true,
+
+		-- Delay (in ms) after which to trigger completion
+		-- Neovim>=0.12 is recommended for positive values
+		delay = 0,
+
+		-- Custom rule of when to trigger completion
+		predicate = nil,
+
+		-- Whether to map arrow keys for more consistent wildmenu behavior
+		map_arrows = true,
+	},
+
+	-- Autocorrection: adjust non-existing words (commands, options, etc.)
+	autocorrect = {
+		enable = true,
+
+		-- Custom autocorrection rule
+		func = nil,
+	},
+
+	-- Autopeek: show command's target range in a floating window
+	autopeek = {
+		enable = true,
+
+		-- Number of lines to show above and below range lines
+		n_context = 1,
+
+		-- Custom rule of when to show peek window
+		predicate = nil,
+
+		-- Window options
+		window = {
+			-- Floating window config
+			config = {},
+
+			-- Function to render statuscolumn
+			statuscolumn = nil,
+		},
+	},
+})
+
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── output, notification ───────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+setup_plugin("fidget", {
+	notification = {
+		window = {
+			winblend = 0,
+		},
+	},
+	progress = {
+		suppress_on_insert = false,
+	},
+})
+
+setup_plugin("notify", {}) -- PROBABLY NOT, BUT WORTH A TRY (== nvim-notify ?)
+
+setup_plugin("nvim-notify", function(notify)
+	notify.setup({
+		stages = "fade",
+		timeout = 3000,
+		render = "wrapped-default",
+		max_width = function()
+			return math.floor(vim.o.columns * 0.4)
+		end,
+	})
+
+	vim.notify = notify
+end)
+
+setup_plugin("control_panel", {}) -- https://github.com/mhanberg/control-panel.nvim
+setup_plugin("output_panel", {}) --  https://github.com/mhanberg/output-panel.nvim
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── UI libraries ───────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+setup_plugin("cosmic-ui", {})
+setup_plugin("volt", function(_) end) -- https://github.com/nvzone/volt  Create blazing fast & beautiful reactive UI in Neovim
+setup_plugin("noice")
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── fonts, characters ──────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 setup_plugin("nvim-web-devicons", {
 	-- your personal icons can go here (to override)
 	-- you can specify color or cterm_color instead of specifying both of them
@@ -60,49 +265,14 @@ setup_plugin("nvim-web-devicons", {
 })
 setup_plugin("bye-nerdfont", {}) -- https://github.com/dullmode/bye-nerdfont.nvim
 
-setup_plugin("mini.cmdline", {
-	-- Autocompletion: show `:h 'wildmenu'` as you type
-	autocomplete = {
-		enable = true,
 
-		-- Delay (in ms) after which to trigger completion
-		-- Neovim>=0.12 is recommended for positive values
-		delay = 0,
+--─────────────────────────────────────────────────────────────────────────────
+--──── focus ──────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
-		-- Custom rule of when to trigger completion
-		predicate = nil,
-
-		-- Whether to map arrow keys for more consistent wildmenu behavior
-		map_arrows = true,
-	},
-
-	-- Autocorrection: adjust non-existing words (commands, options, etc.)
-	autocorrect = {
-		enable = true,
-
-		-- Custom autocorrection rule
-		func = nil,
-	},
-
-	-- Autopeek: show command's target range in a floating window
-	autopeek = {
-		enable = true,
-
-		-- Number of lines to show above and below range lines
-		n_context = 1,
-
-		-- Custom rule of when to show peek window
-		predicate = nil,
-
-		-- Window options
-		window = {
-			-- Floating window config
-			config = {},
-
-			-- Function to render statuscolumn
-			statuscolumn = nil,
-		},
-	},
+setup_plugin("vimade", {
+	recipe = { "default", { animate = true } },
+	fadelevel = 0.4,
 })
 
 setup_plugin("zen-mode", {
@@ -113,123 +283,12 @@ setup_plugin("zen-mode", {
 	},
 })
 vim.o.laststatus = 3
-setup_plugin("lualine", {
-	inactive_sections = {
-		lualine_a = {},
-		lualine_b = {},
-		lualine_c = {},
-		lualine_x = {},
-		lualine_y = {},
-		lualine_z = {},
-	},
-})
 
-setup_plugin("nvim-navic", {})
-setup_plugin("bufferline", {})
-setup_plugin("statuscol", {})
+--─────────────────────────────────────────────────────────────────────────────
+--──── mode-related ───────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("fidget", {
-	notification = {
-		window = {
-			winblend = 0,
-		},
-	},
-	progress = {
-		suppress_on_insert = false,
-	},
-})
-
-setup_plugin("nvim-notify", function(notify)
-	notify.setup({
-		stages = "fade",
-		timeout = 3000,
-		render = "wrapped-default",
-		max_width = function()
-			return math.floor(vim.o.columns * 0.4)
-		end,
-	})
-
-	vim.notify = notify
-end)
-
-setup_plugin("headlines", {
-	markdown = {
-		headline_highlights = {
-			"Headline1",
-			"Headline2",
-			"Headline3",
-			"Headline4",
-			"Headline5",
-			"Headline6",
-		},
-		codeblock_highlight = "CodeBlock",
-	},
-})
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "markdown", "norg" },
-	callback = function()
-		vim.opt_local.conceallevel = 2
-	end,
-})
-
-setup_plugin("dropbar", function(dropbar)
-	dropbar.setup({
-		-- bar = {
-		-- 	padding = {
-		-- 		left = 1,
-		-- 		right = 1,
-		-- 	},
-		-- },
-	})
-
-	vim.ui.select = require("dropbar.utils.menu").select
-
-	vim.keymap.set("n", "<leader>;", function()
-		require("dropbar.api").pick()
-	end)
-
-	vim.keymap.set("n", "[;", function()
-		require("dropbar.api").goto_context_start()
-	end)
-
-	vim.keymap.set("n", "];", function()
-		require("dropbar.api").select_next_context()
-	end)
-end)
-
--- utils.packadd("nui") -- TODO: comment out after next build
-setup_plugin("nvim-navbuddy", function(navbuddy)
-	navbuddy.setup({
-		lsp = {
-			auto_attach = true,
-		},
-	})
-
-	vim.keymap.set("n", "<leader>nb", function()
-		navbuddy.open()
-	end)
-end)
-
--- TODO: maybe use aerial instead of navbuddy
-setup_plugin("aerial", function(aerial)
-	aerial.setup({
-		layout = {
-			min_width = 30,
-			default_direction = "prefer_right",
-		},
-		attach_mode = "window",
-		close_automatic_events = {
-			"unsupported",
-			"switch_buffer",
-		},
-	})
-
-	vim.keymap.set("n", "<leader>o", "<cmd>AerialToggle<cr>")
-	vim.keymap.set("n", "{", "<cmd>AerialPrev<cr>")
-	vim.keymap.set("n", "}", "<cmd>AerialNext<cr>")
-end)
-
-setup_plugin("noice")
+setup_plugin("modicator", {}) -- https://github.com/mawkler/modicator.nvim Cursor line number mode indicator plugin for Neovim
 
 setup_plugin("modes", {
 	colors = {
@@ -266,38 +325,30 @@ setup_plugin("modes", {
 	ignore = { "NvimTree", "TelescopePrompt", "!minifiles" },
 })
 
-setup_plugin("cmdbuf", {}) -- https://github.com/notomo/cmdbuf.nvim -- PROBABLY NOT, BUT WORTH A TRY
+--─────────────────────────────────────────────────────────────────────────────
+--──── other/general ──────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
-if false then
-	---------------- alternative lines -------------
-	setup_plugin("cokeline", {})
-	setup_plugin("galaxyline", function(_) end)
-	setup_plugin("heirline", {})
-	setup_plugin("heirline-components", {})
-	setup_plugin("nougat", function(_) end)
-	setup_plugin("staline", {})
-	setup_plugin("tabby", {})
-	setup_plugin("minibar", {})
-	setup_plugin("winbar", {})
-	setup_plugin("windline", function(_) end)
-end
+setup_plugin("reactive", {}) -- https://github.com/rasulomaroff/reactive.nvim Reactivity. Right in your neovim.
 
-setup_plugin("control_panel", {}) -- https://github.com/mhanberg/control-panel.nvim
-setup_plugin("output_panel", {}) --  https://github.com/mhanberg/output-panel.nvim
-
-setup_plugin("cosmic-ui", {})
-setup_plugin("fsplash", {}) -- https://github.com/jovanlanik/fsplash.nvim Show a custom splash screen in a floating window
-
-setup_plugin("smartcolumn", {})
-
-setup_plugin("vimade", {
-	recipe = { "default", { animate = true } },
-	fadelevel = 0.4,
+-- https://github.com/lukas-reineke/headlines.nvim | adds horizontal highlights for text filetypes, like markdown, orgmode, and neorg
+setup_plugin("headlines", { -- TODO: move to colors (?)
+	markdown = {
+		headline_highlights = {
+			"Headline1",
+			"Headline2",
+			"Headline3",
+			"Headline4",
+			"Headline5",
+			"Headline6",
+		},
+		codeblock_highlight = "CodeBlock",
+	},
 })
 
-setup_plugin("menu", {})
-setup_plugin("symbols", {})
-setup_plugin("reactive", {}) -- https://github.com/rasulomaroff/reactive.nvim Reactivity. Right in your neovim.
-setup_plugin("modicator", {}) -- https://github.com/mawkler/modicator.nvim Cursor line number mode indicator plugin for Neovim
-setup_plugin("volt", function(_) end) -- https://github.com/nvzone/volt  Create blazing fast & beautiful reactive UI in Neovim
-setup_plugin("notify", {}) -- PROBABLY NOT, BUT WORTH A TRY (== nvim-notify ?)
+vim.api.nvim_create_autocmd("FileType", {
+	pattern = { "markdown", "norg" },
+	callback = function()
+		vim.opt_local.conceallevel = 2
+	end,
+})

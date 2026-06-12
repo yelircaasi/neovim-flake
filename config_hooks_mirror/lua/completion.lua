@@ -1,3 +1,26 @@
+--─────────────────────────────────────────────────────────────────────────────
+--──── snippet sources ────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+utils.packadd("friendly-snippets")
+
+vim.api.nvim_create_autocmd("InsertEnter", {
+	callback = function()
+		utils.packadd("friendly-snippets") -- Optional: for pre-made snippets
+
+		-- utils.packadd("jsregexp")
+		-- require("jsregexp")
+		require("luasnip.loaders.from_vscode").lazy_load()
+		require("luasnip.loaders.from_snipmate").lazy_load()
+	end,
+})
+
+utils.packadd("ultisnips")
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── snippet engines ────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
 local function setup_luasnip()
 	vim.cmd(":packadd luasnip")
 	local ls = require("luasnip")
@@ -45,7 +68,20 @@ local function setup_luasnip()
 end
 setup_luasnip()
 
+--─────────────────────────────────────────────────────────────────────────────
+--──── completion engines ─────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
 -- TODO: clean up, check whether name is "cmp" or "nvim-cmp"
+
+-- should work (optional dependency): require("jsregexp")
+
+-- used as sources:
+-- setup_plugin("cmp-nvim-lsp")
+-- setup_plugin("cmp-buffer")
+-- setup_plugin("cmp-path")
+-- setup_plugin("cmp-cmdline")
+
 local function setup_nvim_cmp()
 	utils.packadd("cmp-nvim-lsp")
 	utils.packadd("cmp-buffer")
@@ -154,46 +190,66 @@ local function setup_nvim_cmp()
 end
 setup_nvim_cmp()
 
--- FROM LAZY (?): opts_extend = { "sources.default" }
-setup_plugin("blink", {
-	-- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)
-	-- 'super-tab' for mappings similar to vscode (tab to accept)
-	-- 'enter' for enter to accept
-	-- 'none' for no mappings
-	--
-	-- All presets have the following mappings:
-	-- C-space: Open menu or open docs if already open
-	-- C-n/C-p or Up/Down: Select next/previous item
-	-- C-e: Hide menu
-	-- C-k: Toggle signature help (if signature.enabled = true)
-	--
-	-- See :h blink-cmp-config-keymap for defining your own keymap
-	keymap = { preset = "default" },
+local bink_cmp_defaults = {
+  -- Enables keymaps, completions and signature help when true (doesn't apply to cmdline or term)
+  --
+  -- If the function returns 'force', the default conditions for disabling the plugin will be ignored
+  -- Default conditions: (vim.bo.buftype ~= 'prompt' and vim.b.completion ~= false)
+  -- Note that the default conditions are ignored when `vim.b.completion` is explicitly set to `true`
+  --
+  -- Exceptions: vim.bo.filetype == 'dap-repl'
+  enabled = function() return not vim.tbl_contains({ "lua", "markdown" }, vim.bo.filetype) end,
 
-	appearance = {
-		-- 'mono' (default) for 'Nerd Font Mono' or 'normal' for 'Nerd Font'
-		-- Adjusts spacing to ensure icons are aligned
-		nerd_font_variant = "mono",
-	},
+  -- Disable cmdline
+  cmdline = { enabled = false },
 
-	-- (Default) Only show the documentation popup when manually triggered
-	completion = { documentation = { auto_show = false } },
+  completion = {
+    -- 'prefix' will fuzzy match on the text before the cursor
+    -- 'full' will fuzzy match on the text before _and_ after the cursor
+    -- example: 'foo_|_bar' will match 'foo_' for 'prefix' and 'foo__bar' for 'full'
+    keyword = { range = 'full' },
 
-	-- Default list of enabled providers defined so that you can extend it
-	-- elsewhere in your config, without redefining it, due to `opts_extend`
-	sources = {
-		default = { "lsp", "path", "snippets", "buffer" },
-	},
+    -- Disable auto brackets
+    -- NOTE: some LSPs may add auto brackets themselves anyway
+    accept = { auto_brackets = { enabled = false }, },
 
-	-- (Default) Rust fuzzy matcher for typo resistance and significantly better performance
-	-- You may use a lua implementation instead by using `implementation = "lua"` or fallback to the lua implementation,
-	-- when the Rust fuzzy matcher is not available, by using `implementation = "prefer_rust"`
-	--
-	-- See the fuzzy documentation for more information
-	fuzzy = { implementation = "prefer_rust_with_warning" },
-})
+    -- Don't select by default, auto insert on selection
+    list = { selection = { preselect = false, auto_insert = true } },
+    -- or set via a function
+    list = { selection = { preselect = function(ctx) return vim.bo.filetype ~= 'markdown' end } },
 
-setup_plugin("blink.cmp", { ------------------------------------------------------------------------------------- blink
+    menu = {
+      -- Don't automatically show the completion menu
+      auto_show = false,
+
+      -- nvim-cmp style menu
+      draw = {
+        columns = {
+          { "label", "label_description", gap = 1 },
+          { "kind_icon", "kind" }
+        },
+      }
+    },
+
+    -- Show documentation when selecting a completion item
+    documentation = { auto_show = true, auto_show_delay_ms = 500 },
+
+    -- Display a preview of the selected item on the current line
+    ghost_text = { enabled = true },
+  },
+
+  sources = {
+    -- Remove 'buffer' if you don't want text completions, by default it's only enabled when LSP returns no items
+    default = { 'lsp', 'path', 'snippets', 'buffer' },
+  },
+
+  -- Use a preset for snippets, check the snippets documentation for more information
+  snippets = { preset = 'default' | 'luasnip' | 'mini_snippets' | 'vsnip' },
+
+  -- Experimental signature help support
+  signature = { enabled = true }
+}
+local blink_cmp_opts = { ------------------------------------------------------------------------------------- blink
 	fuzzy = { implementation = "lua" }, -- TODO: change to Rust
 	keymap = {
 		-- 'default' for vim-like (C-y to accept)
@@ -214,27 +270,5 @@ setup_plugin("blink.cmp", { ----------------------------------------------------
 		["<C-b>"] = { "scroll_documentation_up", "fallback" },
 		["<C-f>"] = { "scroll_documentation_down", "fallback" },
 	},
-})
-
-utils.packadd("friendly-snippets")
-utils.packadd("ultisnips")
-
--- utils.packadd("jsregexp")
--- require("jsregexp")
-
-vim.api.nvim_create_autocmd("InsertEnter", {
-	callback = function()
-		utils.packadd("friendly-snippets") -- Optional: for pre-made snippets
-
-		-- utils.packadd("jsregexp")
-		-- require("jsregexp")
-		require("luasnip.loaders.from_vscode").lazy_load()
-		require("luasnip.loaders.from_snipmate").lazy_load()
-	end,
-})
-
--- used as sources above
--- setup_plugin("cmp-nvim-lsp")
--- setup_plugin("cmp-buffer")
--- setup_plugin("cmp-path")
--- setup_plugin("cmp-cmdline")
+}
+setup_plugin("blink.cmp", blink_cmp_opts)
