@@ -104,9 +104,9 @@ WezTerm's config is already Lua, so a companion plugin is a natural fit.
 
 - Pros
 
-    - WezTerm's Lua API has things the CLI simply can't expose: `window:active_pane()`, `pane:get_foreground_process_info()`, `pane:get_lines_as_text()` with full metadata, event hooks like `mux-is-process-stateful`. You can't get foreground process info from `wezterm cli list` alone — the sister plugin closes that gap.
+    - WezTerm's Lua API has things the CLI simply can't expose: `window:active_pane()`, `pane:get_foreground_process_info()`, `pane:get_lines_as_text()` with full metadata, event hooks like `mux-is-process-stateful`. We can't get foreground process info from `wezterm cli list` alone — the sister plugin closes that gap.
     - Bidirectional eventing becomes possible: WezTerm can *push* events to Neovim (via user vars or a socket) rather than Neovim having to poll via CLI calls. This enables things like "terminal command finished, refocus Neovim automatically."
-    - Cleaner tab/status bar integration — you can render Neovim state (filename, mode, git branch) natively in WezTerm's tab bar without hacks.
+    - Cleaner tab/status bar integration — we can render Neovim state (filename, mode, git branch) natively in WezTerm's tab bar without hacks.
 
 - Cons
 
@@ -115,6 +115,43 @@ WezTerm's config is already Lua, so a companion plugin is a natural fit.
     - Most of what a sister plugin enables can be approximated through the CLI or OSC escape sequences (e.g. setting user vars via `printf "\033]1337;SetUserVar=..."`), keeping everything on the Neovim side.
     - WezTerm's Lua API surface is less stable than Neovim's and more likely to break between releases.
 
-- Verdict
+- Conslusion
 
     A thin sister plugin is worth it for two specific things: foreground process detection (to know what's running in a pane without parsing titles) and push-based eventing (to trigger Neovim actions when a pane becomes idle). Everything else is better handled on the Neovim side via CLI calls, keeping the user-facing API surface in one place.
+
+
+### Additional Notes
+
+Wezterm does not support executing arbitrary Lua via the CLI — `wezterm cli` is purely a command/control interface (spawn, send-text, list, etc.), not a Lua REPL.
+
+However there are a few approaches for bridging the gap:
+
+#### Unix domain socket
+
+WezTerm exposes a socket at the path in `$WEZTERM_UNIX_SOCKET`. The protocol is not publicly documented and is considered internal, but  it has been reverse-engineered.
+It's fragile — likely to break between releases — so not a good foundation for a plugin.
+
+#### User vars (OSC 1337)
+
+The idiomatic WezTerm IPC mechanism going the *other* direction — Neovim → WezTerm — is setting user vars via an escape sequence:
+
+```lua
+io.write("\033]1337;SetUserVar=" .. base64(key) .. "=" .. base64(value) .. "\007")
+```
+
+WezTerm fires the `user-var-changed` event in its Lua config when this is received, which is where the sister plugin would live. This is the officially supported push channel and is stable.
+
+**Going the other direction (WezTerm → Neovim)**
+This is better handled via Neovim's own RPC socket (`$NVIM` env var):
+
+```bash
+nvim --server $NVIM --remote-send "<cmd>lua ...<cr>"
+# or for proper RPC:
+nvim --server $NVIM --remote-expr "luaeval('...')"
+```
+
+So the practical architecture for tight bidirectional integration is:
+- **Neovim → WezTerm**: OSC user vars, consumed by `user-var-changed` in `wezterm.lua`
+- **WezTerm → Neovim**: `nvim --server $NVIM --remote-expr` from within a WezTerm Lua callback
+
+That gives me a clean bidirectional channel without touching the internal socket protocol.

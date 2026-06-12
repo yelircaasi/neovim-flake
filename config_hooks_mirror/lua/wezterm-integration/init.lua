@@ -7,7 +7,7 @@ local map = vim.keymap.set
 local M = {}
 
 M.opts = {
-			keymaps = true,
+			create_keymaps = true,
 			prefix_send = "<leader>w",
 			prefix_run = "<leader>r",
 		}
@@ -15,11 +15,11 @@ M.opts = {
 -- ─── public API ───────────────────────────────────────────────────────────────
 
 --- Options accepted by send_selection / send_text:
----@class WeztermSendOpts
----@field direction? "Left"|"Right"|"Up"|"Down"|"Next"|"Prev"
----@field match?     string   Pattern matched against pane title / cwd
----@field pane_id?  string   Explicit pane id (overrides everything else)
----@field pick?     boolean  Show interactive picker (async)
+---@class WeztermIntegrationOpts
+---@field direction?   "Left"|"Right"|"Up"|"Down"|"Next"|"Prev"
+---@field match?       string   Pattern matched against pane title / cwd
+---@field pane_id?     string   Explicit pane id (overrides everything else)
+---@field pick?        boolean  Show interactive picker (async)
 ---@field add_newline? boolean  Ensure trailing newline (default true)
 
 --- Resolve a target pane_id from opts (sync paths only; pick is handled separately).
@@ -98,9 +98,11 @@ function M.send_selection(opts)
 	M.send_text(text, opts)
 end
 
-local function vmap_send(key, directions)
-	local lhs = prefix_send .. key
-	local direction = directions[key]
+---@param key string
+---@param opts WeztermIntegrationOpts
+local function vmap_send(key, opts)
+	local lhs = opts.prefix_send .. key
+	local direction = opts.directions[key]
 	local direction_lower = string.lower(direction)
 	local rhs = function()
 		print("Sending selection " .. direction_lower .. ".")
@@ -110,9 +112,11 @@ local function vmap_send(key, directions)
 	map("v", lhs, rhs, { desc = desc }) --, silent = true })
 end
 
-local function nmap_send(key, directions)
-	local lhs = prefix_send .. key
-	local direction = directions[key]
+---@param key string
+---@param opts WeztermIntegrationOpts
+local function nmap_send(key, opts)
+	local lhs = opts.prefix_send .. key
+	local direction = opts.directions[key]
 	local direction_lower = string.lower(direction)
 	local text = selection.get_current_block()
 	local rhs = function()
@@ -123,9 +127,11 @@ local function nmap_send(key, directions)
 	map("n", lhs, rhs, { desc = desc }) --, silent = true })
 end
 
-local function map_run(key, directions)
-	local lhs = prefix_send .. key
-	local direction = directions[key]
+---@param key string
+---@param opts WeztermIntegrationOpts
+local function map_run(key, opts)
+	local lhs = opts.prefix_send .. key
+	local direction = opts.directions[key]
 	local direction_lower = string.lower(direction)
 	local rhs = function()
 		print("Sending selection " .. direction_lower .. ".")
@@ -135,6 +141,7 @@ local function map_run(key, directions)
 	map({ "n", "v" }, lhs, rhs, { desc = desc }) --, silent = true })
 end
 
+---@param opts? WeztermIntegrationOpts
 local function make_current_file_command(opts)
 	opts = opts or {}
 	local file_path = vim.api.nvim_buf_get_name(0)
@@ -242,8 +249,10 @@ function M.retrieve_output(opts)
 end
 
 ---@class WeztermSendSetupOpts
----@field keymaps? boolean   Enable default keymaps (default: true)
----@field prefix?  string    Keymap prefix (default: "<leader>w")
+---@field directions? Directions
+---@field create_keymaps? boolean   Enable default keymaps (default: true)
+---@field prefix_send?  string      Keymap prefix (default: "<leader>w")
+---@field prefix_run?  string       Keymap prefix (default: "<leader>r")
 
 ---@param config? WeztermIntegrationSetupOpts
 function M.setup(config)
@@ -261,7 +270,7 @@ function M.setup(config)
 
 		M.opts = vim.tbl_deep_extend("force", M.opts, config or {})
 
-		if not M.opts.keymaps then
+		if not M.opts.create_keymaps then
 			return
 		end
 
