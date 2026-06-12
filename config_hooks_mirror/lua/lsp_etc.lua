@@ -1,108 +1,8 @@
 -- TODO: Divide up by language and keep only the global (cross-language) configuration here.
 
--- TODO: set up pylsp-rope for refactoring
--- LSP ========================================================================================
-
--- Mypy integration
--- Option 1: Via nvim-lint (recommended for live diagnostics)
--- Option 2: Use conform for on-save mypy checks (slower but thorough)
-
--- pip install "python-lsp-server[all]" pylsp-mypy
 -- [Modern Neovim LSP Setup Guide](https://www.youtube.com/watch?v=lljs_7xB7Ps)
 
--- new LSP config, compiled from old ones
-
 vim.cmd("set completeopt+=noselect")
-
--- CONFIGS ------------------------------------------------------------------------------------
-
-vim.lsp.config["tinymist"] = {} -- TODO (?)
-vim.lsp.config["haskell-ls"] = {} -- TODO (?)
-vim.lsp.config["lua_ls"] = { -- TODO (?)
-	settings = {
-		Lua = {
-			workspace = { library = vim.api.nvim_get_runtime_file("", true) },
-		},
-	},
-}
-vim.lsp.config["haskell-language-server"] = { ------------------------------------------------------------------ HASKELL
-	cmd = { "haskell-language-server" },
-	filetypes = { "haskell" },
-	root_markers = { { "*.cabal" }, ".git" },
-	settings = {},
-}
-vim.lsp.config["luals"] = { ---------------------------------------------------------------------------------------- LUA
-	-- Command and arguments to start the server.
-	cmd = { "lua-language-server" },
-	-- Filetypes to automatically attach to.
-	filetypes = { "lua" },
-	-- Sets the "workspace" to the directory where any of these files is found.
-	-- Files that share a root directory will reuse the LSP server connection.
-	-- Nested lists indicate equal priority, see |vim.lsp.Config|.
-	root_markers = { { ".luarc.json", ".luarc.jsonc" }, ".git" },
-	-- Specific settings to send to the server. The schema is server-defined.
-	-- Example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
-	settings = {
-		Lua = {
-			runtime = {
-				version = "LuaJIT",
-			},
-			workspace = {
-				library = vim.api.nvim_get_runtime_file("", true),
-			},
-			diagnostics = {
-				globals = {
-					"vim",
-				},
-			},
-		},
-	},
-}
-vim.lsp.config["ruff"] = { -------------------------------------------------------------------------------------- PYTHON
-	cmd = { "ruff", "server" },
-	filetypes = { "python" },
-	root_markers = { { ".ruff_cache", "pyproject.toml" }, ".git" },
-	-- {
-	-- 	 "pyproject.toml",
-	--   "ruff.toml",
-	-- 	 ".ruff.toml",
-	-- 	 "setup.py",
-	-- 	 "setup.cfg",
-	-- 	 "requirements.txt",
-	--   ".git",
-	-- }
-	-- example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
-	settings = {},
-}
-vim.lsp.config["pyright"] = {
-	cmd = { "pyright-langserver", "--stdio" },
-	filetypes = { "python" },
-	root_markers = {
-		{ "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile" },
-		".git",
-	},
-	settings = {
-		python = {
-			analysis = {
-				autoSearchPaths = true,
-				useLibraryCodeForTypes = true,
-				typeCheckingMode = "basic", -- alternative: "strict"
-			},
-		},
-	},
-}
-vim.lsp.config["nixd"] = {
-	cmd = { "nixd" },
-	filetypes = { "nix" },
-	root_markers = { "flake.nix", ".git" },
-	settings = {},
-}
-vim.lsp.config["rust-analyzer"] = { ------------------------------------------------------------------------------- RUST
-	cmd = { "rust-analyzer" },
-	filetypes = { "rust" },
-	root_markers = { { "Cargo.toml", "cargo.lock" }, ".git" },
-	settings = {},
-}
 
 -- AUTOCOMMANDS -------------------------------------------------------------------------------
 
@@ -128,16 +28,6 @@ local function on_attach(ev)
 end
 
 vim.api.nvim_create_autocmd("LspAttach", { callback = on_attach })
-
--- ENABLE -------------------------------------------------------------------------------------
-vim.lsp.enable("lua_ls")
-vim.lsp.enable("luals")
-vim.lsp.enable("nixd")
-vim.lsp.enable("pylsp")
-vim.lsp.enable("pyright")
-vim.lsp.enable("ruff")
-vim.lsp.enable("ruff")
-vim.lsp.enable("tinymist")
 
 -- LSP UI ------------------------------------------------------------------------------------------------
 
@@ -234,78 +124,53 @@ set_diagnostics_mode()
 
 -- CONFORM --------------------------------------------------------------------------------------------
 
+local conform_config = {
+	formatters_by_ft = {
+		python = {
+			"ruff_fix",
+			"ruff_format",
+			"ruff_organize_imports",
+			-- "mypy",
+		},
+		nix = {
+			"alejandra",
+		},
+		lua = {
+			"stylua",
+		},
+		haskell = {
+			"fourmolu",
+		},
+		rust = {
+			"rustfmt",
+		},
+		go = {
+			"gofmt",
+		},
+	},
+	format_on_save = {
+		timeout_ms = 1000,
+		lsp_format = "fallback", -- Use LSP formatting if available
+	},
+	formatters = {
+		mypy = {
+			command = "mypy",
+			args = { "--no-error-summary", "--show-column-numbers", "--no-color-output", "$FILENAME" },
+			stdin = false,
+			-- Ignore exit code so it doesn't block save; use for diagnostics instead
+			ignore_exitcode = true,
+		},
+	},
+}
 setup_plugin("conform", function(conform)
-	conform.setup({
-		formatters_by_ft = {
-			python = {
-				"ruff_fix",
-				"ruff_format",
-				"ruff_organize_imports",
-				-- "mypy",
-			},
-			nix = {
-				"alejandra",
-			},
-			lua = {
-				"stylua",
-			},
-			haskell = {
-				"fourmolu",
-			},
-			rust = {
-				"rustfmt",
-			},
-			go = {
-				"gofmt",
-			},
-		},
-		format_on_save = {
-			timeout_ms = 1000,
-			lsp_format = "fallback", -- Use LSP formatting if available
-		},
-		formatters = {
-			mypy = {
-				command = "mypy",
-				args = { "--no-error-summary", "--show-column-numbers", "--no-color-output", "$FILENAME" },
-				stdin = false,
-				-- Ignore exit code so it doesn't block save; use for diagnostics instead
-				ignore_exitcode = true,
-			},
-		},
-	})
+	conform.setup(conform_config)
 
 	vim.api.nvim_create_autocmd("BufWritePre", {
-		pattern = "*.py",
+		-- pattern = "*.py",
 		callback = function(args)
 			conform.format({ bufnr = args.buf })
 		end,
-		desc = "Format Python on save with conform",
-	})
-end)
-
--- ALTERNATIVE
-setup_plugin("conform", function(conform)
-	require("conform").setup({
-		formatters_by_ft = {
-			python = {
-				-- To fix auto-fixable lint errors.
-				"ruff_fix",
-				-- To run the Ruff formatter.
-				"ruff_format",
-				-- To organize the imports.
-				"ruff_organize_imports",
-			},
-			lua = {
-				"stylua",
-			},
-		},
-	})
-
-	-- Optional: format on save
-	vim.api.nvim_create_autocmd("BufWritePre", {
-		callback = function(args)
-			require("conform").format({ bufnr = args.buf })
-		end,
+		-- desc = "Format Python on save with conform",
 	})
 end)
 
@@ -361,54 +226,56 @@ setup_plugin("lsp-format", {
 	},
 	yaml = { tab_width = 2 },
 })
+
+local lspkind_defaults = {
+	-- defines how annotations are shown
+	-- default: symbol
+	-- options: 'text', 'text_symbol', 'symbol_text', 'symbol'
+	mode = "symbol_text",
+
+	-- default symbol map
+	-- can be either 'default' (requires nerd-fonts font) or
+	-- 'codicons' for codicon preset (requires vscode-codicons font)
+	--
+	-- default: 'default'
+	preset = "codicons",
+
+	-- override preset symbols
+	--
+	-- default: {}
+	symbol_map = {
+		Text = "󰉿",
+		Method = "󰆧",
+		Function = "󰊕",
+		Constructor = "",
+		Field = "󰜢",
+		Variable = "󰀫",
+		Class = "󰠱",
+		Interface = "",
+		Module = "",
+		Property = "󰜢",
+		Unit = "󰑭",
+		Value = "󰎠",
+		Enum = "",
+		Keyword = "󰌋",
+		Snippet = "",
+		Color = "󰏘",
+		File = "󰈙",
+		Reference = "󰈇",
+		Folder = "󰉋",
+		EnumMember = "",
+		Constant = "󰏿",
+		Struct = "󰙅",
+		Event = "",
+		Operator = "󰆕",
+		TypeParameter = "",
+	},
+}
 setup_plugin("lspkind", function(lspkind)
-	lspkind.init({
-		-- defines how annotations are shown
-		-- default: symbol
-		-- options: 'text', 'text_symbol', 'symbol_text', 'symbol'
-		mode = "symbol_text",
-
-		-- default symbol map
-		-- can be either 'default' (requires nerd-fonts font) or
-		-- 'codicons' for codicon preset (requires vscode-codicons font)
-		--
-		-- default: 'default'
-		preset = "codicons",
-
-		-- override preset symbols
-		--
-		-- default: {}
-		symbol_map = {
-			Text = "󰉿",
-			Method = "󰆧",
-			Function = "󰊕",
-			Constructor = "",
-			Field = "󰜢",
-			Variable = "󰀫",
-			Class = "󰠱",
-			Interface = "",
-			Module = "",
-			Property = "󰜢",
-			Unit = "󰑭",
-			Value = "󰎠",
-			Enum = "",
-			Keyword = "󰌋",
-			Snippet = "",
-			Color = "󰏘",
-			File = "󰈙",
-			Reference = "󰈇",
-			Folder = "󰉋",
-			EnumMember = "",
-			Constant = "󰏿",
-			Struct = "󰙅",
-			Event = "",
-			Operator = "󰆕",
-			TypeParameter = "",
-		},
-	})
+	lspkind.init(lspkind_defaults)
 end)
 
-setup_plugin("lspsaga", {
+local lspsaga_defaults = {
 	layout = "normal", -- "float"
 	symbol_in_winbar = {
 		enable = true,
@@ -520,7 +387,8 @@ setup_plugin("lspsaga", {
 		kind = {},
 		imp_sign = "󰳛 ",
 	},
-})
+}
+setup_plugin("lspsaga", lspsaga_defaults)
 vim.keymap.set({ "n", "t" }, "<A-d>", "<cmd>Lspsaga term_toggle")
 vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc")
 
@@ -729,7 +597,8 @@ local trouble_defaults = {
 	},
 }
 setup_plugin("trouble.nvim", trouble_defaults)
-setup_plugin("quicker", {
+
+local quicker_defaults = {
 	-- Local options to set for quickfix
 	opts = {
 		buflisted = false,
@@ -798,7 +667,8 @@ setup_plugin("quicker", {
 	header_length = function(type, start_col)
 		return vim.o.columns - start_col
 	end,
-})
+}
+setup_plugin("quicker", quicker_defaults)
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = "qf",
@@ -811,16 +681,9 @@ vim.api.nvim_create_autocmd("FileType", {
 })
 
 -- MISCELLANEOUS
-setup_plugin("null-ls") -- OBSOLETE
+-- setup_plugin("null-ls") -- OBSOLETE
 -- setup_plugin("guard") -- TODO - needed?
-setup_plugin("mypy", {
-	-- additional arguments to pass to invocations of `mypy`
-	-- by default, it is called with `--show-error-end --follow-imports=silent`
-	extra_args = { "--check-untyped-defs", "--verbose" },
-	-- override mypy diagnostic severities
-	-- the default is { error = vim.diagnostic.severity.WARN, note = vim.diagnostic.severity.HINT }
-	severities = { error = vim.diagnostic.severity.ERROR, note = vim.diagnostic.severity.INFO },
-})
+
 setup_plugin("nvim-lint", function(lint)
 	lint.linters_by_ft = {
 		markdown = { "vale" },

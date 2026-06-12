@@ -8,3 +8,12 @@ vim.api.nvim_create_autocmd("FileType", {
 		ht.lsp.start()
 	end,
 })
+
+vim.lsp.config["haskell-language-server"] = { ------------------------------------------------------------------ HASKELL
+	cmd = { "haskell-language-server" },
+	filetypes = { "haskell" },
+	root_markers = { { "*.cabal" }, ".git" },
+	settings = {},
+}
+
+vim.lsp.config["haskell-ls"] = {} -- TODO (?)

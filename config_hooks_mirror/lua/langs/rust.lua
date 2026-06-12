@@ -92,3 +92,11 @@ vim.keymap.set(
 	end,
 	{ silent = true, buffer = bufnr }
 )
+
+-- TODO: probably extraneous with rustaceanvim
+vim.lsp.config["rust-analyzer"] = { ------------------------------------------------------------------------------- RUST
+	cmd = { "rust-analyzer" },
+	filetypes = { "rust" },
+	root_markers = { { "Cargo.toml", "cargo.lock" }, ".git" },
+	settings = {},
+}
