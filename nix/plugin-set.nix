@@ -369,7 +369,7 @@ in rec {
       };
       meta.homepage = "https://github.com/rmagatti/gx-extended.nvim";
     };
-    ultimate-autopair-nvim = pkgs.vimUtils.buildVimPlugin {
+    ultimate-autopair = pkgs.vimUtils.buildVimPlugin {
       pname = "ultimate-autopair.nvim";
       version = "2024-01-18";
       src = pkgs.fetchFromGitHub {

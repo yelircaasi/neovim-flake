@@ -1,8 +1,23 @@
-setup_plugin("inc_rename", {})
+-- LINK
+-- DESC
+local inc_rename_defaults = {} -- TODO
+setup_plugin("inc_rename", inc_rename_defaults)
 
-setup_plugin("muren", {})
-setup_plugin("rip-substitute", {})
-setup_plugin("sad", {}) -- TODO: install sad
+-- LINK
+-- DESC
+local muren_defaults = {} -- TODO
+setup_plugin("muren", muren_defaults)
+
+-- LINK
+-- DESC
+local rip_substitute_defaults = {} -- TODO
+setup_plugin("rip-substitute", rip_substitute_defaults)
+
+-- TODO: install sad
+-- LINK
+-- DESC
+local sad_defaults = {} -- TODO
+setup_plugin("sad", sad_defaults)
 
 setup_plugin("fzf-lua", function(fzf)
 	fzf.setup({
@@ -263,9 +278,15 @@ end, {
 	-- end,
 })
 
-setup_plugin("renamer", {})
+-- LINK
+-- DESC
+local renamer_defaults = {} -- TODO
+setup_plugin("renamer", renamer_defaults)
 
-setup_plugin("search-replace", {})
+-- LINK
+-- DESC
+local search_replace_defaults = {} -- TODO
+setup_plugin("search-replace", search_replace_defaults)
 
 local rgflow_defaults = {
 	-- Set the default rip grep flags and options for when running a search via
@@ -282,16 +303,48 @@ local rgflow_defaults = {
 }
 setup_plugin("rgflow-nvim", rgflow_defaults)
 
-setup_plugin("ssr", {})
-setup_plugin("substitute", {})
+-- LINK
+-- DESC
+local ssr_defaults = {} -- TODO
+setup_plugin("ssr", ssr_defaults)
 
-setup_plugin("actions-preview", {})
+-- LINK
+-- DESC
+local substitute_defaults = {} -- TODO
+setup_plugin("substitute", substitute_defaults)
 
-setup_plugin("spider", {})
-setup_plugin("improved-search-nvim", {}) -- PROBABLY NOT, BUT WORTH A TRY
-setup_plugin("nvim-rg", {}) -- PROBABLY NOT, BUT WORTH A TRY https://github.com/duane9/nvim-rg
-setup_plugin("hlsearch-nvim", {}) -- PROBABLY NOT, BUT WORTH A TRY
-setup_plugin("nvim-monorepos", {}) -- https://github.com/sajjathossain/nvim-monorepos simple telescope file finder for monorepos
+-- LINK
+-- DESC
+local actions_preview_defaults = {} -- TODO
+setup_plugin("actions-preview", actions_preview_defaults)
+
+-- LINK
+-- DESC
+local spider_defaults = {} -- TODO
+setup_plugin("spider", spider_defaults)
+
+-- PROBABLY NOT, BUT WORTH A TRY
+-- LINK
+-- DESC
+local improved_search_nvim_defaults = {} -- TODO
+setup_plugin("improved-search-nvim", improved_search_nvim_defaults)
+
+-- PROBABLY NOT, BUT WORTH A TRY https://github.com/duane9/nvim-rg
+-- LINK
+-- DESC
+local nvim_rg_defaults = {} -- TODO
+setup_plugin("nvim-rg", nvim_rg_defaults)
+
+-- PROBABLY NOT, BUT WORTH A TRY
+-- LINK
+-- DESC
+local hlsearch_nvim_defaults = {} -- TODO
+setup_plugin("hlsearch-nvim", hlsearch_nvim_defaults)
+
+-- https://github.com/sajjathossain/nvim-monorepos
+-- simple telescope file finder for monorepos
+local nvim_monorepos_defaults = {} -- TODO
+setup_plugin("nvim-monorepos", nvim_monorepos_defaults)
 
 local blink_defaults = {
 	-- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)

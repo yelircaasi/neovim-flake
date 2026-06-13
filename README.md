@@ -16,6 +16,7 @@ Add cloud.lua
 	-- setup_plugin("none-ls", {})
 	-- setup_plugin("nvim-alt-substitute", {})-- archived; superseded by nvim-rip-substitute
 	-- setup_plugin("pylsp-rope", {})
+  -- utils.packadd("vim-multiple-cursors") -- PROBABLY NOT, BUT WORTH A TRY
 ```
 
 More complicated installations:
@@ -141,6 +142,7 @@ https://github.com/GR3YH4TT3R93/licenses.nvim
 https://github.com/tjdevries/present.nvim
 https://github.com/rareitems/anki.nvim
 https://github.com/idris-community/idris2-nvim
+https://github.com/jake-stewart/multicursor.nvim
 
 https://ayats.org/blog/neovim-wrapper
 https://github.com/calops/nix/tree/main/modules/home/programs/neovim

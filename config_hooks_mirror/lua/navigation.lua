@@ -2,7 +2,10 @@
 --──── FILES ──────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("spear", {})
+-- LINK
+-- DESC
+local spear_defaults = {} -- TODO
+setup_plugin("spear", spear_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── WINDOWS ────────────────────────────────────────────────────────────────
@@ -43,14 +46,25 @@ setup_plugin("swm", function(swm)
 	map("n", "<C-l>", swm.l, { desc = "Window right" })
 end)
 
-setup_plugin("pragma", {}) -- https://github.com/DrKGD/pragma.nvim Neovim plugin for programatically setup window layouts
+-- https://github.com/DrKGD/pragma.nvim
+-- Neovim plugin for programatically setup window layouts
+local pragma_defaults = {} -- TODO
+setup_plugin("pragma", pragma_defaults)
 
-setup_plugin("windex-nvim", {})
+-- LINK
+-- DESC
+local windex_nvim_defaults = {} -- TODO
+setup_plugin("windex-nvim", windex_nvim_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── BUFFERS ────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
-setup_plugin("bafa", {}) -- A minimal 🤏🏾 BufExplorer alternative
+
+-- A minimal 🤏🏾 BufExplorer alternative
+-- LINK
+-- DESC
+local bafa_defaults = {} -- TODO
+setup_plugin("bafa", bafa_defaults)
 
 utils.setup_plugin("flybuf", function(flybuf)
 	flybuf.setup({
@@ -60,9 +74,15 @@ utils.setup_plugin("flybuf", function(flybuf)
 	vim.keymap.set("n", "<leader>bf", "FlyBuf", { desc = "FlyBuf: buffer list" })
 end)
 
-setup_plugin("vuffers", {})
+-- LINK
+-- DESC
+local vuffers_defaults = {} -- TODO
+setup_plugin("vuffers", vuffers_defaults)
 
-setup_plugin("retrospect", {}) -- https://github.com/mrquantumcodes/retrospect.nvim A simple and lightweight buffer manager for Neovim
+-- https://github.com/mrquantumcodes/retrospect.nvim
+-- A simple and lightweight buffer manager for Neovim
+local retrospect_defaults = {} -- TODO
+setup_plugin("retrospect", retrospect_defaults)
 
 setup_plugin("stickybuf", function(stickybuf)
 	-- Automatically pin special buffers so they can't be replaced
@@ -242,11 +262,17 @@ local navigator_defaults = {
 		-- cmake = {filetypes = {'cmake', 'makefile'}, single_file_support = false},
 	},
 }
-setup_plugin("navigator", {}) -- https://github.com/ray-x/navigator.lua
 
-utils.packadd("vim-wordmotion") -- PROBABLY NOT, BUT WORTH A TRY
+-- https://github.com/ray-x/navigator.lua
+-- DESC
+local navigator_defaults = {} -- TODO
+setup_plugin("navigator", navigator_defaults)
 
-utils.packadd("clever-f.vim") -- PROBABLY NOT, BUT WORTH A TRY
+-- PROBABLY NOT, BUT WORTH A TRY
+utils.packadd("vim-wordmotion")
+
+-- PROBABLY NOT, BUT WORTH A TRY
+utils.packadd("clever-f.vim")
 
 -- https://github.com/smoka7/hop.nvim
 setup_plugin("hop", function(hop)
@@ -671,8 +697,15 @@ setup_plugin("treemonkey", function(_) end)
 --──── MARKS ───────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("whaler", {})
-setup_plugin("marks-nvim", {})
+-- LINK
+-- DESC
+local whaler_defaults = {} -- TODO
+setup_plugin("whaler", whaler_defaults)
+
+-- LINK
+-- DESC
+local marks_nvim_defaults = {} -- TODO
+setup_plugin("marks-nvim", marks_nvim_defaults)
 
 setup_plugin("harpoon", function(harpoon)
 	-- harpoon-core uses the same API as harpoon2
@@ -733,21 +766,34 @@ setup_plugin("markit", function(markit)
 	map("n", "m:", "Markit mark list all<cr>", { desc = "Markit: list marks" })
 end)
 
-setup_plugin("arrow", {}) -- https://github.com/otavioschwanck/arrow.nvim  Bookmark your files, separated by project, and quickly navigate through them.
+-- https://github.com/otavioschwanck/arrow.nvim
+--  Bookmark your files, separated by project, and quickly navigate through them.
+local arrow_defaults = {} -- TODO
+setup_plugin("arrow", arrow_defaults)
 
-utils.packadd("vim-edgemotion") -- PROBABLY NOT, BUT WORTH A TRY
+-- PROBABLY NOT, BUT WORTH A TRY
+utils.packadd("vim-edgemotion")
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── URL-RELATED ────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("gx-extended-nvim", {}) -- gx-extended.nvim supercharges Neovim's built-in gx command. Press gx on anything — package names, import statements, issue numbers, commit hashes, and more — and it opens the right URL in your browser.
+-- LINK
+-- gx-extended.nvim supercharges Neovim's built-in gx command. Press gx on anything — package names, import statements, issue numbers, commit hashes, and more — and it opens the right URL in your browser.
+local gx_extended_nvim_defaults = {} -- TODO
+setup_plugin("gx-extended-nvim", gx_extended_nvim_defaults)
 
-setup_plugin("urlview", {}) -- https://github.com/axieax/urlview.nvim viewing all the URLs in a buffer
+-- https://github.com/axieax/urlview.nvim
+-- viewing all the URLs in a buffer
+local urlview_defaults = {} -- TODO
+setup_plugin("urlview", urlview_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── OTHER ───────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 -- likely deprecated; see README
-setup_plugin("highlight-current-n-nvim", {}) -- https://github.com/rktjmp/highlight-current-n.nvim Highlights the current /, ? or * match under your cursor when pressing n or N and gets out of the way afterwards.
+-- https://github.com/rktjmp/highlight-current-n.nvim
+-- Highlights the current /, ? or * match under your cursor when pressing n or N and gets out of the way afterwards.
+local highlight_current_n_nvim_defaults = {} -- TODO
+setup_plugin("highlight-current-n-nvim", highlight_current_n_nvim_defaults)

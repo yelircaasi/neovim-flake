@@ -42,5 +42,12 @@ setup_plugin("neotest", function(neotest)
 	end, "Toggle test summary")
 end)
 
-setup_plugin("coverage", {}) -- https://github.com/andythigpen/nvim-coverage
-setup_plugin("neotest-plenary", {}) -- for lua testing
+-- https://github.com/andythigpen/nvim-coverage
+-- DESC
+local coverage_defaults = {} -- TODO
+setup_plugin("coverage", coverage_defaults)
+
+-- LINK
+-- for lua testing
+local neotest_plenary_defaults = {} -- TODO
+setup_plugin("neotest-plenary", neotest_plenary_defaults)

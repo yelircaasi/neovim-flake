@@ -17,7 +17,10 @@ setup_plugin("toggleterm", {
 	},
 })
 
-setup_plugin("neaterm", {})
+-- LINK
+-- DESC
+local neaterm_defaults = {} -- TODO
+setup_plugin("neaterm", neaterm_defaults)
 utils.packadd("termim")
 
 setup_plugin("yarepl", {

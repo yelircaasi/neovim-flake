@@ -36,7 +36,12 @@ get_sqlite()
 setup_plugin("NeoComposer", function(neocomposer)
 	neocomposer.setup(neocomposer_defaults)
 end)
-setup_plugin("neocomposer-nvim", {}) -- TODO: resolve & remove duplication
+
+-- TODO: resolve & remove duplication
+-- LINK
+-- DESC
+local neocomposer_nvim_defaults = {} -- TODO
+setup_plugin("neocomposer-nvim", neocomposer_nvim_defaults)
 
 local nvim_macros_defaults = {
 	json_file_path = "./macros.json",

@@ -1,4 +1,7 @@
-setup_plugin("lazydev", {})
+-- LINK
+-- DESC
+local lazydev_defaults = {} -- TODO
+setup_plugin("lazydev", lazydev_defaults)
 
 setup_plugin("neorepl")
 

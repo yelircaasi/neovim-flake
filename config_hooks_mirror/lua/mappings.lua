@@ -401,10 +401,17 @@ setup_plugin("insx", function(insx)
 	-- insx.add(require("insx.preset.standard").setup())
 end)
 
-setup_plugin("keymap-amend-nvim", {}) -- https://github.com/anuvyklack/keymap-amend.nvim
+-- https://github.com/anuvyklack/keymap-amend.nvim
+-- DESC
+local keymap_amend_nvim_defaults = {} -- TODO
+setup_plugin("keymap-amend-nvim", keymap_amend_nvim_defaults)
 
 setup_plugin("unimpaired-which-key", function(_) end)
-setup_plugin("wf", {}) -- https://github.com/Cassin01/wf.nvim  A modern which-key for neovim
+
+-- https://github.com/Cassin01/wf.nvim
+--  A modern which-key for neovim
+local wf_defaults = {} -- TODO
+setup_plugin("wf", wf_defaults)
 
 -- use which-key to ncreate commands
 --[[
@@ -422,12 +429,35 @@ t = {
 	v = { "<cmd>Vterm<cr>", "Vertical Terminal" },
 },
 --]]
-setup_plugin("keytex", {}) -- https://github.com/cronJohn/keytex.nvim  A neovim plugin for keyboard shortcut management
 
-setup_plugin("nvim-keymapper", {})
+-- https://github.com/cronJohn/keytex.nvim
+--  A neovim plugin for keyboard shortcut management
+local keytex_defaults = {} -- TODO
+setup_plugin("keytex", keytex_defaults)
 
-setup_plugin("keyseer", {})
-setup_plugin("homerows", {}) -- PROBABLY NOT, BUT WORTH A TRY https://github.com/unode/homerow.vim/blob/master/autoload/homerow.vim
+-- LINK
+-- DESC
+local nvim_keymapper_defaults = {} -- TODO
+setup_plugin("nvim-keymapper", nvim_keymapper_defaults)
 
-setup_plugin("whichkey_setup", {}) -- PROBABLY NOT, BUT WORTH A TRY
-setup_plugin("better-escape", {}) -- https://github.com/max397574/better-escape.nvim Map keys without delay when typing
+-- LINK
+-- DESC
+local keyseer_defaults = {} -- TODO
+setup_plugin("keyseer", keyseer_defaults)
+
+-- PROBABLY NOT, BUT WORTH A TRY https://github.com/unode/homerow.vim/blob/master/autoload/homerow.vim
+-- LINK
+-- DESC
+local homerows_defaults = {} -- TODO
+setup_plugin("homerows", homerows_defaults)
+
+-- PROBABLY NOT, BUT WORTH A TRY
+-- LINK
+-- DESC
+local whichkey_setup_defaults = {} -- TODO
+setup_plugin("whichkey_setup", whichkey_setup_defaults)
+
+-- https://github.com/max397574/better-escape.nvim
+-- Map keys without delay when typing
+local better_escape_defaults = {} -- TODO
+setup_plugin("better-escape", better_escape_defaults)

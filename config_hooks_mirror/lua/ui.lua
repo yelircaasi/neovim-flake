@@ -2,21 +2,33 @@
 --──── columns ────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("smartcolumn", {})
+-- LINK
+-- DESC
+local smartcolumn_defaults = {} -- TODO
+setup_plugin("smartcolumn", smartcolumn_defaults)
 
-setup_plugin("statuscol", {})
+-- LINK
+-- DESC
+local statuscol_defaults = {} -- TODO
+setup_plugin("statuscol", statuscol_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── menus, selection ───────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("menu", {})
+-- LINK
+-- DESC
+local menu_defaults = {} -- TODO
+setup_plugin("menu", menu_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── outline ────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("symbols", {})
+-- LINK
+-- DESC
+local symbols_defaults = {} -- TODO
+setup_plugin("symbols", symbols_defaults)
 
 -- TODO: maybe use aerial instead of navbuddy
 setup_plugin(
@@ -96,8 +108,15 @@ setup_plugin("dropbar", function(dropbar)
 	end)
 end)
 
-setup_plugin("nvim-navic", {})
-setup_plugin("bufferline", {})
+-- LINK
+-- DESC
+local nvim_navic_defaults = {} -- TODO
+setup_plugin("nvim-navic", nvim_navic_defaults)
+
+-- LINK
+-- DESC
+local bufferline_defaults = {} -- TODO
+setup_plugin("bufferline", bufferline_defaults)
 
 ---------------- alternative lines -------------
 if false then
@@ -117,7 +136,10 @@ end
 --──── command interface ──────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("cmdbuf", {}) -- https://github.com/notomo/cmdbuf.nvim -- PROBABLY NOT, BUT WORTH A TRY
+-- https://github.com/notomo/cmdbuf.nvim
+-- -- PROBABLY NOT, BUT WORTH A TRY
+local cmdbuf_defaults = {} -- TODO
+setup_plugin("cmdbuf", cmdbuf_defaults)
 
 setup_plugin("mini.cmdline", {
 	-- Autocompletion: show `:h 'wildmenu'` as you type
@@ -179,7 +201,11 @@ setup_plugin("fidget", {
 	},
 })
 
-setup_plugin("notify", {}) -- PROBABLY NOT, BUT WORTH A TRY (== nvim-notify ?)
+-- PROBABLY NOT, BUT WORTH A TRY (== nvim-notify ?)
+-- LINK
+-- DESC
+local notify_defaults = {} -- TODO
+setup_plugin("notify", notify_defaults)
 
 setup_plugin("nvim-notify", function(notify)
 	notify.setup({
@@ -194,14 +220,24 @@ setup_plugin("nvim-notify", function(notify)
 	vim.notify = notify
 end)
 
-setup_plugin("control_panel", {}) -- https://github.com/mhanberg/control-panel.nvim
-setup_plugin("output_panel", {}) --  https://github.com/mhanberg/output-panel.nvim
+-- https://github.com/mhanberg/control-panel.nvim
+-- DESC
+local control_panel_defaults = {} -- TODO
+setup_plugin("control_panel", control_panel_defaults)
+
+-- https://github.com/mhanberg/output-panel.nvim
+-- DESC
+local output_panel_defaults = {} -- TODO
+setup_plugin("output_panel", output_panel_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── UI libraries ───────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("cosmic-ui", {})
+-- LINK
+-- DESC
+local cosmic_ui_defaults = {} -- TODO
+setup_plugin("cosmic-ui", cosmic_ui_defaults)
 setup_plugin("volt", function(_) end) -- https://github.com/nvzone/volt  Create blazing fast & beautiful reactive UI in Neovim
 setup_plugin("noice")
 
@@ -268,7 +304,11 @@ setup_plugin("nvim-web-devicons", {
 		},
 	},
 })
-setup_plugin("bye-nerdfont", {}) -- https://github.com/dullmode/bye-nerdfont.nvim
+
+-- https://github.com/dullmode/bye-nerdfont.nvim
+-- DESC
+local bye_nerdfont_defaults = {} -- TODO
+setup_plugin("bye-nerdfont", bye_nerdfont_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── focus ──────────────────────────────────────────────────────────────────
@@ -292,7 +332,10 @@ vim.o.laststatus = 3
 --──── mode-related ───────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("modicator", {}) -- https://github.com/mawkler/modicator.nvim Cursor line number mode indicator plugin for Neovim
+-- https://github.com/mawkler/modicator.nvim
+-- Cursor line number mode indicator plugin for Neovim
+local modicator_defaults = {} -- TODO
+setup_plugin("modicator", modicator_defaults)
 
 setup_plugin("modes", {
 	colors = {
@@ -333,7 +376,10 @@ setup_plugin("modes", {
 --──── other/general ──────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("reactive", {}) -- https://github.com/rasulomaroff/reactive.nvim Reactivity. Right in your neovim.
+-- https://github.com/rasulomaroff/reactive.nvim
+-- Reactivity. Right in your neovim.
+local reactive_defaults = {} -- TODO
+setup_plugin("reactive", reactive_defaults)
 
 -- https://github.com/lukas-reineke/headlines.nvim | adds horizontal highlights for text filetypes, like markdown, orgmode, and neorg
 setup_plugin("headlines", { -- TODO: move to colors (?)

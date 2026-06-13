@@ -87,4 +87,8 @@ setup_plugin("mini.sessions", {
 })
 
 setup_plugin("projector", function(_) end)
-setup_plugin("neoconf", {}) --  https://github.com/folke/neoconf.nvim Neovim plugin to manage global and project-local settings
+
+-- https://github.com/folke/neoconf.nvim Neovim plugin to manage global and project-local settings
+-- DESC
+local neoconf_defaults = {} -- TODO
+setup_plugin("neoconf", neoconf_defaults)

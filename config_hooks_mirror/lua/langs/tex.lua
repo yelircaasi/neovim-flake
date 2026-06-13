@@ -2,4 +2,7 @@ utils.packadd("vimtex", function()
 	vim.g.vimtex_view_method = "zathura"
 end)
 
-setup_plugin("texmagic", {})
+-- LINK
+-- DESC
+local texmagic_defaults = {} -- TODO
+setup_plugin("texmagic", texmagic_defaults)

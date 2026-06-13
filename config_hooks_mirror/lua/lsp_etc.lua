@@ -785,22 +785,71 @@ setup_plugin("refactoring", function(refactoring)
 	end, { desc = "Debug print clean", expr = true, remap = true })
 end)
 
-setup_plugin("bqf", {})
+-- LINK
+-- DESC
+local bqf_defaults = {} -- TODO
+setup_plugin("bqf", bqf_defaults)
 utils.packadd("error-jump")
-setup_plugin("qfview-nvim", {})
 
-setup_plugin("vale", {})
-setup_plugin("nvim-genghis", {}) -- https://github.com/chrisgrieser/nvim-genghis Lightweight and quick file operations without being a full-blown file manager.
+-- LINK
+-- DESC
+local qfview_nvim_defaults = {} -- TODO
+setup_plugin("qfview-nvim", qfview_nvim_defaults)
 
-setup_plugin("precommit", {})
+-- LINK
+-- DESC
+local vale_defaults = {} -- TODO
+setup_plugin("vale", vale_defaults)
+
+-- https://github.com/chrisgrieser/nvim-genghis
+-- Lightweight and quick file operations without being a full-blown file manager.
+local nvim_genghis_defaults = {} -- TODO
+setup_plugin("nvim-genghis", nvim_genghis_defaults)
+
+-- LINK
+-- DESC
+local precommit_defaults = {} -- TODO
+setup_plugin("precommit", precommit_defaults)
 
 setup_plugin("lint", function(lint) end)
-setup_plugin("corn", {}) -- https://github.com/RaafatTurki/corn.nvim LSP diagnostics at your corner
-setup_plugin("glance", {}) -- https://github.com/dnlhc/glance.nvim Peek preview window for LSP locations in Neovim
-setup_plugin("dmap", {}) -- nvim plugin providing a subtle overview of LSP diagnostics
-setup_plugin("strict", {}) -- https://github.com/emileferreira/nvim-strict Strict, native code style formatting plugin for Neovim. Expose deep nesting, overlong lines, trailing whitespace, trailing empty lines, todos and inconsistent indentation.
-setup_plugin("inlayhint-filler", {}) -- https://github.com/davidyz/inlayhint-filler.nvim
-setup_plugin("hlargs-nvim", {}) -- https://github.com/m-demare/hlargs.nvim Highlight arguments' definitions and usages, using Treesitter
-setup_plugin("lsp_signature", {}) -- PROBABLY NOT, BUT WORTH A TRY
 
-setup_plugin("nvim-lightbulb", {}) -- https://github.com/kosayoda/nvim-lightbulb VSCode 💡 for neovim's built-in LSP.
+-- https://github.com/RaafatTurki/corn.nvim
+-- LSP diagnostics at your corner
+local corn_defaults = {} -- TODO
+setup_plugin("corn", corn_defaults)
+
+-- https://github.com/dnlhc/glance.nvim
+-- Peek preview window for LSP locations in Neovim
+local glance_defaults = {} -- TODO
+setup_plugin("glance", glance_defaults)
+
+-- LINK
+-- nvim plugin providing a subtle overview of LSP diagnostics
+local dmap_defaults = {} -- TODO
+setup_plugin("dmap", dmap_defaults)
+
+-- https://github.com/emileferreira/nvim-strict
+-- Strict, native code style formatting plugin for Neovim. Expose deep nesting, overlong lines, trailing whitespace, trailing empty lines, todos and inconsistent indentation.
+local strict_defaults = {} -- TODO
+setup_plugin("strict", strict_defaults)
+
+-- https://github.com/davidyz/inlayhint-filler.nvim
+-- DESC
+local inlayhint_filler_defaults = {} -- TODO
+setup_plugin("inlayhint-filler", inlayhint_filler_defaults)
+
+-- https://github.com/m-demare/hlargs.nvim
+-- Highlight arguments' definitions and usages, using Treesitter
+local hlargs_nvim_defaults = {} -- TODO
+setup_plugin("hlargs-nvim", hlargs_nvim_defaults)
+
+-- PROBABLY NOT, BUT WORTH A TRY
+-- LINK
+-- DESC
+local lsp_signature_defaults = {} -- TODO
+setup_plugin("lsp_signature", lsp_signature_defaults)
+
+-- https://github.com/kosayoda/nvim-lightbulb
+-- VSCode 💡 for neovim's built-in LSP.
+local nvim_lightbulb_defaults = {} -- TODO
+setup_plugin("nvim-lightbulb", nvim_lightbulb_defaults)

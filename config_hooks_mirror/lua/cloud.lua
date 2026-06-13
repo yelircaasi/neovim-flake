@@ -60,7 +60,11 @@ local kubectl_defaults = {
 	obj_fresh = 5, -- highlight if creation newer than number (in minutes)
 	api_resources_cache_ttl = 60 * 60 * 3, -- 3 hours in seconds
 }
-setup_plugin("kubectl", {}) -- https://github.com/Ramilito/kubectl.nvim  Streamline your Kubernetes management within Neovim—control and monitor your cluster seamlessly, all without leaving your coding environment.
+
+-- https://github.com/Ramilito/kubectl.nvim
+--  Streamline your Kubernetes management within Neovim—control and monitor your cluster seamlessly, all without leaving your coding environment.
+local kubectl_defaults = {} -- TODO
+setup_plugin("kubectl", kubectl_defaults)
 
 local kpops_defaults = {}
 setup_plugin("kpops", kpops_defaults) -- TODO: install https://github.com/bakdata/kpops
