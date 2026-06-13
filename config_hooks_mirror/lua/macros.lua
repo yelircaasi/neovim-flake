@@ -1,8 +1,12 @@
+-- https://github.com/3rd/sqlite.nvim
+-- Library for working with SQLite databases in Neovim. Requires `sqlite3` in PATH.
 local function get_sqlite() -- TODO: move to utils? move sqlite to modules?
 	vim.cmd(":packadd sqlite")
 	return require("sqlite")
 end
 
+-- https://github.com/lvim-tech/NeoComposer.nvim
+-- Neovim plugin that simplifies macros, enhancing productivity with harmony.
 local neocomposer_defaults = {
 	notify = true,
 	delay_timer = 150,
@@ -38,11 +42,11 @@ setup_plugin("NeoComposer", function(neocomposer)
 end)
 
 -- TODO: resolve & remove duplication
--- LINK
--- DESC
 local neocomposer_nvim_defaults = {} -- TODO
 setup_plugin("neocomposer-nvim", neocomposer_nvim_defaults)
 
+-- https://github.com/kr40/nvim-macros
+-- Easy way to save and load Macros!
 local nvim_macros_defaults = {
 	json_file_path = "./macros.json",
 	default_macro_register = "a",
@@ -50,6 +54,8 @@ local nvim_macros_defaults = {
 }
 setup_plugin("nvim-macros", nvim_macros_defaults)
 
+-- https://github.com/chrisgrieser/nvim-recorder
+-- Enhance the usage of macros in Neovim.
 local recorder_defaults = {
 	-- Named registers where macros are saved (single lowercase letters only).
 	-- The first register is the default register used as macro-slot after

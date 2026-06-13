@@ -2,9 +2,26 @@
 --──── FILES ──────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- LINK
--- DESC
-local spear_defaults = {} -- TODO
+-- https://github.com/kbario/spear.nvim
+-- blazingly smooth intrafolder file navigation for neovim
+local spear_defaults = {
+	-- how you want spear to match extensions if multiple are provided
+	-- "first" (default): spears to the first extension matched
+	-- "next": spears to the next extension matched if the first matches current
+	match_pref = "first",
+	-- will save the file you are spearing from when you spear from it
+	-- false (default)
+	-- true
+	save_on_spear = false,
+	-- whether or not to print error messages
+	-- true (default)
+	-- false
+	print_err = true,
+	-- whether or not to print info messages such as 'speared to app.tsx'
+	-- true (default)
+	-- false
+	print_info = true,
+}
 setup_plugin("spear", spear_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
@@ -51,21 +68,33 @@ end)
 local pragma_defaults = {} -- TODO
 setup_plugin("pragma", pragma_defaults)
 
--- LINK
--- DESC
-local windex_nvim_defaults = {} -- TODO
+-- https://github.com/declancm/windex.nvim
+-- Clean window maximizing, terminal toggling, window/tmux pane movements and more!
+local windex_nvim_defaults = {
+	-- KEYMAPS:
+	default_keymaps = true, -- Enable default keymaps.
+	extra_keymaps = false, -- Enable extra keymaps.
+	arrow_keys = false, -- Default window movement keymaps use arrow keys instead of 'h,j,k,l'.
+
+	-- OPTIONS:
+	numbered_term = false, -- Enable line numbers in the terminal.
+	save_buffers = false, -- Save all buffers before switching tmux panes.
+	warnings = true, -- Enable warnings before some actions such as closing tmux panes.
+}
 setup_plugin("windex-nvim", windex_nvim_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── BUFFERS ────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- A minimal 🤏🏾 BufExplorer alternative
--- LINK
--- DESC
+-- A minimal BufExplorer alternative
+-- https://github.com/mistweaverco/bafa.nvim
+-- A minimal BufExplorer alternative for lazy people for your favorite editor.
 local bafa_defaults = {} -- TODO
 setup_plugin("bafa", bafa_defaults)
 
+-- https://github.com/nvimdev/flybuf.nvim
+-- show buffers in a float window and support use shortcut to open buffer
 utils.setup_plugin("flybuf", function(flybuf)
 	flybuf.setup({
 		-- Show relative line numbers in the buffer list
@@ -74,9 +103,61 @@ utils.setup_plugin("flybuf", function(flybuf)
 	vim.keymap.set("n", "<leader>bf", "FlyBuf", { desc = "FlyBuf: buffer list" })
 end)
 
--- LINK
--- DESC
-local vuffers_defaults = {} -- TODO
+-- https://github.com/Hajime-Suzuki/vuffers.nvim
+-- a neovim plugin that creates a vertical split window to help you manage and navigate your buffers more efficiently
+local vuffers_defaults = {
+	debug = {
+		enabled = true,
+		level = "error", -- "error" | "warn" | "info" | "debug" | "trace"
+	},
+	exclude = {
+		-- do not show them on the vuffers list
+		filenames = { "term://" },
+		filetypes = { "lazygit", "NvimTree", "qf" },
+	},
+	handlers = {
+		-- when deleting a buffer via vuffers list (by default triggered by "d" key)
+		on_delete_buffer = function(bufnr)
+			vim.api.nvim_command(":bwipeout " .. bufnr)
+		end,
+	},
+	keymaps = {
+		-- if false, no bindings will be provided at all
+		-- thus you will have to bind on your own
+		use_default = true,
+		-- key maps on the vuffers list
+		-- - may map multiple keys for the same action
+		--    open = { "<CR>", "<C-l>" }
+		-- - disable a specific binding using "false"
+		--    open = false
+		view = {
+			open = "<CR>",
+			delete = "d",
+			pin = "p",
+			unpin = "P",
+			rename = "r",
+			reset_custom_display_name = "R",
+			reset_custom_display_names = "<leader>R",
+			move_up = "U",
+			move_down = "D",
+			move_to = "i",
+		},
+	},
+	sort = {
+		type = "none", -- "none" | "filename"
+		direction = "asc", -- "asc" | "desc"
+	},
+	view = {
+		modified_icon = "󰛿", -- when a buffer is modified, this icon will be shown
+		pinned_icon = "󰐾",
+		show_file_extension = false,
+		window = {
+			auto_resize = false,
+			width = 35,
+			focus_on_open = false,
+		},
+	},
+}
 setup_plugin("vuffers", vuffers_defaults)
 
 -- https://github.com/mrquantumcodes/retrospect.nvim
@@ -84,6 +165,8 @@ setup_plugin("vuffers", vuffers_defaults)
 local retrospect_defaults = {} -- TODO
 setup_plugin("retrospect", retrospect_defaults)
 
+-- https://github.com/stevearc/stickybuf.nvim
+-- Neovim plugin for locking a buffer to a window
 setup_plugin("stickybuf", function(stickybuf)
 	-- Automatically pin special buffers so they can't be replaced
 	local cfg = {
@@ -697,16 +780,18 @@ setup_plugin("treemonkey", function(_) end)
 --──── MARKS ───────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- LINK
--- DESC
+-- https://github.com/SalOrak/whaler.nvim
+-- Minimalistic & highly extensible project manager for NeoVim.
 local whaler_defaults = {} -- TODO
 setup_plugin("whaler", whaler_defaults)
 
--- LINK
--- DESC
+-- https://github.com/chentoast/marks.nvim
+-- A better user experience for viewing and interacting with Vim marks.
 local marks_nvim_defaults = {} -- TODO
 setup_plugin("marks-nvim", marks_nvim_defaults)
 
+-- https://github.com/MeanderingProgrammer/harpoon-core.nvim
+-- Neovim harpoon like plugin, but only the core bits
 setup_plugin("harpoon", function(harpoon)
 	-- harpoon-core uses the same API as harpoon2
 	harpoon.setup({})
@@ -778,7 +863,7 @@ utils.packadd("vim-edgemotion")
 --──── URL-RELATED ────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- LINK
+-- https://github.com/rmagatti/gx-extended.nvim
 -- gx-extended.nvim supercharges Neovim's built-in gx command. Press gx on anything — package names, import statements, issue numbers, commit hashes, and more — and it opens the right URL in your browser.
 local gx_extended_nvim_defaults = {} -- TODO
 setup_plugin("gx-extended-nvim", gx_extended_nvim_defaults)

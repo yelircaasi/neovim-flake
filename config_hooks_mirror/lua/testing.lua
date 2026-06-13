@@ -1,7 +1,7 @@
 vim.opt.shell = utils.get_executable("sh") -- TODO: move to global opts file?
 
--- neotest = utils.get_plugin("neotest")
--- neotest.setup({
+-- https://github.com/nvim-neotest/neotest
+-- An extensible framework for interacting with tests within NeoVim.
 setup_plugin("neotest", function(neotest)
 	neotest.setup({
 		adapters = {
@@ -43,11 +43,30 @@ setup_plugin("neotest", function(neotest)
 end)
 
 -- https://github.com/andythigpen/nvim-coverage
--- DESC
-local coverage_defaults = {} -- TODO
-setup_plugin("coverage", coverage_defaults)
+-- Displays test coverage data in the sign column
+local coverage_sample_config = {
+	commands = true, -- create commands
+	highlights = {
+		-- customize highlight groups created by the plugin
+		covered = { fg = "#C3E88D" }, -- supports style, fg, bg, sp (see :h highlight-gui)
+		uncovered = { fg = "#F07178" },
+	},
+	signs = {
+		-- use your own highlight groups or text markers
+		covered = { hl = "CoverageCovered", text = "▎" },
+		uncovered = { hl = "CoverageUncovered", text = "▎" },
+	},
+	summary = {
+		-- customize the summary pop-up
+		min_coverage = 80.0, -- minimum coverage threshold (used for highlighting)
+	},
+	lang = {
+		-- customize language specific settings
+	},
+}
+setup_plugin("coverage", coverage_sample_config)
 
--- LINK
+-- https://github.com/nvim-neotest/neotest-plenary
 -- for lua testing
 local neotest_plenary_defaults = {} -- TODO
 setup_plugin("neotest-plenary", neotest_plenary_defaults)

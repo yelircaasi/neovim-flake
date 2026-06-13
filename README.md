@@ -19,6 +19,8 @@ Add cloud.lua
   -- utils.packadd("vim-multiple-cursors") -- PROBABLY NOT, BUT WORTH A TRY
 ```
 
+https://docs.rockylinux.org/10/books/nvchad/ *********
+
 More complicated installations:
 
 ```lua
@@ -147,6 +149,10 @@ https://github.com/jake-stewart/multicursor.nvim
 https://ayats.org/blog/neovim-wrapper
 https://github.com/calops/nix/tree/main/modules/home/programs/neovim
 
+https://github.com/codeasashu/oas.nvim
+https://github.com/tlj/api-browser.nvim
+https://github.com/rusagaib/oas-preview.nvim
+
 [ ] https://github.com/yelircaasi/neovim-flake
 [ ] https://github.com/yelircaasi/nvim-pde-via-nix
 [ ] https://github.com/yelircaasi/nvim-config-old
@@ -171,6 +177,9 @@ https://github.com/calops/nix/tree/main/modules/home/programs/neovim
 
 https://github.com/LuxVim/nvim-luxterm
 https://github.com/luxvim/LuxVim
+
+https://github.com/nvimtools  -> check out repos
+https://github.com/nvzone/volt  --> check examples in README
 
 ## Data Flow
 

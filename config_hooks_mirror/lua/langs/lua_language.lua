@@ -1,5 +1,5 @@
--- LINK
--- DESC
+-- https://github.com/folke/lazydev.nvim
+-- Faster LuaLS setup for Neovim
 local lazydev_defaults = {} -- TODO
 setup_plugin("lazydev", lazydev_defaults)
 

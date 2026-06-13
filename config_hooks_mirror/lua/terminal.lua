@@ -1,8 +1,12 @@
+-- https://github.com/voldikss/vim-floaterm
+-- Terminal manager for (neo)vim
 utils.packadd("vim-floaterm", function()
 	vim.g.floaterm_width = 0.8
 	vim.g.floaterm_height = 0.8
 end)
 
+-- https://github.com/akinsho/toggleterm.nvim
+-- A neovim lua plugin to help easily manage multiple terminal windows
 setup_plugin("toggleterm", {
 	open_mapping = [[<c-\>]],
 	direction = "float",
@@ -17,10 +21,13 @@ setup_plugin("toggleterm", {
 	},
 })
 
--- LINK
--- DESC
+-- https://github.com/Dan7h3x/neaterm.nvim
+-- A little (smart maybe) terminal plugin for neovim.
 local neaterm_defaults = {} -- TODO
 setup_plugin("neaterm", neaterm_defaults)
+
+-- https://github.com/2KAbhishek/termim.nvim
+-- Neovim Terminal, Improved
 utils.packadd("termim")
 
 setup_plugin("yarepl", {

@@ -785,20 +785,72 @@ setup_plugin("refactoring", function(refactoring)
 	end, { desc = "Debug print clean", expr = true, remap = true })
 end)
 
--- LINK
--- DESC
-local bqf_defaults = {} -- TODO
-setup_plugin("bqf", bqf_defaults)
-utils.packadd("error-jump")
+-- https://github.com/kevinhwang91/nvim-bqf
+-- Better quickfix window in Neovim, polish old quickfix window.
+local bqf_config = {
+	auto_enable = true,
+	auto_resize_height = true, -- highly recommended enable
+	preview = {
+		win_height = 12,
+		win_vheight = 12,
+		delay_syntax = 80,
+		border = { "┏", "━", "┓", "┃", "┛", "━", "┗", "┃" },
+		show_title = false,
+		should_preview_cb = function(bufnr, qwinid)
+			local ret = true
+			local bufname = vim.api.nvim_buf_get_name(bufnr)
+			local fsize = vim.fn.getfsize(bufname)
+			if fsize > 100 * 1024 then
+				-- skip file size greater than 100k
+				ret = false
+			elseif bufname:match("^fugitive://") then
+				-- skip fugitive buffer
+				ret = false
+			end
+			return ret
+		end,
+	},
+	-- make `drop` and `tab drop` to become preferred
+	func_map = {
+		drop = "o",
+		openc = "O",
+		split = "<C-s>",
+		tabdrop = "<C-t>",
+		-- set to empty string to disable
+		tabc = "",
+		ptogglemode = "z,",
+	},
+	filter = {
+		fzf = {
+			action_for = { ["ctrl-s"] = "split", ["ctrl-t"] = "tab drop" },
+			extra_opts = { "--bind", "ctrl-o:toggle-all", "--prompt", "> " },
+		},
+	},
+}
+setup_plugin("bqf", bqf_config)
 
--- LINK
--- DESC
-local qfview_nvim_defaults = {} -- TODO
-setup_plugin("qfview-nvim", qfview_nvim_defaults)
+-- https://github.com/Dr-42/error-jump.nvim
+-- Gives basic functionality for error messages with format filename:line:column
+setup_plugin("error-jump", function(error_jump)
+	vim.keymap.set("n", "<leader>es", error_jump.jump_to_error, { desc = "[E]rror [S]ource" })
+	vim.keymap.set("n", "<leader>en", error_jump.next_error, { desc = "[E]rror [N]ext" })
+	vim.keymap.set("n", "<leader>eN", error_jump.next_error, { desc = "[E]rror [N]previous" })
+	vim.keymap.set("n", "<leader>ec", error_jump.compile, { desc = "[E]rror [C]ompile" })
+end)
 
--- LINK
--- DESC
-local vale_defaults = {} -- TODO
+-- https://github.com/ashfinal/qfview.nvim
+-- Pretty quickfix/location view for Neovim
+-- no config options
+setup_plugin("qfview")
+
+-- https://github.com/marcelofern/vale.nvim
+-- A Neovim wrapper around Vale, the syntax-aware linter for prose.
+local vale_defaults = {
+	-- path to the vale binary.
+	bin = "/bin/vale",
+	-- path to your vale-specific configuration.
+	vale_config_path = "$HOME/.config/vale/vale.ini",
+}
 setup_plugin("vale", vale_defaults)
 
 -- https://github.com/chrisgrieser/nvim-genghis
@@ -806,11 +858,13 @@ setup_plugin("vale", vale_defaults)
 local nvim_genghis_defaults = {} -- TODO
 setup_plugin("nvim-genghis", nvim_genghis_defaults)
 
--- LINK
--- DESC
+-- https://github.com/Ttibsi/pre-commit.nvim
+-- Trigger pre-commit linters/formatter straight from within Neovim
 local precommit_defaults = {} -- TODO
 setup_plugin("precommit", precommit_defaults)
 
+-- https://github.com/mfussenegger/nvim-lint
+-- An asynchronous linter plugin for Neovim complementary to the built-in Language Server Protocol support.
 setup_plugin("lint", function(lint) end)
 
 -- https://github.com/RaafatTurki/corn.nvim
@@ -823,14 +877,98 @@ setup_plugin("corn", corn_defaults)
 local glance_defaults = {} -- TODO
 setup_plugin("glance", glance_defaults)
 
--- LINK
+-- https://github.com/doums/dmap.nvim
 -- nvim plugin providing a subtle overview of LSP diagnostics
-local dmap_defaults = {} -- TODO
+local dmap_defaults = {
+	-- highlight groups used for diagnostic marks
+	-- by default link to corresponding `DiagnosticSign*` groups
+	d_hl = {
+		hint = "dmapHint",
+		info = "dmapInfo",
+		warn = "dmapWarn",
+		error = "dmapError",
+	},
+	-- highlight group used for the diagnostic window
+	-- by default link to `NormalFloat`
+	win_hl = "dmapWin",
+	-- text used for diagnostic marks
+	-- ⚠ the text must be one character long
+	d_mark = {
+		hint = "╸",
+		info = "╸",
+		warn = "╸",
+		error = "╸",
+	},
+	-- max height of the diagnostic window
+	-- if not set defaults to the height of the reference window
+	-- must be positive
+	win_max_height = nil,
+	-- alignment of the diagnostic window relative to the reference window
+	-- `left` | `right`
+	win_align = "right",
+	-- horizontal offset (in character cell) of the diagnostic window
+	-- must be positive
+	win_h_offset = 1,
+	-- vertical offset (in character cell) of the diagnostic window
+	-- must be positive
+	win_v_offset = 1,
+	-- ignore these diagnostic sources
+	ignore_sources = {},
+	-- ignore these filetypes buffer
+	ignore_filetypes = { "NvimTree" },
+	-- severity option passed to `vim.diagnostic.get()` (`:h diagnostic-severity`)
+	severity = nil,
+	-- override arguments passed to `nvim_open_win` (see `:h nvim_open_win`)
+	-- ⚠ can potentially break the plugin, use at your own risk
+	nvim_float_api = nil,
+}
 setup_plugin("dmap", dmap_defaults)
 
 -- https://github.com/emileferreira/nvim-strict
 -- Strict, native code style formatting plugin for Neovim. Expose deep nesting, overlong lines, trailing whitespace, trailing empty lines, todos and inconsistent indentation.
-local strict_defaults = {} -- TODO
+local strict_defaults = {
+	included_filetypes = nil,
+	excluded_filetypes = nil,
+	excluded_buftypes = { "help", "nofile", "terminal", "prompt" },
+	match_priority = -1,
+	deep_nesting = {
+		highlight = true,
+		highlight_group = "DiffDelete",
+		depth_limit = 3,
+		ignored_trailing_characters = nil,
+		ignored_leading_characters = nil,
+	},
+	overlong_lines = {
+		highlight = true,
+		highlight_group = "DiffDelete",
+		length_limit = 80,
+		split_on_save = true,
+	},
+	trailing_whitespace = {
+		highlight = true,
+		highlight_group = "SpellBad",
+		remove_on_save = true,
+	},
+	trailing_empty_lines = {
+		highlight = true,
+		highlight_group = "SpellBad",
+		remove_on_save = true,
+	},
+	space_indentation = {
+		highlight = false,
+		highlight_group = "SpellBad",
+		convert_on_save = false,
+	},
+	tab_indentation = {
+		highlight = true,
+		highlight_group = "SpellBad",
+		convert_on_save = true,
+	},
+	todos = {
+		highlight = true,
+		highlight_group = "DiffAdd",
+	},
+}
 setup_plugin("strict", strict_defaults)
 
 -- https://github.com/davidyz/inlayhint-filler.nvim
@@ -844,9 +982,90 @@ local hlargs_nvim_defaults = {} -- TODO
 setup_plugin("hlargs-nvim", hlargs_nvim_defaults)
 
 -- PROBABLY NOT, BUT WORTH A TRY
--- LINK
--- DESC
-local lsp_signature_defaults = {} -- TODO
+-- https://github.com/ray-x/lsp_signature.nvim
+-- LSP signature hint as you type
+local lsp_signature_defaults = {
+	debug = false, -- set to true to enable debug logging
+	log_path = vim.fn.stdpath("log") .. "/lsp_signature.log", -- log dir when debug is true
+	-- default is  ~/.cache/nvim/lsp_signature.log
+	verbose = false, -- show debug line number
+
+	bind = true, -- This is mandatory, otherwise border config won't get registered.
+	-- If you want to hook lspsaga or other signature handler, pls set to false
+	doc_lines = 10, -- will show two lines of comment/doc(if there are more than two lines in doc, will be truncated);
+	-- set to 0 if you DO NOT want any API comments be shown
+	-- This setting only take effect in insert mode, it does not affect signature help in normal
+	-- mode, 10 by default
+
+	max_height = 12, -- max height of signature floating_window, include borders
+	max_width = function()
+		return vim.api.nvim_win_get_width(0) * 0.8
+	end, -- max_width of signature floating_window, line will be wrapped if exceed max_width
+	-- the value need >= 40
+	-- if max_width is function, it will be called
+	wrap = true, -- allow doc/signature text wrap inside floating_window, useful if your lsp return doc/sig is too long
+	floating_window = true, -- show hint in a floating window, set to false for virtual text only mode
+
+	floating_window_above_cur_line = true, -- try to place the floating above the current line when possible Note:
+	-- will set to true when fully tested, set to false will use whichever side has more space
+	-- this setting will be helpful if you do not want the PUM and floating win overlap
+
+	floating_window_off_x = 1, -- adjust float windows x position.
+	-- can be either a number or function
+	floating_window_off_y = 0, -- adjust float windows y position. e.g -2 move window up 2 lines; 2 move down 2 lines
+	-- can be either number or function, see examples
+	ignore_error = func(err, ctx, config), -- this scilence errors, check init.lua for more details
+
+	close_timeout = 4000, -- close floating window after ms when laster parameter is entered
+	fix_pos = false, -- set to true, the floating window will not auto-close until finish all parameters
+	hint_enable = true, -- virtual hint enable
+	hint_prefix = "🐼 ", -- Panda for parameter, NOTE: for the terminal not support emoji, might crash
+	-- or, provide a table with 3 icons
+	-- hint_prefix = {
+	--     above = "↙ ",  -- when the hint is on the line above the current line
+	--     current = "← ",  -- when the hint is on the same line
+	--     below = "↖ "  -- when the hint is on the line below the current line
+	-- }
+	hint_scheme = "String",
+	hint_inline = function()
+		return false
+	end, -- should the hint be inline(nvim 0.10 only)?  default false
+	-- return true | 'inline' to show hint inline, return false | 'eol' to show hint at end of line
+	-- return one of: true|false|virt_text_pos: 'eol', 'eol_right_align', 'overlay', 'right_align', 'inline'
+	hi_parameter = "LspSignatureActiveParameter", -- how your parameter will be highlight
+	handler_opts = {
+		border = "rounded", -- double, rounded, single, shadow, none, or a table of borders
+	},
+
+	always_trigger = false, -- sometime show signature on new line or in middle of parameter can be confusing, set it to false for #58
+
+	auto_close_after = nil, -- autoclose signature float win after x sec, disabled if nil.
+	extra_trigger_chars = {}, -- Array of extra characters that will trigger signature completion, e.g., {"(", ","}
+	zindex = 200, -- by default it will be on top of all floating windows, set to <= 50 send it to bottom
+
+	padding = "", -- character to pad on left and right of signature can be ' ', or '|'  etc
+
+	transparency = nil, -- disabled by default, allow floating win transparent value 1~100
+	shadow_blend = 36, -- if you using shadow as border use this set the opacity
+	shadow_guibg = "Black", -- if you using shadow as border use this set the color e.g. 'Green' or '#121315'
+	timer_interval = 200, -- default timer check interval set to lower value if you want to reduce latency
+	toggle_key = nil, -- toggle signature on and off in insert mode,  e.g. toggle_key = '<M-x>'
+	toggle_key_flip_floatwin_setting = false, -- true: toggle floating_windows: true|false setting after toggle key pressed
+	-- false: floating_windows setup will not change, toggle_key will pop up signature helper, but signature
+	-- may not popup when typing depends on floating_window setting
+
+	select_signature_key = nil, -- cycle to next signature, e.g. '<M-n>' function overloading
+	move_signature_window_key = nil, -- move the floating window, e.g. {'<M-k>', '<M-j>'} to move up and down, or
+	-- table of 4 keymaps, e.g. {'<M-k>', '<M-j>', '<M-h>', '<M-l>'} to move up, down, left, right
+	move_cursor_key = nil, -- imap, use nvim_set_current_win to move cursor between current win and floating window
+	-- e.g. move_cursor_key = '<M-p>',
+	-- once moved to floating window, you can use <M-d>, <M-u> to move cursor up and down
+	keymaps = {}, -- relate to move_cursor_key; the keymaps inside floating window with arguments of bufnr
+	-- e.g. keymaps = function(bufnr) vim.keymap.set(...) end
+	-- it can be function that set keymaps
+	-- e.g. keymaps = { { 'j', '<C-o>j' }, } this map j to <C-o>j in floating window
+	-- <M-d> and <M-u> are default keymaps to move cursor up and down
+}
 setup_plugin("lsp_signature", lsp_signature_defaults)
 
 -- https://github.com/kosayoda/nvim-lightbulb

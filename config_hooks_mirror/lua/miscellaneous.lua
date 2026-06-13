@@ -314,13 +314,8 @@ setup_plugin("showkeys", showkeys_defaults)
 local hypersonic_defaults = {} -- TODO
 setup_plugin("hypersonic", hypersonic_defaults)
 
--- LINK
--- DESC
-local regex_vars_defaults = {} -- TODO
-setup_plugin("regex-vars", regex_vars_defaults)
-
--- LINK
--- DESC
+-- https://github.com/bennypowers/nvim-regexplainer
+-- Describe the regexp under the cursor
 local regexplainer_defaults = {} -- TODO
 setup_plugin("regexplainer", regexplainer_defaults)
 
@@ -328,9 +323,14 @@ setup_plugin("regexplainer", regexplainer_defaults)
 --──── docs ───────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- LINK
--- DESC
-local tldr_defaults = {} -- TODO
+-- https://github.com/mrjones2014/tldr.nvim
+-- A Telescope previewer for tldr-pages
+local tldr_defaults = {
+	-- the shell command to use
+	tldr_command = "tldr",
+	-- a string of extra arguments to pass to `tldr`, e.g. tldr_args = '--color always'
+	tldr_args = "",
+}
 setup_plugin("tldr", tldr_defaults)
 
 -- https://github.com/emiasims/nvim-luaref
@@ -338,7 +338,20 @@ setup_plugin("tldr", tldr_defaults)
 local nvim_luaref_defaults = {} -- TODO
 setup_plugin("nvim-luaref", nvim_luaref_defaults)
 
-utils.packadd("auto-pandoc")
+-- https://github.com/jghauser/auto-pandoc.nvim
+-- Use pandoc to convert markdown files according to options from a yaml block
+utils.packadd("auto-pandoc", function(auto_pandoc)
+	vim.api.nvim_create_autocmd("BufEnter", {
+		pattern = "*.md",
+		callback = function()
+			keymap.set("n", "go", function()
+				auto_pandoc.run_pandoc()
+			end, { silent = true, buffer = 0 })
+		end,
+		group = vim.api.nvim_create_augroup("setAutoPandocKeymap", {}),
+		desc = "Set keymap for auto-pandoc",
+	})
+end)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── fonts, characters, non-english, etc. ───────────────────────────────────

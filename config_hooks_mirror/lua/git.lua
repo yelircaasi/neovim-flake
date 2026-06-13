@@ -392,19 +392,19 @@ local octo_default_config = {
 setup_plugin("octo")
 
 -- TODO: install gh
--- LINK
--- DESC
+-- https://github.com/2kabhishek/octohub.nvim
+-- All Your GitHub repos and more in Neovim
 local octohub_defaults = {} -- TODO
 setup_plugin("octohub", octohub_defaults)
 
--- LINK
--- DESC
+-- https://github.com/Juksuu/worktrees.nvim
+-- Git worktree wrapper for neovim
 local worktrees_defaults = {} -- TODO
 setup_plugin("worktrees", worktrees_defaults)
 
 -- TODO: install delta, guihua
--- LINK
--- DESC
+-- https://github.com/ray-x/forgit.nvim
+-- Interactive fzf+git for Neovim. I remembered the git commands so you wont forget.
 local forgit_defaults = {} -- TODO
 setup_plugin("forgit", forgit_defaults)
 

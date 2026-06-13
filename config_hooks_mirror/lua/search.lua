@@ -1,3 +1,8 @@
+-- https://github.com/jake-stewart/regex-vars.nvim
+-- search in neovim with variable expansion
+local regex_vars_defaults = {} -- TODO
+setup_plugin("regex-vars", regex_vars_defaults)
+
 -- LINK
 -- DESC
 local inc_rename_defaults = {} -- TODO
