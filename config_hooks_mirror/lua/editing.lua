@@ -719,6 +719,20 @@ setup_plugin("splitjoin", function(splitjoin)
 	}
 end)
 
+-- (uses nvim-treesitter)
+-- https://github.com/aarondiel/spread.nvim
+-- a neovim plugin to spread out inline objects, arrays, parameter lists, etc.
+local spread_defaults = nil
+setup_plugin("spread", function(spread)
+	local default_options = {
+		silent = true,
+		noremap = true,
+	}
+
+	vim.keymap.add("n", "<leader>ss", spread.out, default_options)
+	vim.keymap.add("n", "<leader>ssc", spread.combine, default_options)
+end)
+
 -- https://github.com/wansmer/treesj | for splitting/joining blocks of code
 local treesj_defaults = {
 	---@type boolean Use default keymaps (<space>m - toggle, <space>j - join, <space>s - split)
@@ -1698,6 +1712,14 @@ local mini_pairs_defaults = {
 	},
 }
 setup_plugin("mini.pairs", mini_pairs_defaults)
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── digraphs ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+-- https://github.com/protex/better-digraphs.nvim
+-- Better digraphs plugin based on idea from Damian Conway
+setup_plugin("better-digraphs", function(_) end)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── indentation and alignment ──────────────────────────────────────────────

@@ -42,8 +42,7 @@ setup_plugin("NeoComposer", function(neocomposer)
 end)
 
 -- TODO: resolve & remove duplication
-local neocomposer_nvim_defaults = {} -- TODO
-setup_plugin("neocomposer-nvim", neocomposer_nvim_defaults)
+setup_plugin("neocomposer-nvim")
 
 -- https://github.com/kr40/nvim-macros
 -- Easy way to save and load Macros!

@@ -1,27 +1,167 @@
 -- https://github.com/jake-stewart/regex-vars.nvim
 -- search in neovim with variable expansion
-local regex_vars_defaults = {} -- TODO
-setup_plugin("regex-vars", regex_vars_defaults)
+local regex_vars_defaults = nil
+setup_plugin("regex-vars", function(rv)
+	-- example
+	rv.setup({
+		[rv.escape(":foo:")] = "bar",
+	})
+end)
 
--- LINK
--- DESC
-local inc_rename_defaults = {} -- TODO
+-- https://github.com/smjonas/inc-rename.nvim
+-- Incremental LSP renaming based on Neovim's command-preview feature
+local inc_rename_defaults = {
+	-- the name of the command
+	cmd_name = "IncRename",
+	-- the highlight group used for highlighting the identifier's new name
+	hl_group = "Substitute",
+	-- whether an empty new name should be previewed; if false the command preview will be cancelled instead
+	preview_empty_name = false,
+	-- whether to display a `Renamed m instances in n files` message after a rename operation
+	show_message = true,
+	-- whether to save the "IncRename" command in the commandline history (set to false to prevent issues with
+	-- navigating to older entries that may arise due to the behavior of command preview)
+	save_in_cmdline_history = true,
+	-- the type of the external input buffer to use (currently supports "dressing" or "snacks")
+	input_buffer_type = nil,
+	-- callback to run after renaming, receives the result table (from LSP handler) as an argument
+	post_hook = nil,
+}
 setup_plugin("inc_rename", inc_rename_defaults)
 
--- LINK
--- DESC
-local muren_defaults = {} -- TODO
+-- https://github.com/AckslD/muren.nvim
+-- multiple search and replace with ease
+local muren_defaults = {
+	-- general
+	create_commands = true,
+	filetype_in_preview = true,
+	-- default togglable options
+	two_step = false,
+	all_on_line = true,
+	preview = true,
+	cwd = false,
+	files = "**/*",
+	-- keymaps
+	keys = {
+		close = "q",
+		toggle_side = "<Tab>",
+		toggle_options_focus = "<C-s>",
+		toggle_option_under_cursor = "<CR>",
+		scroll_preview_up = "<Up>",
+		scroll_preview_down = "<Down>",
+		do_replace = "<CR>",
+		-- NOTE these are not guaranteed to work, what they do is just apply `:normal! u` vs :normal! <C-r>`
+		-- on the last affected buffers so if you do some edit in these buffers in the meantime it won't do the correct thing
+		do_undo = "<localleader>u",
+		do_redo = "<localleader>r",
+	},
+	-- ui sizes
+	patterns_width = 30,
+	patterns_height = 10,
+	options_width = 20,
+	preview_height = 12,
+	-- window positions
+	anchor = "center", -- Set to one of:
+	-- 'center' | 'top' | 'bottom' | 'left' | 'right' | 'top_left' | 'top_right' | 'bottom_left' | 'bottom_right'
+	vertical_offset = 0, -- offsets are relative to anchors
+	horizontal_offset = 0,
+	-- options order in ui
+	order = {
+		"buffer",
+		"dir",
+		"files",
+		"two_step",
+		"all_on_line",
+		"preview",
+	},
+	-- highlights used for options ui
+	hl = {
+		options = {
+			on = "@string",
+			off = "@variable.builtin",
+		},
+		preview = {
+			cwd = {
+				path = "Comment",
+				lnum = "Number",
+			},
+		},
+	},
+}
 setup_plugin("muren", muren_defaults)
 
--- LINK
--- DESC
-local rip_substitute_defaults = {} -- TODO
+-- TODO: install ripgrep
+-- https://github.com/chrisgrieser/nvim-rip-substitute
+-- Search & replace in the current buffer or workspace with incremental preview, a convenient UI, and modern regex syntax
+local rip_substitute_defaults = {
+	popupWin = {
+		title = " rip-substitute",
+		border = getBorder(), -- `vim.o.winborder` on nvim 0.11, otherwise "rounded"
+		matchCountHlGroup = "Keyword",
+		noMatchHlGroup = "ErrorMsg",
+		position = "bottom", ---@type "top"|"bottom"
+		hideSearchReplaceLabels = false,
+		hideKeymapHints = false,
+		disableCompletions = true, -- such as from blink.cmp
+	},
+	prefill = {
+		normal = "cursorWord", ---@type "cursorWord"|false
+		visual = "selection", ---@type "selection"|false -- (not with ex-command, see README)
+		startInReplaceLineIfPrefill = false,
+		alsoPrefillReplaceLine = false,
+	},
+	keymaps = { -- normal mode (if not stated otherwise)
+		abort = "q",
+		confirmAndSubstituteInBuffer = "<CR>",
+		insertModeConfirmAndSubstituteInBuffer = "<C-CR>",
+		confirmAndSubstituteInCwd = "<S-CR>",
+		prevSubstitutionInHistory = "<Up>",
+		nextSubstitutionInHistory = "<Down>",
+		toggleFixedStrings = "<C-f>", -- ripgrep's `--fixed-strings`
+		toggleIgnoreCase = "<C-c>", -- ripgrep's `--ignore-case`
+		openAtRegex101 = "R",
+		showHelp = "?",
+	},
+	incrementalPreview = {
+		matchHlGroup = "IncSearch",
+		rangeBackdropBrightness = 50, ---@type number|false 0-100, false disables backdrop
+	},
+	regexOptions = {
+		startWithFixedStrings = false,
+		startWithIgnoreCase = false,
+		pcre2 = true, -- enables lookarounds and backreferences, but slightly slower
+		autoBraceSimpleCaptureGroups = true, -- disable if using named capture groups (see README)
+	},
+	editingBehavior = {
+		-- typing `()` in the search line automatically adds `$n` to the replace line
+		autoCaptureGroups = false,
+	},
+	history = {
+		---@type string|false false to disable saving history, will only have sessional history
+		path = vim.fn.stdpath("data") .. "/rip-substitute/history.json",
+		maxSize = 30,
+	},
+	notification = {
+		onSuccess = true,
+		icon = "",
+	},
+	debug = false, -- extra notifications for debugging
+}
 setup_plugin("rip-substitute", rip_substitute_defaults)
 
--- TODO: install sad
--- LINK
--- DESC
-local sad_defaults = {} -- TODO
+-- TODO: install sad, delta, fzf, fd
+-- https://github.com/ray-x/sad.nvim
+-- Space Age seD in Neovim. A project-wide find and replace plugin for Neovim.
+local sad_defaults = {
+	debug = false, -- print debug info
+	diff = "delta", -- you can use `less`, `diff-so-fancy`
+	ls_file = "fd", -- also git ls-files
+	exact = false, -- exact match
+	vsplit = false, -- split sad window the screen vertically, when set to number
+	-- it is a threadhold when window is larger than the threshold sad will split vertically,
+	height_ratio = 0.6, -- height ratio of sad window when split horizontally
+	width_ratio = 0.6, -- height ratio of sad window when split vertically
+}
 setup_plugin("sad", sad_defaults)
 
 setup_plugin("fzf-lua", function(fzf)
@@ -219,6 +359,213 @@ setup_plugin("grug-far", function(grug)
 	end, { desc = "Search and replace selection" })
 end)
 
+-- https://github.com/nvim-pack/nvim-spectre
+-- search panel for neovim
+local spectre_defaults = {
+
+	color_devicons = true,
+	open_cmd = "vnew", -- can also be a lua function
+	live_update = false, -- auto execute search again when you write to any file in vim
+	lnum_for_results = true, -- show line number for search/replace results
+	line_sep_start = "┌-----------------------------------------",
+	result_padding = "¦  ",
+	line_sep = "└-----------------------------------------",
+	highlight = {
+		ui = "String",
+		search = "DiffChange",
+		replace = "DiffDelete",
+	},
+	mapping = {
+		["tab"] = {
+			map = "<Tab>",
+			cmd = "<cmd>lua require('spectre').tab()<cr>",
+			desc = "next query",
+		},
+		["shift-tab"] = {
+			map = "<S-Tab>",
+			cmd = "<cmd>lua require('spectre').tab_shift()<cr>",
+			desc = "previous query",
+		},
+		["toggle_line"] = {
+			map = "dd",
+			cmd = "<cmd>lua require('spectre').toggle_line()<CR>",
+			desc = "toggle item",
+		},
+		["enter_file"] = {
+			map = "<cr>",
+			cmd = "<cmd>lua require('spectre.actions').select_entry()<CR>",
+			desc = "open file",
+		},
+		["send_to_qf"] = {
+			map = "<leader>q",
+			cmd = "<cmd>lua require('spectre.actions').send_to_qf()<CR>",
+			desc = "send all items to quickfix",
+		},
+		["replace_cmd"] = {
+			map = "<leader>c",
+			cmd = "<cmd>lua require('spectre.actions').replace_cmd()<CR>",
+			desc = "input replace command",
+		},
+		["show_option_menu"] = {
+			map = "<leader>o",
+			cmd = "<cmd>lua require('spectre').show_options()<CR>",
+			desc = "show options",
+		},
+		["run_current_replace"] = {
+			map = "<leader>rc",
+			cmd = "<cmd>lua require('spectre.actions').run_current_replace()<CR>",
+			desc = "replace current line",
+		},
+		["run_replace"] = {
+			map = "<leader>R",
+			cmd = "<cmd>lua require('spectre.actions').run_replace()<CR>",
+			desc = "replace all",
+		},
+		["change_view_mode"] = {
+			map = "<leader>v",
+			cmd = "<cmd>lua require('spectre').change_view()<CR>",
+			desc = "change result view mode",
+		},
+		["change_replace_sed"] = {
+			map = "trs",
+			cmd = "<cmd>lua require('spectre').change_engine_replace('sed')<CR>",
+			desc = "use sed to replace",
+		},
+		["change_replace_oxi"] = {
+			map = "tro",
+			cmd = "<cmd>lua require('spectre').change_engine_replace('oxi')<CR>",
+			desc = "use oxi to replace",
+		},
+		["toggle_live_update"] = {
+			map = "tu",
+			cmd = "<cmd>lua require('spectre').toggle_live_update()<CR>",
+			desc = "update when vim writes to file",
+		},
+		["toggle_ignore_case"] = {
+			map = "ti",
+			cmd = "<cmd>lua require('spectre').change_options('ignore-case')<CR>",
+			desc = "toggle ignore case",
+		},
+		["toggle_ignore_hidden"] = {
+			map = "th",
+			cmd = "<cmd>lua require('spectre').change_options('hidden')<CR>",
+			desc = "toggle search hidden",
+		},
+		["resume_last_search"] = {
+			map = "<leader>l",
+			cmd = "<cmd>lua require('spectre').resume_last_search()<CR>",
+			desc = "repeat last search",
+		},
+		["select_template"] = {
+			map = "<leader>rp",
+			cmd = "<cmd>lua require('spectre.actions').select_template()<CR>",
+			desc = "pick template",
+		},
+		["delete_line"] = {
+			map = "<leader>rd",
+			cmd = "<cmd>lua require('spectre.actions').run_delete_line()<CR>",
+			desc = "delete line",
+		},
+		-- you can put your mapping here it only use normal mode
+	},
+	find_engine = {
+		-- rg is map with finder_cmd
+		["rg"] = {
+			cmd = "rg",
+			-- default args
+			args = {
+				"--color=never",
+				"--no-heading",
+				"--with-filename",
+				"--line-number",
+				"--column",
+			},
+			options = {
+				["ignore-case"] = {
+					value = "--ignore-case",
+					icon = "[I]",
+					desc = "ignore case",
+				},
+				["hidden"] = {
+					value = "--hidden",
+					desc = "hidden file",
+					icon = "[H]",
+				},
+				-- you can put any rg search option you want here it can toggle with
+				-- show_option function
+			},
+		},
+		["ag"] = {
+			cmd = "ag",
+			args = {
+				"--vimgrep",
+				"-s",
+			},
+			options = {
+				["ignore-case"] = {
+					value = "-i",
+					icon = "[I]",
+					desc = "ignore case",
+				},
+				["hidden"] = {
+					value = "--hidden",
+					desc = "hidden file",
+					icon = "[H]",
+				},
+			},
+		},
+	},
+	replace_engine = {
+		["sed"] = {
+			cmd = "sed",
+			args = nil,
+			options = {
+				["ignore-case"] = {
+					value = "--ignore-case",
+					icon = "[I]",
+					desc = "ignore case",
+				},
+			},
+		},
+		-- call rust code by nvim-oxi to replace
+		["oxi"] = {
+			cmd = "oxi",
+			args = {},
+			options = {
+				["ignore-case"] = {
+					value = "i",
+					icon = "[I]",
+					desc = "ignore case",
+				},
+			},
+		},
+		["sd"] = {
+			cmd = "sd",
+			options = {},
+		},
+	},
+	default = {
+		find = {
+			--pick one of item in find_engine
+			cmd = "rg",
+			options = { "ignore-case" },
+		},
+		replace = {
+			--pick one of item in replace_engine
+			cmd = "sed",
+		},
+	},
+	replace_vim_cmd = "cdo",
+	use_trouble_qf = false, -- use trouble.nvim as quickfix list
+	is_open_target_win = true, --open file on opener window
+	is_insert_mode = false, -- start open panel on is_insert_mode
+	is_block_ui_break = false, -- mapping backspace and enter key to avoid ui break
+	open_template = {
+		-- an template to use on open function
+		-- see the 'custom function' section below to learn how to configure the template
+		-- { search_text = 'text1', replace_text = '', path = "" }
+	},
+}
 setup_plugin("spectre", function(spectre)
 	spectre.setup({ live_update = true })
 
@@ -283,16 +630,88 @@ end, {
 	-- end,
 })
 
--- LINK
--- DESC
-local renamer_defaults = {} -- TODO
-setup_plugin("renamer", renamer_defaults)
+-- https://github.com/filipdutescu/renamer.nvim
+-- VS Code-like renaming UI for Neovim, writen in Lua
+setup_plugin("renamer", function(renamer)
+	local mappings_utils = require("renamer.mappings.utils")
+	local renamer_defaults = {
+		-- The popup title, shown if `border` is true
+		title = "Rename",
+		-- The padding around the popup content
+		padding = {
+			top = 0,
+			left = 0,
+			bottom = 0,
+			right = 0,
+		},
+		-- The minimum width of the popup
+		min_width = 15,
+		-- The maximum width of the popup
+		max_width = 45,
+		-- Whether or not to shown a border around the popup
+		border = true,
+		-- The characters which make up the border
+		border_chars = { "─", "│", "─", "│", "╭", "╮", "╯", "╰" },
+		-- Whether or not to highlight the current word references through LSP
+		show_refs = true,
+		-- Whether or not to add resulting changes to the quickfix list
+		with_qf_list = true,
+		-- Whether or not to enter the new name through the UI or Neovim's `input`
+		-- prompt
+		with_popup = true,
+		-- The keymaps available while in the `renamer` buffer. The example below
+		-- overrides the default values, but you can add others as well.
+		mappings = {
+			["<c-i>"] = mappings_utils.set_cursor_to_start,
+			["<c-a>"] = mappings_utils.set_cursor_to_end,
+			["<c-e>"] = mappings_utils.set_cursor_to_word_end,
+			["<c-b>"] = mappings_utils.set_cursor_to_word_start,
+			["<c-c>"] = mappings_utils.clear_line,
+			["<c-u>"] = mappings_utils.undo,
+			["<c-r>"] = mappings_utils.redo,
+		},
+		-- Custom handler to be run after successfully renaming the word. Receives
+		-- the LSP 'textDocument/rename' raw response as its parameter.
+		handler = nil,
+	}
+	renamer.setup(renamer_defaults)
+end)
 
--- LINK
--- DESC
-local search_replace_defaults = {} -- TODO
-setup_plugin("search-replace", search_replace_defaults)
+-- https://github.com/roobert/search-replace.nvim
+-- A Neovim search and replace plugin that builds on the native search and replace experience
+local search_replace_defaults = {
+	-- optionally override defaults
+	default_replace_single_buffer_options = "gcI",
+	default_replace_multi_buffer_options = "egcI",
+}
+setup_plugin("search-replace", function(search_replace)
+	search_replace.setup(search_replace_defaults)
+	local opts = {}
+	vim.api.nvim_set_keymap("v", "<C-r>", "<CMD>SearchReplaceSingleBufferVisualSelection<CR>", opts)
+	vim.api.nvim_set_keymap("v", "<C-s>", "<CMD>SearchReplaceWithinVisualSelection<CR>", opts)
+	vim.api.nvim_set_keymap("v", "<C-b>", "<CMD>SearchReplaceWithinVisualSelectionCWord<CR>", opts)
 
+	vim.api.nvim_set_keymap("n", "<leader>rs", "<CMD>SearchReplaceSingleBufferSelections<CR>", opts)
+	vim.api.nvim_set_keymap("n", "<leader>ro", "<CMD>SearchReplaceSingleBufferOpen<CR>", opts)
+	vim.api.nvim_set_keymap("n", "<leader>rw", "<CMD>SearchReplaceSingleBufferCWord<CR>", opts)
+	vim.api.nvim_set_keymap("n", "<leader>rW", "<CMD>SearchReplaceSingleBufferCWORD<CR>", opts)
+	vim.api.nvim_set_keymap("n", "<leader>re", "<CMD>SearchReplaceSingleBufferCExpr<CR>", opts)
+	vim.api.nvim_set_keymap("n", "<leader>rf", "<CMD>SearchReplaceSingleBufferCFile<CR>", opts)
+
+	vim.api.nvim_set_keymap("n", "<leader>rbs", "<CMD>SearchReplaceMultiBufferSelections<CR>", opts)
+	vim.api.nvim_set_keymap("n", "<leader>rbo", "<CMD>SearchReplaceMultiBufferOpen<CR>", opts)
+	vim.api.nvim_set_keymap("n", "<leader>rbw", "<CMD>SearchReplaceMultiBufferCWord<CR>", opts)
+	vim.api.nvim_set_keymap("n", "<leader>rbW", "<CMD>SearchReplaceMultiBufferCWORD<CR>", opts)
+	vim.api.nvim_set_keymap("n", "<leader>rbe", "<CMD>SearchReplaceMultiBufferCExpr<CR>", opts)
+	vim.api.nvim_set_keymap("n", "<leader>rbf", "<CMD>SearchReplaceMultiBufferCFile<CR>", opts)
+
+	-- show the effects of a search / replace in a live preview window
+	vim.o.inccommand = "split"
+end)
+
+-- https://github.com/mangelozzi/rgflow.nvim
+-- The more you use this plugin, the better you become at using RipGrep from the CLI.
+--     Not simply a wrapper which could be replaced by a few lines of config.
 local rgflow_defaults = {
 	-- Set the default rip grep flags and options for when running a search via
 	-- RgFlow. Once changed via the UI, the previous search flags are used for
@@ -308,48 +727,213 @@ local rgflow_defaults = {
 }
 setup_plugin("rgflow-nvim", rgflow_defaults)
 
--- LINK
--- DESC
-local ssr_defaults = {} -- TODO
+-- https://github.com/cshuaimin/ssr.nvim
+-- Treesitter based structural search and replace plugin for Neovim
+local ssr_defaults = {
+	border = "rounded",
+	min_width = 50,
+	min_height = 5,
+	max_width = 120,
+	max_height = 25,
+	adjust_window = true,
+	keymaps = {
+		close = "q",
+		next_match = "n",
+		prev_match = "N",
+		replace_confirm = "<cr>",
+		replace_all = "<leader><cr>",
+	},
+}
 setup_plugin("ssr", ssr_defaults)
 
--- LINK
--- DESC
-local substitute_defaults = {} -- TODO
-setup_plugin("substitute", substitute_defaults)
+-- https://github.com/gbprod/substitute.nvim
+-- Neovim plugin introducing a new operators motions to quickly replace and exchange text
+local substitute_defaults = {
+	on_substitute = nil,
+	yank_substituted_text = false,
+	preserve_cursor_position = false,
+	modifiers = nil,
+	highlight_substituted_text = {
+		enabled = true,
+		timer = 500,
+	},
+	range = {
+		prefix = "s",
+		prompt_current_text = false,
+		confirm = false,
+		complete_word = false,
+		subject = nil,
+		range = nil,
+		suffix = "",
+		auto_apply = false,
+		cursor_position = "end",
+	},
+	exchange = {
+		motion = false,
+		use_esc_to_cancel = true,
+		preserve_cursor_position = false,
+	},
+}
+setup_plugin("substitute", function(substitute)
+	substitute.setup(substitute_defaults)
+	vim.keymap.set("n", "s", substitute.operator, { noremap = true })
+	vim.keymap.set("n", "ss", substitute.line, { noremap = true })
+	vim.keymap.set("n", "S", substitute.eol, { noremap = true })
+	vim.keymap.set("x", "s", substitute.visual, { noremap = true })
+end)
 
--- LINK
--- DESC
-local actions_preview_defaults = {} -- TODO
+-- https://github.com/aznhe21/actions-preview.nvim
+-- Fully customizable previewer for LSP code actions
+local actions_preview_defaults = {
+	-- options for vim.diff(): https://neovim.io/doc/user/lua.html#vim.diff()
+	diff = {
+		ctxlen = 3,
+	},
+
+	-- priority list of external command to highlight diff
+	-- disabled by defalt, must be set by yourself
+	highlight_command = {
+		-- require("actions-preview.highlight").delta(),
+		-- require("actions-preview.highlight").diff_so_fancy(),
+		-- require("actions-preview.highlight").diff_highlight(),
+	},
+
+	-- priority list of preferred backend
+	backend = { "telescope", "minipick", "snacks", "nui" },
+
+	-- options related to telescope.nvim
+	telescope = vim.tbl_extend(
+		"force",
+		-- telescope theme: https://github.com/nvim-telescope/telescope.nvim#themes
+		require("telescope.themes").get_dropdown(),
+		-- a table for customizing content
+		{
+			-- a function to make a table containing the values to be displayed.
+			-- fun(action: Action): { title: string, client_name: string|nil }
+			make_value = nil,
+
+			-- a function to make a function to be used in `display` of a entry.
+			-- see also `:h telescope.make_entry` and `:h telescope.pickers.entry_display`.
+			-- fun(values: { index: integer, action: Action, title: string, client_name: string }[]): function
+			make_make_display = nil,
+		}
+	),
+
+	-- options for nui.nvim components
+	nui = {
+		-- component direction. "col" or "row"
+		dir = "col",
+		-- keymap for selection component: https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/menu#keymap
+		keymap = nil,
+		-- options for nui Layout component: https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/layout
+		layout = {
+			position = "50%",
+			size = {
+				width = "60%",
+				height = "90%",
+			},
+			min_width = 40,
+			min_height = 10,
+			relative = "editor",
+		},
+		-- options for preview area: https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/popup
+		preview = {
+			size = "60%",
+			border = {
+				style = "rounded",
+				padding = { 0, 1 },
+			},
+		},
+		-- options for selection area: https://github.com/MunifTanjim/nui.nvim/tree/main/lua/nui/menu
+		select = {
+			size = "40%",
+			border = {
+				style = "rounded",
+				padding = { 0, 1 },
+			},
+		},
+	},
+
+	--- options for snacks picker
+	---@type snacks.picker.Config
+	snacks = {
+		layout = { preset = "default" },
+	},
+}
 setup_plugin("actions-preview", actions_preview_defaults)
 
--- LINK
--- DESC
-local spider_defaults = {} -- TODO
-setup_plugin("spider", spider_defaults)
+-- TODO: custom movement patterns: https://github.com/chrisgrieser/nvim-spider#advanced-custom-movement-patterns
+-- https://github.com/chrisgrieser/nvim-spider
+-- Use the w, e, b motions like a spider. Move by subwords and skip insignificant punctuation.
+local spider_defaults = {
+	skipInsignificantPunctuation = true,
+	subwordMovement = true,
+	consistentOperatorPending = false, -- see the README for details
+	customPatterns = {}, -- see the README for details
+}
+setup_plugin("spider", function(spider)
+	spider.setup(spider_defaults)
+
+	vim.keymap.set({ "n", "o", "x" }, "w", "<cmd>lua require('spider').motion('w')<CR>")
+	vim.keymap.set({ "n", "o", "x" }, "e", "<cmd>lua require('spider').motion('e')<CR>")
+	vim.keymap.set({ "n", "o", "x" }, "b", "<cmd>lua require('spider').motion('b')<CR>")
+	vim.keymap.set({ "n", "o", "x" }, "ge", "<cmd>lua require('spider').motion('ge')<CR>")
+end)
 
 -- PROBABLY NOT, BUT WORTH A TRY
--- LINK
--- DESC
-local improved_search_nvim_defaults = {} -- TODO
-setup_plugin("improved-search-nvim", improved_search_nvim_defaults)
+-- https://github.com/backdround/improved-search.nvim
+--[[
+provides:
+
+- stable jump to next / previous search pattern (regardless of the last search direction)
+- search the word under the cursor without moving (like * or #)
+- search operator:
+  - search text selected in visual mode (visual selection + operator)
+  - search text provided by a motion (operator + motion)
+  - it all works for a multiline search.
+--]]
+local improved_search_nvim_defaults = nil
+setup_plugin("improved-search-nvim", function(search)
+	vim.keymap.set({ "n", "x", "o" }, "n", search.stable_next)
+	vim.keymap.set({ "n", "x", "o" }, "N", search.stable_previous)
+
+	-- Search current word without moving.
+	vim.keymap.set("n", "!", search.current_word)
+
+	-- Search selected text in visual mode
+	vim.keymap.set("x", "!", search.in_place) -- search selection without moving
+	vim.keymap.set("x", "*", search.forward) -- search selection forward
+	vim.keymap.set("x", "#", search.backward) -- search selection backward
+
+	-- Search by motion in place
+	vim.keymap.set("n", "|", search.in_place)
+	-- You can also use search.forward / search.backward for motion selection.
+end)
 
 -- PROBABLY NOT, BUT WORTH A TRY https://github.com/duane9/nvim-rg
--- LINK
--- DESC
-local nvim_rg_defaults = {} -- TODO
-setup_plugin("nvim-rg", nvim_rg_defaults)
+-- https://github.com/duane9/nvim-rg
+-- Run ripgrep from Neovim asynchronously.
+local nvim_rg_defaults = nil
+utils.packadd("nvim-rg", function()
+	vim.g.rg_command = "rg --vimgrep"
+
+	-- to turn off the default mappings:
+	-- vim.g.rg_map_keys = 0
+end)
 
 -- PROBABLY NOT, BUT WORTH A TRY
--- LINK
--- DESC
-local hlsearch_nvim_defaults = {} -- TODO
+-- https://github.com/nvimdev/hlsearch.nvim
+-- auto remove search highlight and rehighlight when using n or N
+local hlsearch_nvim_defaults = nil
 setup_plugin("hlsearch-nvim", hlsearch_nvim_defaults)
 
 -- https://github.com/sajjathossain/nvim-monorepos
 -- simple telescope file finder for monorepos
-local nvim_monorepos_defaults = {} -- TODO
-setup_plugin("nvim-monorepos", nvim_monorepos_defaults)
+local nvim_monorepos_config = {
+	files = { "package.json", "Cargo.toml", "go.mod", "pyproject.toml" },
+	ignore = { ".git", "node_modules", "target", "build" },
+}
+setup_plugin("nvim-monorepos", nvim_monorepos_config)
 
 local blink_defaults = {
 	-- 'default' (recommended) for mappings similar to built-in completions (C-y to accept)

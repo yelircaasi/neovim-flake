@@ -1,5 +1,5 @@
 -- https://github.com/2nthony/sortjson.nvim
--- DESC
+-- A NeoVIM plugin that can sort current JSON file by key name.
 -- written in go
 local sortjson_defaults = {
 	log_level = "WARN", -- log level, see `:h vim.log.levels`, print error info when parsing json failed
@@ -16,7 +16,7 @@ local commands = {
 
 -- https://tangled.org/cuducos.me/yaml.nvim
 -- Simple tools to help developers working YAML in Neovim.
-local yaml_nvim_defaults = {} -- TODO
+local yaml_nvim_defaults = { ft = { "yaml", "<other yaml filetype>" } }
 setup_plugin("yaml_nvim", yaml_nvim_defaults)
 
 -- https://github.com/phelipetls/jsonpath.nvim
@@ -42,7 +42,7 @@ end)
 
 -- https://github.com/b0o/SchemaStore.nvim
 -- JSON schemas for Neovim
-local jsonpath_defaults = {} -- TODO
+local jsonpath_defaults = nil
 setup_plugin("schemastore", function(schemastore)
 	schemastore.json.schemas({
 		extra = {

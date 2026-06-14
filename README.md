@@ -2,6 +2,10 @@
 
 ## Roadmap
 
+https://github.com/va9iff/lil
+https://github.com/uga-rosa/ccc.nvim
+https://github.com/eero-lehtinen/oklch-color-picker.nvim
+
 Add cloud.lua
 
 ```lua
@@ -69,9 +73,6 @@ Resolve neorg dependencies
 ```
 
 neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
-
-- VENDOR: -----------------------------------------------------------------------
-  see miscellaneous.lua
 
 - set up with at least minimal config: ------------------------------------------
   - [x] mypy
@@ -153,6 +154,8 @@ https://github.com/codeasashu/oas.nvim
 https://github.com/tlj/api-browser.nvim
 https://github.com/rusagaib/oas-preview.nvim
 
+https://github.com/atiladefreitas/dooing
+
 [ ] https://github.com/yelircaasi/neovim-flake
 [ ] https://github.com/yelircaasi/nvim-pde-via-nix
 [ ] https://github.com/yelircaasi/nvim-config-old
@@ -167,8 +170,10 @@ https://github.com/rusagaib/oas-preview.nvim
 [ ] https://github.com/cwfryer/neovim-flake/
 [ ] https://github.com/rockerBOO/awesome-neovim?tab=readme-ov-file#plugin-template
 
+- [ ] https://github.com/antosha417/nvim-compare-with-clipboard
 - [ ] https://github.com/tpope/vim-unimpaired/
 - [ ] https://github.com/fedepujol/move.nvim
+- [ ] https://github.com/ptdewey/pendulum-nvim
 
 - [ ] add custom syntax highlighting (later maybe even LSPs) for pictrix and kleidoukhos DSLs: analogous to,
       and using similar setups to, consilium DSLs -> write treesitter parsers someday

@@ -407,8 +407,25 @@ end)
 
 -- https://github.com/anuvyklack/keymap-amend.nvim
 -- Amend the existing keymap in Neovim
-local keymap_amend_nvim_defaults = {} -- TODO
-setup_plugin("keymap-amend-nvim", keymap_amend_nvim_defaults)
+local keymap_amend_nvim_defaults = nil
+setup_plugin("keymap-amend-nvim", function(keymap_amend)
+	local keymap = vim.keymap
+	keymap.amend = keymap_amend
+
+	-- examples
+
+	keymap.amend("n", "k", function(original)
+		print("k key is amended!")
+		original()
+	end)
+
+	keymap.amend("n", "<Esc>", function(original)
+		if vim.v.hlsearch and vim.v.hlsearch == 1 then
+			vim.cmd("nohlsearch")
+		end
+		original()
+	end, { desc = "disable search highlight" })
+end)
 
 -- https://github.com/afreakk/unimpaired-which-key.nvim
 -- Bridge between vim-unimpaired and which-key.nvim
@@ -416,8 +433,107 @@ setup_plugin("unimpaired-which-key", function(_) end)
 
 -- https://github.com/Cassin01/wf.nvim
 --  A modern which-key for neovim
-local wf_defaults = {} -- TODO
-setup_plugin("wf", wf_defaults)
+local wf_defaults = {
+	theme = "default",
+	-- you can copy the full list from lua/wf/setup/init.lua
+}
+setup_plugin("wf", function(wf)
+	local which_key = require("wf.builtin.which_key")
+	local register = require("wf.builtin.register")
+	local bookmark = require("wf.builtin.bookmark")
+	local buffer = require("wf.builtin.buffer")
+	local mark = require("wf.builtin.mark")
+
+	-- Register
+	vim.keymap.set(
+		"n",
+		"<Space>wr",
+		-- register(opts?: table) -> function
+		-- opts?: option
+		register(),
+		{ noremap = true, silent = true, desc = "[wf.nvim] register" }
+	)
+
+	-- Bookmark
+	vim.keymap.set(
+		"n",
+		"<Space>wbo",
+		-- bookmark(bookmark_dirs: table, opts?: table) -> function
+		-- bookmark_dirs: directory or file paths
+		-- opts?: option
+		bookmark({
+			nvim = "~/.config/nvim",
+			zsh = "~/.zshrc",
+		}),
+		{ noremap = true, silent = true, desc = "[wf.nvim] bookmark" }
+	)
+
+	-- Buffer
+	vim.keymap.set(
+		"n",
+		"<Space>wbu",
+		-- buffer(opts?: table) -> function
+		-- opts?: option
+		buffer(),
+		{ noremap = true, silent = true, desc = "[wf.nvim] buffer" }
+	)
+
+	-- Mark
+	vim.keymap.set(
+		"n",
+		"'",
+		-- mark(opts?: table) -> function
+		-- opts?: option
+		mark(),
+		{ nowait = true, noremap = true, silent = true, desc = "[wf.nvim] mark" }
+	)
+
+	-- Which Key
+	vim.keymap.set(
+		"n",
+		"<Leader>",
+		-- mark(opts?: table) -> function
+		-- opts?: option
+		which_key({ text_insert_in_advance = "<Leader>" }),
+		{ noremap = true, silent = true, desc = "[wf.nvim] which-key /" }
+	)
+
+	-- set keymaps with `nowait`
+	-- see `:h :map-nowait`
+
+	-- a timer to call a callback after a specified number of milliseconds.
+	local function timeout(ms, callback)
+		local uv = vim.loop
+		local timer = uv.new_timer()
+		local _callback = vim.schedule_wrap(function()
+			uv.timer_stop(timer)
+			uv.close(timer)
+			callback()
+		end)
+		uv.timer_start(timer, ms, 0, _callback)
+	end
+	timeout(100, function()
+		vim.keymap.set(
+			"n",
+			"<Leader>",
+			which_key({ text_insert_in_advance = "<Leader>" }),
+			{ noremap = true, silent = true, desc = "[wf.nvim] which-key /" }
+		)
+	end)
+	vim.api.nvim_create_autocmd({ "BufEnter", "BufAdd" }, {
+		group = vim.api.nvim_create_augroup("my_wf", { clear = true }),
+		callback = function()
+			timeout(100, function()
+				vim.keymap.set(
+					"n",
+					"<Leader>",
+					which_key({ text_insert_in_advance = "<Leader>" }),
+					{ noremap = true, silent = true, desc = "[wf.nvim] which-key /", buffer = true }
+				)
+			end)
+		end,
+	})
+end)
 
 -- use which-key to ncreate commands
 --[[
@@ -439,8 +555,8 @@ t = {
 -- TODO
 -- https://github.com/cronJohn/keytex.nvim
 --  A neovim plugin for keyboard shortcut management
-local keytex_defaults = {} -- TODO
-setup_plugin("keytex", keytex_defaults)
+local keytex_defaults = nil
+setup_plugin("keytex", function(keytex) end)
 
 -- https://github.com/bgrohman/nvim-keymapper
 -- Neovim Telescope extension for creating, documenting, and searching keymaps.
@@ -546,12 +662,57 @@ local homerows_defaults = {
 setup_plugin("homerows", homerows_defaults)
 
 -- PROBABLY NOT, BUT WORTH A TRY
+-- TODO: review examples
 -- https://github.com/AckslD/nvim-whichkey-setup.lua
 -- Nvim-plugin what wraps vim-which-key to simplify setup in lua
-local whichkey_setup_defaults = {} -- TODO
-setup_plugin("whichkey_setup", whichkey_setup_defaults)
+local whichkey_setup_defaults = nil
+setup_plugin("whichkey_setup", function(wks)
+	wks.config({
+		hide_statusline = false,
+		default_keymap_settings = {
+			silent = true,
+			noremap = true,
+		},
+		default_mode = "n",
+	})
+end)
 
 -- https://github.com/max397574/better-escape.nvim
 -- Map keys without delay when typing
-local better_escape_defaults = {} -- TODO
+local better_escape_defaults = {
+	timeout = vim.o.timeoutlen, -- after `timeout` passes, you can press the escape key and the plugin will ignore it
+	default_mappings = true, -- setting this to false removes all the default mappings
+	mappings = {
+		-- i for insert
+		i = {
+			j = {
+				-- These can all also be functions
+				k = "<Esc>",
+				j = "<Esc>",
+			},
+		},
+		c = {
+			j = {
+				k = "<C-c>",
+				j = "<C-c>",
+			},
+		},
+		t = {
+			j = {
+				k = "<C-\\><C-n>",
+			},
+		},
+		v = {
+			j = {
+				k = "<Esc>",
+			},
+		},
+		s = {
+			j = {
+				k = "<Esc>",
+			},
+		},
+	},
+}
+
 setup_plugin("better-escape", better_escape_defaults)

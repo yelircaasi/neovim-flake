@@ -321,5 +321,18 @@ vim.keymap.set("n", "<leader>tk", taskfile_picker, { desc = "Pick Taskfile task"
 
 -- https://github.com/idanarye/nvim-moonicipal
 -- Task runner with focus on rapidly changing personal tasks
-local moonicipal_defaults = {} -- TODO
+local moonicipal_defaults = {
+	file_prefix = ".my-username", -- TODO
+
+	-- Choose one of these, according to the one you use. Or don't set it and
+	-- default to the less powerful `vim.ui.select()`.
+	selection = "moonicipal.selection.fzf-lua",
+	selection = "moonicipal.selection.telescope",
+
+	-- Default values - you may change them
+	task_actions = {
+		add = "<M-a>",
+		edit = "<M-e>",
+	},
+}
 setup_plugin("moonicipal", moonicipal_defaults)

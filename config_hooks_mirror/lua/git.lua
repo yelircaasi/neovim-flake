@@ -394,18 +394,86 @@ setup_plugin("octo")
 -- TODO: install gh
 -- https://github.com/2kabhishek/octohub.nvim
 -- All Your GitHub repos and more in Neovim
-local octohub_defaults = {} -- TODO
+local octohub_defaults = {
+	icons = { -- List of icons used by Octohub
+		user = " ",
+		star = " ", -- for more, check out config.lua
+		contribution_icons = { "", "", "", "", "", "", "" }, -- Icons for different contribution levels
+	},
+	repos = {
+		per_user_dir = true, -- Create a directory for each user
+		projects_dir = "~/Projects/", -- Directory where repositories are cloned
+		sort_by = "", -- Sort repositories by various parameters
+		repo_type = "", -- Type of repositories to display
+		language = "", -- Repositories language filter
+	},
+	stats = {
+		max_contributions = 50, -- Max number of contributions per day to use for icon selection
+		top_lang_count = 5, -- Number of top languages to display in stats
+		event_count = 5, -- Number of activity events to show
+		window_width = 90, -- Width in percentage of the window to display stats
+		window_height = 60, -- Height in percentage of the window to display stats
+		show_recent_activity = true, -- Show recent activity in the stats window
+		show_contributions = true, -- Show contributions in the stats window
+		show_repo_stats = true, -- Show repository stats in the stats window
+	},
+	cache = {
+		events = 3600 * 6, -- Time in seconds to cache activity events
+		contributions = 3600 * 6, -- Time in seconds to cache contributions data
+		repos = 3600 * 24 * 7, -- Time in seconds to cache repositories
+		username = 3600 * 24 * 7, -- Time in seconds to cache username
+		user = 3600 * 24 * 7, -- Time in seconds to cache user data
+	},
+	add_default_keybindings = true, -- Add default keybindings for the plugin
+}
 setup_plugin("octohub", octohub_defaults)
 
+-- TODO: review examples in README
 -- https://github.com/Juksuu/worktrees.nvim
 -- Git worktree wrapper for neovim
-local worktrees_defaults = {} -- TODO
+local worktrees_config = {
+	log_level = vim.log.levels.WARN,
+	log_status = true,
+	worktree_path = "..",
+	switch_file_command = "Ex",
+	hooks = {
+		on_add = function(name, path, branch)
+			-- your action here
+		end,
+		on_before_switch = function(from, to, git_path_info)
+			-- your action here
+		end,
+		on_switch = function(from, to, git_path_info)
+			-- your action here
+		end,
+		on_remove = function(name)
+			-- your action here
+		end,
+	},
+}
 setup_plugin("worktrees", worktrees_defaults)
 
 -- TODO: install delta, guihua
 -- https://github.com/ray-x/forgit.nvim
 -- Interactive fzf+git for Neovim. I remembered the git commands so you wont forget.
-local forgit_defaults = {} -- TODO
+local forgit_defaults = {
+	debug = false, -- enable debug logging default path is ~/.cache/nvim/forgit.log
+	diff_pager = "delta", -- you can use `diff`, `diff-so-fancy`
+	diff_cmd = "DiffviewOpen", -- you can use `DiffviewOpen`, `Gvdiffsplit` or `!git diff`, auto if not set
+	fugitive = false, -- git fugitive installed?
+	gitsigns = true, -- integrate with gitsigns.nvim
+	flog = false, -- integrate with gitsigns.nvim
+	git_fuzzy = false, -- integrate with git-fuzzy
+	abbreviate = false, -- abvreviate some of the commands e.g. gps -> git push
+	git_alias = true, -- git command extensions see: Git command alias
+	show_result = "quickfix", -- show cmd result in quickfix or notify
+
+	shell_mode = true, -- set to true if you using zsh/bash and can not run forgit commands
+	height_ratio = 0.7, -- height ratio of floating window when split horizontally
+	width_ratio = 0.8, -- width ratio of floating window when split vertically
+	cmds_list = {}, -- additional commands to show in Forgit command list
+	--  e.g. cmd_list = {text = 'Gs get_hunks', cmd = 'Gitsigns get_hunks'}
+}
 setup_plugin("forgit", forgit_defaults)
 
 local official_gitlab_config = {
@@ -1132,5 +1200,32 @@ utils.packadd("vim-fugitive", function()
 	-- print("Installed vim-fugitive.")
 end)
 
-local blame_defaults = {} -- TODO
+-- https://github.com/FabijanZulj/blame.nvim
+-- Neovim fugitive style git blame plugin
+local blame_defaults = {
+	date_format = "%d.%m.%Y",
+	virtual_style = "right_align",
+	relative_date_if_recent = true, -- this is relative only for the latest month
+	views = {
+		window = window_view,
+		virtual = virtual_view,
+		default = window_view,
+	},
+	focus_blame = true,
+	merge_consecutive = false,
+	max_summary_width = 30,
+	colors = nil,
+	blame_options = nil,
+	commit_detail_view = "vsplit",
+	format_fn = formats.commit_date_author_fn,
+	mappings = {
+		commit_info = "i",
+		stack_push = "<TAB>",
+		stack_pop = "<BS>",
+		show_commit = "<CR>",
+		close = { "<esc>", "q" },
+		copy_hash = "y",
+		open_in_browser = "o",
+	},
+}
 setup_plugin("blame", blame_defaults)

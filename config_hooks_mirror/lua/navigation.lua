@@ -65,7 +65,139 @@ end)
 
 -- https://github.com/DrKGD/pragma.nvim
 -- Neovim plugin for programatically setup window layouts
-local pragma_defaults = {} -- TODO
+local pragma_defaults = {
+	register_command = true,
+
+	action = {
+		buffer = {
+			special = {
+				["nvimtree"] = function(winid)
+					local ntapi = require("nvim-tree.api")
+					ntapi.tree.close_in_all_tabs()
+					ntapi.tree.open({ winid = winid })
+					return true
+				end,
+
+				["vuffers"] = function(winid)
+					local vuffers = require("vuffers")
+					vuffers.close()
+					vuffers.open({ win = winid })
+					return true
+				end,
+
+				["doing_tasks"] = function(winid)
+					local path = require("doing.state").state.tasks.file
+					local buf = vim.fn.bufadd(path)
+
+					-- Load buffer and run FileType autocmd
+					vim.api.nvim_set_option_value("filetype", "doing_tasks", { buf = buf })
+					vim.fn.bufload(buf)
+					vim.api.nvim_exec_autocmds("FileType", { buffer = buf })
+					vim.api.nvim_win_set_buf(winid, buf)
+
+					return true
+				end,
+			},
+		},
+	},
+
+	layouts = {
+		["fakezen"] = function()
+			return require("pragma.pragma-builder")
+				.new({ "fakezen" })
+				:winonly({})
+				:subdivide({
+					select = false,
+					alias = "left",
+					direction = "left",
+					width = 0.15,
+					winopts = {
+						number = false,
+						relativenumber = false,
+						statuscolumn = "",
+					},
+				})
+				:subdivide({
+					select = false,
+					alias = "right",
+					direction = "right",
+					width = 0.15,
+					winopts = {
+						number = false,
+						relativenumber = false,
+						statuscolumn = "",
+					},
+				})
+				:buffer({ strategy = "scratch", winalias = "left", winfixbuf = true })
+				:buffer({ strategy = "scratch", winalias = "right", winfixbuf = true })
+				:buffer({ strategy = "lastbuffer", winalias = "root" })
+		end,
+
+		["vhh"] = function()
+			return require("pragma.pragma-builder")
+				.new({ "vhh" })
+				:winonly({})
+				:subdivide({ direction = "below", height = 0.33 })
+				:subdivide({ direction = "left", width = 0.4 })
+				:focus({ alias = "root" })
+		end,
+
+		["vvvh-nvimtree-tasks-vuffer"] = function()
+			return require("pragma.pragma-builder")
+				.new({ "vvh-nvimtree-vuffer-lastused" })
+				:winonly({})
+				:subdivide({ direction = "left", alias = "nvimtree", width = 40 })
+				:subdivide({
+					direction = "below",
+					alias = "doing_tasks",
+					height = 0.60,
+					winopts = {
+						number = true,
+						relativenumber = false,
+						wrap = true,
+						statuscolumn = "",
+					},
+				})
+				:subdivide({
+					direction = "below",
+					alias = "vuffers",
+					height = 0.5,
+					winopts = {
+						number = true,
+						relativenumber = false,
+						statuscolumn = "%{str2nr(line('$'))-v:lnum+1}",
+					},
+				})
+				:buffer({ strategy = "special", name = "nvimtree", winalias = "nvimtree", winfixbuf = true })
+				:buffer({ strategy = "special", name = "vuffers", winalias = "vuffers", winfixbuf = true })
+				:buffer({ strategy = "special", name = "doing_tasks", winalias = "doing_tasks", winfixbuf = true })
+				:buffer({ strategy = "lastbuffer", winalias = "root" })
+				:focus({ alias = "root" })
+		end,
+
+		["vvh-nvimtree-vuffer"] = function()
+			return require("pragma.pragma-builder")
+				.new({ "vvh-nvimtree-vuffer-lastused" })
+				:winonly({})
+				:subdivide({ direction = "left", alias = "nvimtree", width = 40 })
+				:subdivide({
+					direction = "below",
+					alias = "vuffers",
+					height = 0.35,
+					winopts = {
+						number = true,
+						relativenumber = false,
+						wrap = true,
+						statuscolumn = "",
+					},
+				})
+				:buffer({ strategy = "special", name = "nvimtree", winalias = "nvimtree", winfixbuf = true })
+				:buffer({ strategy = "special", name = "vuffers", winalias = "vuffers", winfixbuf = true })
+				:buffer({ strategy = "lastbuffer", winalias = "root" })
+				:focus({ alias = "root" })
+		end,
+	},
+}
 setup_plugin("pragma", pragma_defaults)
 
 -- https://github.com/declancm/windex.nvim
@@ -90,7 +222,135 @@ setup_plugin("windex-nvim", windex_nvim_defaults)
 -- A minimal BufExplorer alternative
 -- https://github.com/mistweaverco/bafa.nvim
 -- A minimal BufExplorer alternative for lazy people for your favorite editor.
-local bafa_defaults = {} -- TODO
+local bafa_defaults = {
+	-- 🔔 Notification configuration
+	notify = {
+		-- Used for for feedback messages
+		-- Anything that has a `vim.notify` like interface will work
+		-- e.g. `juu.notify`, `telescope.notify`, etc.
+		-- print is also supported,
+		-- even though it's does not implement the notify interface
+		provider = "vim.notify",
+	},
+	ui = {
+		-- 🪄 Rendering configuration
+		render = {
+			-- Custom buffer line format function, default is nil.
+			-- The function receives a BafaUiBufferLine as argument
+			-- and should return a string to be displayed in the UI.
+			custom_format_buffer_line = nil,
+		},
+		-- 🧭 Buffer ordering configuration
+		sort = {
+			-- Buffer ordering strategy
+			-- "default" | "last_used" | "manual"
+			-- "default": Buffers are ordered by last usage time
+			-- "last_used": Buffers are ordered by their buffer number
+			-- "manual": Buffers are ordered manually by the user
+			method = "default",
+			-- Only applicable when `method` is "default" or "last_used"
+			-- When true, instead of focusing the current buffer,
+			-- the previously used buffer will be focused when opening the UI
+			focus_alternate_buffer = false,
+		},
+		-- 🦘 Jump-labels configuration
+		jump_labels = {
+			-- Keys to use for jump-labels
+			-- in order of preference
+			-- Should be unique characters
+			-- Duplicates will be ignored
+			-- require('bafa.utils.keys').protected_jump_label_keys
+			-- are also protected and will be ignored
+			-- You can customize this to your keyboard layout
+			-- will also use uppercase variants of these keys
+			-- if the lower-case ones are exhausted
+			-- This should give us roughly 46 unique keys (minus the protected ones)
+			-- That should be enough for most use-cases
+			-- but when we run out of keys, only the first buffers (in order, from top to bottom)
+			-- will get jump-labels assigned
+			keys = {
+				"a",
+				"s",
+				"d",
+				"f",
+				"j",
+				"k",
+				"l",
+				";",
+				"q",
+				"w",
+				"e",
+				"r",
+				"u",
+				"i",
+				"o",
+				"p",
+				"z",
+				"x",
+				"c",
+				"n",
+				"m",
+				",",
+				".",
+			},
+		},
+		-- 🚨 Show diagnostics in the UI
+		diagnostics = true,
+		-- 📄 Show line numbers in the UI
+		line_numbers = false,
+		-- 👀 Title configuration
+		title = {
+			-- Title of the floating window
+			text = "🦥",
+			-- Position of the title: "left", "center", "right"
+			-- See `:h nvim_open_win` for more details
+			pos = "center",
+		},
+		-- 🎨 Floating window border configuration
+		-- Floating window border: "single", "double", "rounded", "solid", "shadow", or a table
+		-- See `:h nvim_open_win` for more details on custom borders
+		border = "rounded",
+		-- 🎨 Floating window style configuration
+		-- Floating window style: "minimal", "normal"
+		-- See `:h nvim_open_win` for more details
+		style = "minimal",
+		-- 📏 Floating window alignment configuration
+		position = {
+			-- Window position preset:
+			-- "center", "top-center", "bottom-center", "top-left", "top-right",
+			-- "bottom-left", "bottom-right", "center-left", "center-right"
+			preset = "center",
+			-- Custom row position (overrides preset if set)
+			-- also supports a function that returns a number
+			row = nil,
+			-- Custom column position (overrides preset if set)
+			-- also supports a function that returns a number
+			col = nil,
+		},
+		-- 💄 Icons configuration
+		icons = {
+			-- 🚨 Diagnostics icons configuration
+			diagnostics = {
+				Error = "", -- Icon for error diagnostics
+				Warn = "", -- Icon for warning diagnostics
+				Info = "", -- Icon for info diagnostics
+				Hint = "", -- Icon for hint diagnostics
+			},
+			-- 🖊️ Buffer changes sign configuration
+			sign = {
+				changes = "┃", -- Sign character for modified/deleted buffers
+			},
+		},
+		-- 🎨 Highlight groups configuration
+		hl = {
+			-- 🖊️ Buffer changes sign highlight groups configuration
+			sign = {
+				modified = "GitSignsChange", -- Highlight group for modified buffer signs (fallback: DiffChange)
+				deleted = "GitSignsDelete", -- Highlight group for deleted buffer signs (fallback: DiffDelete)
+			},
+		},
+	},
+}
 setup_plugin("bafa", bafa_defaults)
 
 -- https://github.com/nvimdev/flybuf.nvim
@@ -162,7 +422,11 @@ setup_plugin("vuffers", vuffers_defaults)
 
 -- https://github.com/mrquantumcodes/retrospect.nvim
 -- A simple and lightweight buffer manager for Neovim
-local retrospect_defaults = {} -- TODO
+local retrospect_defaults = {
+	save_key = "<leader>\\", -- Keybinding to save session (default: <leader>\)
+	load_key = "<leader><BS>", -- Keybinding to load session (default: <leader><BS>)
+	autosave = false, -- Autosave session on every file write (default: false)
+}
 setup_plugin("retrospect", retrospect_defaults)
 
 -- https://github.com/stevearc/stickybuf.nvim
@@ -192,6 +456,71 @@ setup_plugin("stickybuf", function(stickybuf)
 	}
 	stickybuf.setup(cfg)
 end)
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── PROJECTS ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+-- https://github.com/CWood-sdf/spaceport.nvim
+-- The blazingly fastest way to get to your projects
+local spaceport_nvim_defaults = {
+
+	-- This prevents the same directory from being repeated multiple times in the recents section
+	-- For example, I have replaceDirs set to { {"~/projects", "_" } } so that ~/projects is not repeated a ton
+	-- Note every element is applied to the directory in order,
+	--   so if you have { {"~/projects", "_"} } and you also want to replace
+	--   ~/projects/foo with @, then you would need
+	--   { {"~/projects/foo", "@"}, {"~/projects", "_"} }
+	--   or { {"~/projects", "_"}, {"_/foo", "@"} }
+	replaceDirs = {},
+
+	-- turn /home/user/ into ~/ (also works on windows for C:\Users\user\)
+	replaceHome = true,
+
+	-- What to do when entering a directory, personally I use "Oil .", but Ex is preinstalled with neovim
+	projectEntry = "Ex",
+
+	-- Homes used by telescope.extensions.spaceport.find()
+	-- Spaceport scans these for exact `.git` directories using `fd`.
+	projectHomes = { "~" },
+	-- projectHomes = { "~/git-projects", "~/other-projects" },
+
+	-- The farthest back in time that directories should be shown
+	-- I personally use "yesterday" so that there aren't millions of directories on the screen.
+	-- the possible values are: "pin", "today", "yesterday", "pastWeek", "pastMonth", and "later"
+	lastViewTime = "later",
+
+	-- The maximum number of directories to show in the recents section (0 means show all of them)
+	maxRecentFiles = 0,
+
+	-- The sections to show on the screen (see `Customization` for more info)
+	sections = {
+		"_global_remaps",
+		"name",
+		"remaps",
+		"recents",
+	},
+
+	-- toggle or set file and directory icons.
+	--  For example, the following can be used to set different icons `{ file = " ", dir = " ", remaps = " ", pinned = " ", today = " ", yesterday = " ", week = " ", month = " ", long = " ", news = "󱀄 " }`
+	icons = true,
+
+	-- For true speed, it has the type string[][],
+	--  each element of the shortcuts array contains two strings, the first is the key, the second is a match string to a directory
+	--   for example, I have ~/.config/nvim as shortcut f, so I can type `f` to go to my neovim dotfiles, this is set with { { "f", ".config/nvim" } }
+	shortcuts = {
+		{ "f", ".config/nvim" },
+	},
+
+	--- Set to true to have more verbose logging
+	debug = false,
+
+	-- The path to the log file
+	logPath = vim.fn.stdpath("log") .. "/spaceport.log",
+	-- How many hours to preserve each log entry for
+	logPreserveHours = 24,
+}
+setup_plugin("spaceport-nvim", spaceport_nvim_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── TEXT ───────────────────────────────────────────────────────────────
@@ -347,9 +676,143 @@ local navigator_defaults = {
 }
 
 -- https://github.com/ray-x/navigator.lua
--- DESC
-local navigator_defaults = {} -- TODO
-setup_plugin("navigator", navigator_defaults)
+-- Code analysis & navigation plugin for Neovim. Navigate codes like a breeze.
+--     Make exploring LSP and Treesitter symbols a piece of cake. Take control like a boss.
+local navigator_config = {
+	debug = false, -- log output, set to true and log path: ~/.cache/nvim/gh.log
+	-- slowdownd startup and some actions
+	width = 0.75, -- max width ratio (number of cols for the floating window) / (window width)
+	height = 0.3, -- max list window height, 0.3 by default
+	preview_height = 0.35, -- max height of preview windows
+	border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" }, -- border style, can be one of 'none', 'single', 'double',
+	-- 'shadow', or a list of chars which defines the border
+	on_attach = function(client, bufnr) -- no longer supported for nvim >= 0.12, use your own LspAttach autocmd
+	end,
+
+	ts_fold = {
+		enable = false,
+		comment_fold = true, -- fold with comment string
+		max_lines_scan_comments = 20, -- only fold when the fold level higher than this value
+		disable_filetypes = { "help", "guihua", "text" }, -- list of filetypes which doesn't fold using treesitter
+	}, -- modified version of treesitter folding
+	default_mapping = true, -- set to false if you will remap every key
+	keymaps = { { key = "gK", func = vim.lsp.declaration, desc = "declaration" } }, -- a list of key maps
+	-- this kepmap gK will override "gD" mapping function declaration()  in default kepmap
+	-- please check mapping.lua for all keymaps
+	-- rule of overriding: if func and mode ('n' by default) is same
+	-- the key will be overridden
+	treesitter_analysis = true, -- treesitter variable context
+	treesitter_navigation = true, -- bool|table false: use lsp to navigate between symbol ']r/[r', table: a list of
+	--lang using TS navigation
+	treesitter_analysis_max_num = 100, -- how many items to run treesitter analysis
+	treesitter_analysis_condense = true, -- condense form for treesitter analysis
+	-- this value prevent slow in large projects, e.g. found 100000 reference in a project
+	transparency = 50, -- 0 ~ 100 blur the main window, 100: fully transparent, 0: opaque,  set to nil or 100 to disable it
+
+	lsp_signature_help = true, -- if you would like to hook ray-x/lsp_signature plugin in navigator
+	-- setup here. if it is nil, navigator will not init signature help
+	signature_help_cfg = nil, -- if you would like to init ray-x/lsp_signature plugin in navigator, and pass in your own config to signature help
+	icons = { -- refer to lua/navigator.lua for more icons config
+		-- requires nerd fonts or nvim-web-devicons
+		icons = true,
+		-- Code action
+		code_action_icon = "🏏", -- note: need terminal support, for those not support unicode, might crash
+		-- Diagnostics
+		diagnostic_head = "🐛",
+		diagnostic_head_severity_1 = "🈲",
+		fold = {
+			prefix = "⚡", -- icon to show before the folding need to be 2 spaces in display width
+			separator = "", -- e.g. shows   3 lines 
+		},
+	},
+	mason = false, -- Deprecated, setup LSP in your own config and use LspAttach to hook navigator mappings
+	lsp = {
+		enable = true, -- skip lsp setup, and only use treesitter in navigator.
+		-- Use this if you are not using LSP servers, and only want to enable treesitter support.
+		-- If you only want to prevent navigator from touching your LSP server configs,
+		-- use `disable_lsp = "all"` instead.
+		-- If disabled, make sure add require('navigator.lspclient.mapping').setup({bufnr=bufnr, client=client}) in your
+		-- own on_attach
+		code_action = { enable = true, sign = true, sign_priority = 40, virtual_text = true },
+		code_lens_action = { enable = true, sign = true, sign_priority = 40, virtual_text = true },
+		document_highlight = true, -- LSP reference highlight,
+		-- it might already supported by you setup, e.g. LunarVim
+		format_on_save = true, -- {true|false} set to false to disasble lsp code format on save (if you are using prettier/efm/formater etc)
+		-- table: {enable = {'lua', 'go'}, disable = {'javascript', 'typescript'}} to enable/disable specific language
+		-- enable: a whitelist of language that will be formatted on save
+		-- disable: a blacklist of language that will not be formatted on save
+		-- function: function(bufnr) return true end to enable/disable lsp format on save
+		format_options = { async = false }, -- async: disable by default, the option used in vim.lsp.buf.format({async={true|false}, name = 'xxx'})
+		disable_format_cap = { "sqlls", "lua_ls", "gopls" }, -- a list of lsp disable format capacity (e.g. if you using efm or vim-codeformat etc), empty {} by default
+		-- If you using null-ls and want null-ls format your code
+		-- you should disable all other lsp and allow only null-ls.
+		-- disable_lsp = {'pylsd', 'sqlls'},  -- prevents navigator from setting up this list of servers.
+		-- if you use your own LSP setup, and don't want navigator to setup
+		-- any LSP server for you, use `disable_lsp = "all"`.
+		-- you may need to add this to your own on_attach hook:
+		-- require('navigator.lspclient.mapping').setup({bufnr=bufnr, client=client})
+		-- for e.g. denols and tsserver you may want to enable one lsp server at a time.
+		-- default value: {}
+		diagnostic = {
+			underline = true,
+			virtual_text = { spacing = 3, source = true }, -- show virtual for diagnostic message
+			-- set to false to prefer virtual lines
+			update_in_insert = false, -- update diagnostic message in insert mode
+			severity_sort = { reverse = true },
+			float = { -- setup for floating windows style, set to false to disable floating window
+				focusable = false,
+				style = "minimal",
+				border = "rounded",
+				source = "always",
+				header = "",
+				prefix = "",
+			},
+			virtual_lines = {
+				current_line = false, -- show diagnostic only on current line
+			},
+			register = "D", -- yank the error into register
+		},
+
+		hover = {
+			enable = true,
+			-- fallback when hover failed
+			-- e.g. if filetype is go, try godoc
+			go = function()
+				local w = vim.fn.expand("<cWORD>")
+				vim.cmd("GoDoc " .. w)
+			end,
+			-- if python, do python doc
+			python = function()
+				-- run pydoc, behaviours defined in lua/navigator.lua
+			end,
+			default = function()
+				-- fallback apply to all file types not been specified above
+				-- local w = vim.fn.expand('<cWORD>')
+				-- vim.lsp.buf.workspace_symbol(w)
+			end,
+		},
+
+		diagnostic_scrollbar_sign = { "▃", "▆", "█" }, -- experimental:  diagnostic status in scroll bar area; set to false to disable the diagnostic sign,
+		--                for other style, set to {'╍', 'ﮆ'} or {'-', '='}
+		diagnostic_virtual_text = true, -- show virtual for diagnostic message
+		diagnostic_update_in_insert = false, -- update diagnostic message in insert mode
+		display_diagnostic_qf = true, -- always show quickfix if there are diagnostic errors, set to false if you want to ignore it
+		-- set to 'trouble' to show diagnostcs in Trouble
+		ctags = {
+			cmd = "ctags",
+			tagfile = "tags",
+			options = "-R --exclude=.git --exclude=node_modules --exclude=test --exclude=vendor --excmd=number",
+		},
+		-- setup LSP in your own config (nvim 0.12+), then hook navigator in LspAttach
+		-- refer to :help lsp and nvim-lspconfig docs for more info
+		servers = { "cmake", "ltex" }, -- by default empty, and it should load all LSP clients available based on filetype
+		-- but if you want navigator load  e.g. `cmake` and `ltex` for you , you
+		-- can put them in the `servers` list and navigator will auto load them.
+		-- you could still specify the custom config  like this
+		-- cmake = {filetypes = {'cmake', 'makefile'}, single_file_support = false},
+	},
+}
+setup_plugin("navigator", navigator_config)
 
 -- PROBABLY NOT, BUT WORTH A TRY
 utils.packadd("vim-wordmotion")
@@ -780,15 +1243,138 @@ setup_plugin("treemonkey", function(_) end)
 --──── MARKS ───────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
+-- TODO: set up as telescope extension
 -- https://github.com/SalOrak/whaler.nvim
 -- Minimalistic & highly extensible project manager for NeoVim.
-local whaler_defaults = {} -- TODO
+local whaler_defaults = {
+	-- Path directories to search. By default the list is empty.
+	directories = { "/home/user/projects", { path = "/home/user/work", alias = "work" } },
+
+	-- Path directories to append directly to list of projects. By default is empty.
+	oneoff_directories = { "/home/user/.config/nvim" },
+
+	-- Whether to automatically open file explorer. By default is `true`
+	auto_file_explorer = true,
+
+	-- Whether to automatically change current working directory. By default is `true`
+	auto_cwd = true,
+
+	-- Minimum verbosity level to notify when something happens. By default is WARN.
+	-- See `vim.log.levels`
+	verbosity = vim.log.levels.WARN,
+
+	-- Automagically creates a configuration for the file explorer of your choice.
+	-- Options are "fzf_lua_explorer", "netrw"(default), "nvimtree", "neotree", "oil", "telescope_file_browser", "rnvimr"
+	file_explorer = "netrw",
+
+	-- Show hidden directories or not (default false)
+	hidden = false,
+
+	-- (OPTIONAL) If you want to fully customize the file explorer configuration,
+	-- below are all the possible options and its default values.
+	file_explorer_config = {
+
+		-- Plugin. Should be installed.
+		plugin_name = "netrw",
+
+		-- The plugin command to open.
+		-- Command must accept a path as parameter
+		-- Prefix string to be appended after the command and before the directory path.
+		command = "Explorer",
+
+		-- Example: In the `telescope_file_browser` the value is ` path=`.
+		--          The final command is `Telescope file_browser path=/path/to/dir`.
+		-- By default is " " (space)
+		prefix_dir = " ",
+	},
+
+	-- Which picker to use. One of 'telescope', 'fzf_lua' or 'vanilla'. Default to 'telescope'
+	picker = "telescope",
+
+	-- Picker options
+	-- Options to pass to Telescope. Below is the default.
+	telescope_opts = {
+		results_title = false,
+		layout_strategy = "center",
+		previewer = false,
+		layout_config = {
+			--preview_cutoff = 1000,
+			height = 0.3,
+			width = 0.4,
+		},
+		sorting_strategy = "ascending",
+		border = true,
+	},
+	-- For compatiblity you can also use `theme` directly to modify Telescope.
+	theme = {},
+
+	-- Options to pass to FzfLua directly. See
+	-- https://github.com/ibhagwan/fzf-lua?tab=readme-ov-file#customization for
+	-- options. Below is the defaults.
+	fzflua_opts = {
+		prompt = "Whaler >> ",
+		--- You can modify the actions! Go ahead!
+		actions = {
+			["default"] = function(selected)
+				local Whaler = require("whaler")
+				local dirs_map = State:get().dirs_map
+
+				local display = selected[1]
+				local path = dirs_map[selected[1]]
+
+				-- For changing projects and
+				Whaler.select(path, display)
+			end,
+		},
+		fn_format_entry = function(entry)
+			if entry.alias then
+				return ("[" .. entry.alias .. "] " .. vim.fn.fnamemodify(entry.path, ":t"))
+			end
+			return entry.path
+		end,
+	},
+}
 setup_plugin("whaler", whaler_defaults)
 
 -- https://github.com/chentoast/marks.nvim
 -- A better user experience for viewing and interacting with Vim marks.
-local marks_nvim_defaults = {} -- TODO
-setup_plugin("marks-nvim", marks_nvim_defaults)
+local marks_nvim_defaults = {
+	-- whether to map keybinds or not. default true
+	default_mappings = true,
+	-- which builtin marks to show. default {}
+	builtin_marks = { ".", "<", ">", "^" },
+	-- whether movements cycle back to the beginning/end of buffer. default true
+	cyclic = true,
+	-- whether the shada file is updated after modifying uppercase marks. default false
+	force_write_shada = false,
+	-- how often (in ms) to redraw signs/recompute mark positions.
+	-- higher values will have better performance but may cause visual lag,
+	-- while lower values may cause performance penalties. default 150.
+	refresh_interval = 250,
+	-- sign priorities for each type of mark - builtin marks, uppercase marks, lowercase
+	-- marks, and bookmarks.
+	-- can be either a table with all/none of the keys, or a single number, in which case
+	-- the priority applies to all marks.
+	-- default 10.
+	sign_priority = { lower = 10, upper = 15, builtin = 8, bookmark = 20 },
+	-- disables mark tracking for specific filetypes. default {}
+	excluded_filetypes = {},
+	-- disables mark tracking for specific buftypes. default {}
+	excluded_buftypes = {},
+	-- marks.nvim allows you to configure up to 10 bookmark groups, each with its own
+	-- sign/virttext. Bookmarks can be used to group together positions and quickly move
+	-- across multiple buffers. default sign is '!@#$%^&*()' (from 0 to 9), and
+	-- default virt_text is "".
+	bookmark_0 = {
+		sign = "⚑",
+		virt_text = "hello world",
+		-- explicitly prompt for a virtual line annotation when setting a bookmark from this group.
+		-- defaults to false.
+		annotate = false,
+	},
+	mappings = {},
+}
+setup_plugin("marks", marks_nvim_defaults)
 
 -- https://github.com/MeanderingProgrammer/harpoon-core.nvim
 -- Neovim harpoon like plugin, but only the core bits
@@ -853,32 +1439,162 @@ end)
 
 -- https://github.com/otavioschwanck/arrow.nvim
 --  Bookmark your files, separated by project, and quickly navigate through them.
-local arrow_defaults = {} -- TODO
+local arrow_defaults = {
+	show_icons = true,
+	always_show_path = false,
+	separate_by_branch = false, -- Bookmarks will be separated by git branch
+	hide_handbook = false, -- set to true to hide the shortcuts on menu.
+	hide_buffer_handbook = false, --set to true to hide shortcuts on buffer menu
+	save_path = function()
+		return vim.fn.stdpath("cache") .. "/arrow"
+	end,
+	mappings = {
+		edit = "e",
+		delete_mode = "d",
+		clear_all_items = "C",
+		toggle = "s", -- used as save if separate_save_and_remove is true
+		open_vertical = "v",
+		open_horizontal = "-",
+		quit = "q",
+		remove = "x", -- only used if separate_save_and_remove is true
+		next_item = "]",
+		prev_item = "[",
+	},
+	custom_actions = {
+		open = function(target_file_name, current_file_name) end, -- target_file_name = file selected to be open, current_file_name = filename from where this was called
+		split_vertical = function(target_file_name, current_file_name) end,
+		split_horizontal = function(target_file_name, current_file_name) end,
+	},
+	window = { -- controls the appearance and position of an arrow window (see nvim_open_win() for all options)
+		width = "auto",
+		height = "auto",
+		row = "auto",
+		col = "auto",
+		border = "double",
+	},
+	per_buffer_config = {
+		lines = 4, -- Number of lines showed on preview.
+		sort_automatically = true, -- Auto sort buffer marks.
+		satellite = { -- default to nil, display arrow index in scrollbar at every update
+			enable = false,
+			overlap = true,
+			priority = 1000,
+		},
+		zindex = 10, --default 50
+		treesitter_context = nil, -- it can be { line_shift_down = 2 }, currently not usable, for detail see https://github.com/otavioschwanck/arrow.nvim/pull/43#issue-2236320268
+	},
+	separate_save_and_remove = false, -- if true, will remove the toggle and create the save/remove keymaps.
+	leader_key = ";",
+	save_key = "cwd", -- what will be used as root to save the bookmarks. Can be also `git_root` and `git_root_bare`.
+	global_bookmarks = false, -- if true, arrow will save files globally (ignores separate_by_branch)
+	index_keys = "123456789zxcbnmZXVBNM,afghjklAFGHJKLwrtyuiopWRTYUIOP", -- keys mapped to bookmark index, i.e. 1st bookmark will be accessible by 1, and 12th - by c
+	full_path_list = { "update_stuff" }, -- filenames on this list will ALWAYS show the file path too.
+}
 setup_plugin("arrow", arrow_defaults)
 
 -- PROBABLY NOT, BUT WORTH A TRY
+-- https://github.com/haya14busa/vim-edgemotion
+-- Move to the edge!
 utils.packadd("vim-edgemotion")
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── URL-RELATED ────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
+-- TODO: set up Jira
 -- https://github.com/rmagatti/gx-extended.nvim
 -- gx-extended.nvim supercharges Neovim's built-in gx command. Press gx on anything — package names, import statements, issue numbers, commit hashes, and more — and it opens the right URL in your browser.
-local gx_extended_nvim_defaults = {} -- TODO
+local gx_extended_nvim_defaults = {
+	-- Optional: NPM imports in JS/TS files
+	enable_npm_imports = true,
+
+	-- Optional: GitHub file line permalinks
+	enable_github_file_line = true,
+
+	-- Optional: Custom browser
+	open_fn = function() end, -- TODO: create open_fn (see/vendor lazy.util.open)
+	extensions = {
+		{
+			patterns = { "*" },
+			name = "Jira Tickets",
+			match_to_url = function(line_string)
+				local ticket = string.match(line_string, "([A-Z]+-[0-9]+)")
+				if ticket then
+					return "https://yourcompany.atlassian.net/browse/" .. ticket
+				end
+			end,
+		},
+	},
+}
 setup_plugin("gx-extended-nvim", gx_extended_nvim_defaults)
 
 -- https://github.com/axieax/urlview.nvim
 -- viewing all the URLs in a buffer
-local urlview_defaults = {} -- TODO
+local urlview_defaults = {
+	-- Prompt title (`<context> <default_title>`, e.g. `Buffer Links:`)
+	default_title = "Links:",
+	-- Default picker to display links with
+	-- Options: "native" (vim.ui.select) or "telescope"
+	default_picker = "native",
+	-- Set the default protocol for us to prefix URLs with if they don't start with http/https
+	default_prefix = "https://",
+	-- Command or method to open links with
+	-- Options: "netrw", "system" (default OS browser), "clipboard"; or "firefox", "chromium" etc.
+	-- By default, this is "netrw", or "system" if netrw is disabled
+	default_action = "netrw",
+	-- Set the register to use when yanking
+	-- Default: + (system clipboard)
+	default_register = "+",
+	-- Whether plugin URLs should link to the branch used by your package manager
+	default_include_branch = false,
+	-- Ensure links shown in the picker are unique (no duplicates)
+	unique = true,
+	-- Ensure links shown in the picker are sorted alphabetically
+	sorted = true,
+	-- Minimum log level (recommended at least `vim.log.levels.WARN` for error detection warnings)
+	log_level_min = vim.log.levels.INFO,
+	-- Keymaps for jumping to previous / next URL in buffer
+	jump = {
+		prev = "[u",
+		next = "]u",
+	},
+}
 setup_plugin("urlview", urlview_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── OTHER ───────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
+-- TODO: vendor similar approach; see README: https://github.com/rktjmp/highlight-current-n.nvim#neovim-09
 -- likely deprecated; see README
 -- https://github.com/rktjmp/highlight-current-n.nvim
 -- Highlights the current /, ? or * match under your cursor when pressing n or N and gets out of the way afterwards.
-local highlight_current_n_nvim_defaults = {} -- TODO
-setup_plugin("highlight-current-n-nvim", highlight_current_n_nvim_defaults)
+local highlight_current_n_defaults = nil
+setup_plugin("highlight-current-n-nvim", function(highlight_current_n)
+	-- Map keys
+	vim.keymap.set("n", "n", "<Plug>(highlight-current-n-n")
+	vim.keymap.set("n", "n", "<Plug>(highlight-current-n-N")
+
+	-- If you want the highlighting to take effect in other maps they must
+	-- also be nmaps (or rather, not "nore").
+	--
+	-- * will search <cword> ahead, but it can be more ergonomic to have *
+	-- simply fill the / register with the current <cword>, which makes future
+	-- commands like cgn "feel better". This effectively does that by performing
+	-- "search ahead <cword> (*), go back to last match (N)".
+	vim.keymap.set("n", "*", "*N")
+
+	-- Some QOL autocommands
+	--[[ TODO: translate
+		augroup ClearSearchHL
+		autocmd!
+		" You may only want to see hlsearch /while/ searching, you can automatically
+		" toggle hlsearch with the following autocommands
+		autocmd CmdlineEnter /,\? set hlsearch
+		autocmd CmdlineLeave /,\? set nohlsearch
+		" this will apply similar n|N highlighting to the first search result
+		" careful with escaping ? in lua, you may need \\?
+		autocmd CmdlineLeave /,\? lua require('highlight_current_n')['/,?']()
+		augroup END
+	--]]
+end)

@@ -3403,6 +3403,10 @@ in rec {
       path = smartcolumn-nvim;
     }
     {
+      name = "virt-column";
+      path = virt-column-nvim;
+    }
+    {
       name = "bufferline";
       path = bufferline-nvim;
     }

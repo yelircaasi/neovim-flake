@@ -31,6 +31,44 @@ vim.api.nvim_create_autocmd("LspAttach", { callback = on_attach })
 
 -- LSP UI ------------------------------------------------------------------------------------------------
 
+-- https://github.com/dgagn/diagflow.nvim
+-- LSP diagnostics in virtual text at the top right of your screen
+local diagflow_defaults = {
+	enable = true,
+	max_width = 60, -- The maximum width of the diagnostic messages
+	max_height = 10, -- the maximum height per diagnostics
+	severity_colors = { -- The highlight groups to use for each diagnostic severity level
+		error = "DiagnosticFloatingError",
+		warning = "DiagnosticFloatingWarn",
+		info = "DiagnosticFloatingInfo",
+		hint = "DiagnosticFloatingHint",
+	},
+	format = function(diagnostic)
+		return diagnostic.message
+	end,
+	gap_size = 1,
+	scope = "cursor", -- 'cursor', 'line' this changes the scope, so instead of showing errors under the cursor, it shows errors on the entire line.
+	padding_top = 0,
+	padding_right = 0,
+	text_align = "right", -- 'left', 'right'
+	placement = "top", -- 'top', 'inline'
+	inline_padding_left = 0, -- the padding left when the placement is inline
+	update_event = { "DiagnosticChanged", "BufReadPost" }, -- the event that updates the diagnostics cache
+	toggle_event = {}, -- if InsertEnter, can toggle the diagnostics on inserts
+	show_sign = false, -- set to true if you want to render the diagnostic sign before the diagnostic message
+	render_event = { "DiagnosticChanged", "CursorMoved" },
+	border_chars = {
+		top_left = "┌",
+		top_right = "┐",
+		bottom_left = "└",
+		bottom_right = "┘",
+		horizontal = "─",
+		vertical = "│",
+	},
+	show_borders = false,
+}
+setup_plugin("diagflow", diagflow_defaults)
+
 current_mode_index = 1
 diagnostics_active = false
 
@@ -855,12 +893,62 @@ setup_plugin("vale", vale_defaults)
 
 -- https://github.com/chrisgrieser/nvim-genghis
 -- Lightweight and quick file operations without being a full-blown file manager.
-local nvim_genghis_defaults = {} -- TODO
+local nvim_genghis_defaults = {
+	fileOperations = {
+		-- automatically keep the extension when no file extension is given
+		-- (everything after the first non-leading dot is treated as the extension)
+		autoAddExt = true,
+
+		trashCmd = function() ---@type fun(): string|string[]
+			if jit.os == "OSX" then
+				return "trash"
+			end -- builtin since macOS 14
+			if jit.os == "Windows" then
+				return "trash"
+			end
+			if jit.os == "Linux" then
+				return { "gio", "trash" }
+			end
+			return "trash-cli"
+		end,
+
+		ignoreInFolderSelection = { -- using lua pattern matching (e.g., escape `-` as `%-`)
+			"/node_modules/", -- nodejs
+			"/typings/", -- python
+			"/doc/", -- vim help files folders
+			"%.app/", -- macOS pseudo-folders
+			"/%.", -- hidden folders
+		},
+	},
+
+	navigation = {
+		onlySameExtAsCurrentFile = false,
+		ignoreDotfiles = true,
+		ignoreExt = { "png", "svg", "webp", "jpg", "jpeg", "gif", "pdf", "zip" },
+		ignoreFilesWithName = { ".DS_Store" },
+	},
+
+	successNotifications = true,
+
+	icons = { -- set an icon to empty string to disable it
+		chmodx = "󰒃",
+		copyFile = "󱉥",
+		copyPath = "󰅍",
+		duplicate = "",
+		file = "󰈔",
+		move = "󰪹",
+		new = "󰝒",
+		nextFile = "󰖽",
+		prevFile = "󰖿",
+		rename = "󰑕",
+		trash = "󰩹",
+	},
+}
 setup_plugin("nvim-genghis", nvim_genghis_defaults)
 
 -- https://github.com/Ttibsi/pre-commit.nvim
 -- Trigger pre-commit linters/formatter straight from within Neovim
-local precommit_defaults = {} -- TODO
+local precommit_defaults = nil
 setup_plugin("precommit", precommit_defaults)
 
 -- https://github.com/mfussenegger/nvim-lint
@@ -869,13 +957,156 @@ setup_plugin("lint", function(lint) end)
 
 -- https://github.com/RaafatTurki/corn.nvim
 -- LSP diagnostics at your corner
-local corn_defaults = {} -- TODO
+local corn_defaults = {
+	-- enables plugin auto commands
+	auto_cmds = true,
+
+	-- sorts diagnostics according to a criteria. must be one of `severity`, `severity_reverse`, `column`, `column_reverse`, `line_number` or `line_number_reverse`
+	sort_method = "severity",
+
+	-- sets the scope to be searched for diagnostics, must be one of `line` or `file`
+	scope = "line",
+
+	-- sets the style of the border, must be one of `single`, `double`, `rounded`, `solid`, `shadow` or `none`
+	border_style = "single",
+
+	-- sets which vim modes corn isn't allowed to render in, should contain strings like 'n', 'i', 'v', 'V' .. etc
+	blacklisted_modes = {},
+
+	-- sets which severity corn isn't allowed to render in, should contain diagnostic severities like:
+	-- vim.diagnostic.severity.HINT
+	-- vim.diagnostic.severity.INFO
+	-- vim.diagnostic.severity.WARN
+	-- vim.diagnostic.severity.ERROR
+	blacklisted_severities = {},
+
+	-- highlights to use for each diagnostic severity level
+	highlights = {
+		error = "DiagnosticFloatingError",
+		warn = "DiagnosticFloatingWarn",
+		info = "DiagnosticFloatingInfo",
+		hint = "DiagnosticFloatingHint",
+	},
+
+	-- icons to use for each diagnostic severity level
+	icons = {
+		error = "E",
+		warn = "W",
+		hint = "H",
+		info = "I",
+	},
+
+	-- a preprocessor function that takes a raw Corn.Item and returns it after modification, could be used for truncation or other purposes
+	item_preprocess_func = function(item)
+		-- the default truncation logic is here ...
+		return item
+	end,
+
+	-- a hook that executes each time corn is toggled. the current state is provided via `is_hidden`
+	on_toggle = function(is_hidden)
+		-- custom logic goes here
+	end,
+}
 setup_plugin("corn", corn_defaults)
 
 -- https://github.com/dnlhc/glance.nvim
 -- Peek preview window for LSP locations in Neovim
-local glance_defaults = {} -- TODO
-setup_plugin("glance", glance_defaults)
+setup_plugin("glance", function(glance)
+	local actions = glance.actions
+
+	local glance_defaults = {
+		height = 18, -- Height of the window
+		zindex = 45,
+
+		-- When enabled, adds virtual lines behind the preview window to maintain context in the parent window
+		-- Requires Neovim >= 0.10.0
+		preserve_win_context = true,
+
+		-- Controls whether the preview window is "embedded" within your parent window or floating
+		-- above all windows.
+		detached = function(winid)
+			-- Automatically detach when parent window width < 100 columns
+			return vim.api.nvim_win_get_width(winid) < 100
+		end,
+		-- Or use a fixed setting: detached = true,
+
+		preview_win_opts = { -- Configure preview window options
+			cursorline = true,
+			number = true,
+			wrap = true,
+		},
+
+		border = {
+			enable = false, -- Show window borders. Only horizontal borders allowed
+			top_char = "―",
+			bottom_char = "―",
+		},
+
+		list = {
+			position = "right", -- Position of the list window 'left'|'right'
+			width = 0.33, -- Width as percentage (0.1 to 0.5)
+		},
+
+		theme = {
+			enable = true, -- Generate colors based on current colorscheme
+			mode = "auto", -- 'brighten'|'darken'|'auto', 'auto' will set mode based on the brightness of your colorscheme
+		},
+
+		mappings = {
+			list = {
+				["j"] = actions.next, -- Next item
+				["k"] = actions.previous, -- Previous item
+				["<Down>"] = actions.next,
+				["<Up>"] = actions.previous,
+				["<Tab>"] = actions.next_location, -- Next location (skips groups, cycles)
+				["<S-Tab>"] = actions.previous_location, -- Previous location (skips groups, cycles)
+				["<C-u>"] = actions.preview_scroll_win(5), -- Scroll up the preview window
+				["<C-d>"] = actions.preview_scroll_win(-5), -- Scroll down the preview window
+				["v"] = actions.jump_vsplit, -- Open location in vertical split
+				["s"] = actions.jump_split, -- Open location in horizontal split
+				["t"] = actions.jump_tab, -- Open in new tab
+				["<CR>"] = actions.jump, -- Jump to location
+				["o"] = actions.jump,
+				["l"] = actions.open_fold,
+				["h"] = actions.close_fold,
+				["<leader>l"] = actions.enter_win("preview"), -- Focus preview window
+				["q"] = actions.close, -- Closes Glance window
+				["Q"] = actions.close,
+				["<Esc>"] = actions.close,
+				["<C-q>"] = actions.quickfix, -- Send all locations to quickfix list
+				-- ['<Esc>'] = false -- Disable a mapping
+			},
+
+			preview = {
+				["Q"] = actions.close,
+				["<Tab>"] = actions.next_location, -- Next location (skips groups, cycles)
+				["<S-Tab>"] = actions.previous_location, -- Previous location (skips groups, cycles)
+				["<leader>l"] = actions.enter_win("list"), -- Focus list window
+			},
+		},
+
+		hooks = {}, -- Described in Hooks section
+
+		folds = {
+			fold_closed = "",
+			fold_open = "",
+			folded = true, -- Automatically fold list on startup
+		},
+
+		indent_lines = {
+			enable = true, -- Show indent guidelines
+			icon = "│",
+		},
+
+		winbar = {
+			enable = true, -- Enable winbar for the preview (requires neovim-0.8+)
+		},
+
+		use_trouble_qf = false, -- Quickfix action will open trouble.nvim instead of built-in quickfix list
+	}
+
+	glance.setup()
+end)
 
 -- https://github.com/doums/dmap.nvim
 -- nvim plugin providing a subtle overview of LSP diagnostics
@@ -972,14 +1203,61 @@ local strict_defaults = {
 setup_plugin("strict", strict_defaults)
 
 -- https://github.com/davidyz/inlayhint-filler.nvim
--- DESC
-local inlayhint_filler_defaults = {} -- TODO
+-- For some languages like Python, the inlay-hint provided by the language server are actually optional
+--     symbols/tokens that can be inserted into the buffer. This plugin provides an API to insert the
+--     inlay-hint under the cursor into the buffer. In Python, this is useful when you want to insert
+--     the type annotation from the language server into the code, or you want to turn an unnamed
+--     argument (f(10)) into a named argument (f(x=10)).
+--     This is particularly useful when working with functions that takes dozens of arguments.
+local inlayhint_filler_defaults = {
+	blacklisted_servers = {}, -- string[]
+	force = false,
+	eager = false,
+	verbose = false,
+}
 setup_plugin("inlayhint-filler", inlayhint_filler_defaults)
 
 -- https://github.com/m-demare/hlargs.nvim
 -- Highlight arguments' definitions and usages, using Treesitter
-local hlargs_nvim_defaults = {} -- TODO
-setup_plugin("hlargs-nvim", hlargs_nvim_defaults)
+local hlargs_defaults = {
+	color = "#ef9062",
+	highlight = {},
+	excluded_filetypes = {},
+	disable = function(lang, bufnr) -- If changed, `excluded_filetypes` will be ignored
+		return vim.tbl_contains(opts.excluded_filetypes, lang)
+	end,
+	paint_arg_declarations = true,
+	paint_arg_usages = true,
+	paint_catch_blocks = {
+		declarations = false,
+		usages = false,
+	},
+	extras = {
+		named_parameters = false,
+		unused_args = false,
+	},
+	hl_priority = 120,
+	excluded_argnames = {
+		declarations = {},
+		usages = {
+			python = { "self", "cls" },
+			lua = { "self" },
+		},
+	},
+	performance = {
+		parse_delay = 1,
+		slow_parse_delay = 50,
+		max_iterations = 400,
+		max_concurrent_partial_parses = 30,
+		debounce = {
+			partial_parse = 3,
+			partial_insert_mode = 100,
+			total_parse = 700,
+			slow_parse = 5000,
+		},
+	},
+}
+setup_plugin("hlargs", hlargs_defaults)
 
 -- PROBABLY NOT, BUT WORTH A TRY
 -- https://github.com/ray-x/lsp_signature.nvim
@@ -1070,5 +1348,148 @@ setup_plugin("lsp_signature", lsp_signature_defaults)
 
 -- https://github.com/kosayoda/nvim-lightbulb
 -- VSCode 💡 for neovim's built-in LSP.
-local nvim_lightbulb_defaults = {} -- TODO
+local nvim_lightbulb_defaults = {
+	-- Priority of the lightbulb for all handlers except float.
+	priority = 10,
+
+	-- Whether or not to hide the lightbulb when the buffer is not focused.
+	-- Only works if configured during NvimLightbulb.setup
+	hide_in_unfocused_buffer = true,
+
+	-- Whether or not to link the highlight groups automatically.
+	-- Default highlight group links:
+	--   LightBulbSign -> DiagnosticSignInfo
+	--   LightBulbFloatWin -> DiagnosticFloatingInfo
+	--   LightBulbVirtualText -> DiagnosticVirtualTextInfo
+	--   LightBulbNumber -> DiagnosticSignInfo
+	--   LightBulbLine -> CursorLine
+	-- Only works if configured during NvimLightbulb.setup
+	link_highlights = true,
+
+	-- Perform full validation of configuration.
+	-- Available options: "auto", "always", "never"
+	--   "auto" only performs full validation in NvimLightbulb.setup.
+	--   "always" performs full validation in NvimLightbulb.update_lightbulb as well.
+	--   "never" disables config validation.
+	validate_config = "auto",
+
+	-- Code action kinds to observe.
+	-- To match all code actions, set to `nil`.
+	-- Otherwise, set to a table of kinds.
+	-- Example: { "quickfix", "refactor.rewrite" }
+	-- See: https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#codeActionKind
+	action_kinds = nil,
+
+	-- Enable code lens support.
+	-- If the current position has executable code lenses, the icon is changed from `text` to `lens_text`
+	-- for sign, virtual_text, float and status_text.
+	-- The code lens icon is configurable per handler.
+	code_lenses = false,
+
+	-- Configuration for various handlers:
+	-- 1. Sign column.
+	sign = {
+		enabled = true,
+		-- Text to show in the sign column.
+		-- Must be between 1-2 characters.
+		text = "💡",
+		lens_text = "🔎",
+		-- Highlight group to highlight the sign column text.
+		hl = "LightBulbSign",
+	},
+
+	-- 2. Virtual text.
+	virtual_text = {
+		enabled = false,
+		-- Text to show in the virt_text.
+		text = "💡",
+		lens_text = "🔎",
+		-- Position of virtual text given to |nvim_buf_set_extmark|.
+		-- Can be a number representing a fixed column (see `virt_text_pos`).
+		-- Can be a string representing a position (see `virt_text_win_col`).
+		pos = "eol",
+		-- Highlight group to highlight the virtual text.
+		hl = "LightBulbVirtualText",
+		-- How to combine other highlights with text highlight.
+		-- See `hl_mode` of |nvim_buf_set_extmark|.
+		hl_mode = "combine",
+	},
+
+	-- 3. Floating window.
+	float = {
+		enabled = false,
+		-- Text to show in the floating window.
+		text = "💡",
+		lens_text = "🔎",
+		-- Highlight group to highlight the floating window.
+		hl = "LightBulbFloatWin",
+		-- Window options.
+		-- See |vim.lsp.util.open_floating_preview| and |nvim_open_win|.
+		-- Note that some options may be overridden by |open_floating_preview|.
+		win_opts = {
+			focusable = false,
+		},
+	},
+
+	-- 4. Status text.
+	-- When enabled, will allow using |NvimLightbulb.get_status_text|
+	-- to retrieve the configured text.
+	status_text = {
+		enabled = false,
+		-- Text to set if a lightbulb is available.
+		text = "💡",
+		lens_text = "🔎",
+		-- Text to set if a lightbulb is unavailable.
+		text_unavailable = "",
+	},
+
+	-- 5. Number column.
+	number = {
+		enabled = false,
+		-- Highlight group to highlight the number column if there is a lightbulb.
+		hl = "LightBulbNumber",
+	},
+
+	-- 6. Content line.
+	line = {
+		enabled = false,
+		-- Highlight group to highlight the line if there is a lightbulb.
+		hl = "LightBulbLine",
+	},
+
+	-- Autocmd configuration.
+	-- If enabled, automatically defines an autocmd to show the lightbulb.
+	-- If disabled, you will have to manually call |NvimLightbulb.update_lightbulb|.
+	-- Only works if configured during NvimLightbulb.setup
+	autocmd = {
+		-- Whether or not to enable autocmd creation.
+		enabled = false,
+		-- See |updatetime|.
+		-- Set to a negative value to avoid setting the updatetime.
+		updatetime = 200,
+		-- See |nvim_create_autocmd|.
+		events = { "CursorHold", "CursorHoldI" },
+		-- See |nvim_create_autocmd| and |autocmd-pattern|.
+		pattern = { "*" },
+	},
+
+	-- Scenarios to not show a lightbulb.
+	ignore = {
+		-- LSP client names to ignore.
+		-- Example: {"null-ls", "lua_ls"}
+		clients = {},
+		-- Filetypes to ignore.
+		-- Example: {"neo-tree", "lua"}
+		ft = {},
+		-- Ignore code actions without a `kind` like refactor.rewrite, quickfix.
+		actions_without_kind = false,
+	},
+
+	--- A general filter function for code actions.
+	--- The function is called for code actions *after* any `ignore` or `action_kinds`
+	--- options are applied.
+	--- The function should return true to keep the code action, false otherwise.
+	---@type (fun(client_name:string, result:lsp.CodeAction|lsp.Command):boolean)|nil
+	filter = nil,
+}
 setup_plugin("nvim-lightbulb", nvim_lightbulb_defaults)

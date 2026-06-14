@@ -55,6 +55,14 @@ vim.lsp.enable("pylsp")
 vim.lsp.enable("pyright")
 vim.lsp.enable("ruff")
 
+-- https://github.com/liborw/equals
+-- takes python code or markdown with python code blocks and append intermediate results to expressions followed by #=
+local equals_defaults = {
+	set_keys = true,
+}
+setup_plugin("equals", equals_defaults)
+-- vim.api.nvim_set_keymap('n', 'ee', '<cmd>lua require("equals").buffer()<cr>', {noremap = true})
+
 -- TODO: set up pylsp-rope for refactoring
 
 -- Mypy integration

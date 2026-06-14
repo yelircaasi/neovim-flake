@@ -66,7 +66,7 @@ local coverage_sample_config = {
 }
 setup_plugin("coverage", coverage_sample_config)
 
+-- TODO: add to neotest setup
 -- https://github.com/nvim-neotest/neotest-plenary
 -- for lua testing
-local neotest_plenary_defaults = {} -- TODO
-setup_plugin("neotest-plenary", neotest_plenary_defaults)
+setup_plugin("neotest-plenary") -- just to test installation & requiring
