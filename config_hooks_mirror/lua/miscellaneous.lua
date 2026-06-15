@@ -2,11 +2,13 @@
 --──── to vendor ──────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
+-- <EXPERIMENTAL>
 -- https://github.com/LunarVim/Launch.nvim
 -- Launch.nvim is modular starter for Neovim.
 local launch_defaults = nil
 setup_plugin("Launch", launch_defaults)
 
+-- <EXPERIMENTAL>
 -- https://github.com/bagohart/minimal-narrow-region.nvim
 -- Opinionated minimal implementation of Emacs' narrowing feature (https://www.gnu.org/software/emacs/manual/html_node/emacs/Narrowing.html)
 local minimal_narrow_region_defaults = nil
@@ -26,28 +28,6 @@ setup_plugin("telemake") -- TODO: set up as telescope extension
 --     This library itself depend on middleclass library.
 local nvim_api_wrappers_defaults = nil
 setup_plugin("nvim-api-wrappers", nvim_api_wrappers_defaults)
-
--- https://github.com/alonso-montero/k8vim.nvim
--- Kubernetes interface for nvim
-local k8vim_defaults = nil
-setup_plugin("k8vim", k8vim_defaults)
-
--- TODO: compare https://github.com/lukas-reineke/virt-column.nvim (may be better)
--- https://github.com/xiyaowong/virtcolumn.nvim
--- Display a line as the colorcolumn
-local virtcolumn_defaults = nil
-setup_plugin("virtcolumn", function(virtcolumn)
-	vim.g.virtcolumn_char = "▕" -- char to display the line
-	vim.g.virtcolumn_priority = 10 -- priority of extmark
-end)
-
--- :help virt-column.txt
--- https://github.com/lukas-reineke/virt-column.nvim
--- Display a character as the colorcolumn
-local virt_column_defaults = {} -- TODO: https://github.com/lukas-reineke/virt-column.nvim/blob/master/lua/virt-column/config.lua
-setup_plugin("virt-column", function(virt_column)
-	virt_column.setup(virt_column_defaults)
-end)
 
 -- https://github.com/willothy/wezterm.nvim
 -- Utilities for interacting with Wezterm from within Neovim
@@ -82,66 +62,6 @@ local present_defaults = {
 setup_plugin("present", present_defaults)
 -- https://github.com/letieu/wezterm-move.nvim
 -- https://github.com/mawkler/move-mode.nvim
-
---─────────────────────────────────────────────────────────────────────────────
---──── live preview ───────────────────────────────────────────────────────────
---─────────────────────────────────────────────────────────────────────────────
-
--- TODO: move to multi-lang
--- TODO: set up with qutebrowser, sioyek
--- https://github.com/frabjous/knap
--- Neovim plugin for creating live-updating-as-you-type previews of LaTeX, markdown, and other files in the viewer of your choice.
-vim.g.knap_settings = {
-	htmloutputext = "html",
-	htmltohtml = "none",
-	htmltohtmlviewerlaunch = "falkon %outputfile%",
-	htmltohtmlviewerrefresh = "none",
-	mdoutputext = "html",
-	mdtohtml = "pandoc --standalone %docroot% -o %outputfile%",
-	mdtohtmlviewerlaunch = "falkon %outputfile%",
-	mdtohtmlviewerrefresh = "none",
-	mdtopdf = "pandoc %docroot% -o %outputfile%",
-	mdtopdfviewerlaunch = "sioyek %outputfile%",
-	mdtopdfviewerrefresh = "none",
-	markdownoutputext = "html",
-	markdowntohtml = "pandoc --standalone %docroot% -o %outputfile%",
-	markdowntohtmlviewerlaunch = "falkon %outputfile%",
-	markdowntohtmlviewerrefresh = "none",
-	markdowntopdf = "pandoc %docroot% -o %outputfile%",
-	markdowntopdfviewerlaunch = "sioyek %outputfile%",
-	markdowntopdfviewerrefresh = "none",
-	texoutputext = "pdf",
-	textopdf = "pdflatex -interaction=batchmode -halt-on-error -synctex=1 %docroot%",
-	textopdfviewerlaunch = "sioyek --inverse-search 'nvim --headless -es --cmd \"lua require('\"'\"'knaphelper'\"'\"').relayjump('\"'\"'%servername%'\"'\"','\"'\"'%1'\"'\"',%2,%3)\"' --new-window %outputfile%",
-	textopdfviewerrefresh = "none",
-	textopdfforwardjump = "sioyek --inverse-search 'nvim --headless -es --cmd \"lua require('\"'\"'knaphelper'\"'\"').relayjump('\"'\"'%servername%'\"'\"','\"'\"'%1'\"'\"',%2,%3)\"' --reuse-window --forward-search-file %srcfile% --forward-search-line %line% %outputfile%",
-	textopdfshorterror = 'A=%outputfile% ; LOGFILE="${A%.pdf}.log" ; rubber-info "$LOGFILE" 2>&1 | head -n 1',
-	delay = 250,
-}
-setup_plugin("knap", function(knap)
-	-- set shorter name for keymap function
-	local kmap = vim.keymap.set
-
-	-- F5 processes the document once, and refreshes the view
-	kmap({ "n", "v", "i" }, "<F5>", function()
-		require("knap").process_once()
-	end)
-
-	-- F6 closes the viewer application, and allows settings to be reset
-	kmap({ "n", "v", "i" }, "<F6>", function()
-		require("knap").close_viewer()
-	end)
-
-	-- F7 toggles the auto-processing on and off
-	kmap({ "n", "v", "i" }, "<F7>", function()
-		require("knap").toggle_autopreviewing()
-	end)
-
-	-- F8 invokes a SyncTeX forward search, or similar, where appropriate
-	kmap({ "n", "v", "i" }, "<F8>", function()
-		require("knap").forward_jump()
-	end)
-end)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── nvim-/lua-related ──────────────────────────────────────────────────────
@@ -1301,42 +1221,6 @@ setup_plugin("nvim-apm", nvim_apm_defaults)
 --─────────────────────────────────────────────────────────────────────────────
 --──── other ──────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
-
--- TODO: move to multi-lang, install quicktype
--- https://github.com/midoBB/nvim-quicktype
--- Generate types from JSON all inside Neovim
-local nvim_quicktype_defaults = {
-	global = {
-		-- Quicktype global options
-		cmd = "quicktype", -- Path to the quicktype executable
-		src_lang = "json", -- The language of the input
-		no_combine_classes = false, -- Do not combine classes with shared properties into a single base class
-		all_properties_optional = false, -- Make all properties optional
-		alphabetize_properties = false, -- Alphabetize properties
-		telemetry = "disable", -- Send telemetry data to Quicktype (can be "enable", or "disable")
-		output_file = nil, -- Output file (if not specified, output is printed to stdout)
-		debug_dir = nil, -- Directory to write debug info to (if not specified, no debug info is written)
-		clipboard_source_register = nil, -- Register from which to read the copied JSON (if not specified, if will default to system then to unnamed and lastly to 0 register)
-	},
-	filetypes = {
-		-- Quicktype language-specific options
-		typescript = {
-			lang = "typescript", -- The language to generate types for
-			additional_options = {
-				-- Add any additional options here
-				-- Example:
-				-- ["just-types"] = true,
-				-- ["prefer-unions"] = true,
-			},
-		},
-		python = {
-			lang = "python", -- The language to generate types for
-			additional_options = {},
-		},
-		-- Add more filetypes as needed
-	},
-}
-setup_plugin("nvim-quicktype", nvim_quicktype_defaults)
 
 -- Neovim plugin for aligning bilingual parallel texts
 -- https://github.com/tanloong/interlaced.nvim

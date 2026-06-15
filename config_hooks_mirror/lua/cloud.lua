@@ -144,3 +144,8 @@ setup_plugin("kubels", kubels_defaults)
 -- vim syntax for helm templates (yaml + gotmpl + sprig + custom)
 local function setup_vim_helm() end
 utils.packadd("vim-helm", setup_vim_helm)
+
+-- https://github.com/alonso-montero/k8vim.nvim
+-- Kubernetes interface for nvim
+local k8vim_defaults = nil
+setup_plugin("k8vim", k8vim_defaults)

@@ -193,6 +193,7 @@ local config_modules = {
 
 	["tmp"] = true,
 
+	["langs.multilang"] = false,
 	["langs.go"] = false,
 	["langs.haskell"] = true,
 	["langs.json_yaml"] = true,

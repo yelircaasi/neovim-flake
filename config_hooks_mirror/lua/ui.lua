@@ -2,6 +2,23 @@
 --──── columns ────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
+-- TODO: compare https://github.com/lukas-reineke/virt-column.nvim (may be better)
+-- https://github.com/xiyaowong/virtcolumn.nvim
+-- Display a line as the colorcolumn
+local virtcolumn_defaults = nil
+setup_plugin("virtcolumn", function(virtcolumn)
+	vim.g.virtcolumn_char = "▕" -- char to display the line
+	vim.g.virtcolumn_priority = 10 -- priority of extmark
+end)
+
+-- :help virt-column.txt
+-- https://github.com/lukas-reineke/virt-column.nvim
+-- Display a character as the colorcolumn
+local virt_column_defaults = {} -- TODO: https://github.com/lukas-reineke/virt-column.nvim/blob/master/lua/virt-column/config.lua
+setup_plugin("virt-column", function(virt_column)
+	virt_column.setup(virt_column_defaults)
+end)
+
 -- https://github.com/m4xshen/smartcolumn.nvim
 -- A Neovim plugin hiding your colorcolumn when unneeded.
 local smartcolumn_defaults = {

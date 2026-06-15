@@ -72,6 +72,7 @@ sync_hooks lua/langs/haskell.lua
 sync_hooks lua/langs/json_yaml.lua
 sync_hooks lua/langs/lua_language.lua
 sync_hooks lua/langs/markdown.lua
+sync_hooks lua/langs/multilang.lua
 sync_hooks lua/langs/nix.lua
 sync_hooks lua/langs/python.lua
 sync_hooks lua/langs/rust.lua
