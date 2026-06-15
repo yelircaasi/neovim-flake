@@ -9,7 +9,12 @@
 --
 -- 		-- Map 'q' dynamically so if you DO open the output float,
 -- 		-- you can instantly dismiss it with a single keypress.
--- 		vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = true, silent = true })
+-- map_explicit({
+-- 	mode = "n",
+-- 	sequence = "q",
+-- 	action = "<cmd>close<cr>",
+-- 	opts = { buffer = true, silent = true },
+-- })
 -- 	end,
 -- })
 
@@ -242,6 +247,11 @@ end
 -- 		vim.cmd("stopinsert")
 
 -- 		-- Optional: Map 'q' to close the output float easily
--- 		vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = true })
+-- map_explicit({
+-- 	mode = "n",
+-- 	sequence = "q",
+-- 	action = "<cmd>close<cr>",
+-- 	opts = { buffer = true },
+-- })
 -- 	end,
 -- })

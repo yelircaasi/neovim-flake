@@ -501,7 +501,11 @@ if include_gitlab then
 		utils.packadd("gitlab-nvim") -- https://docs.gitlab.com/editor_extensions/neovim/
 		setup_plugin("gitlab", function(gitlab)
 			gitlab.setup(official_gitlab_config)
-			vim.keymap.set("n", "<C-g>", "<Plug>(GitLabToggleCodeSuggestions)")
+			map_explicit({
+				mode = "n",
+				sequence = "<C-g>",
+				action = "<Plug>(GitLabToggleCodeSuggestions)",
+			})
 		end)
 	end
 	setup_gitlab_nvim()
@@ -1194,7 +1198,12 @@ local neogit_default_config = {
 }
 setup_plugin("neogit", function(neogit)
 	neogit.setup(neogit_default_config)
-	vim.keymap.set("n", "<leader>gg", "<cmd>Neogit<cr>", { desc = "Open Neogit UI" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>gg",
+		action = "<cmd>Neogit<cr>",
+		opts = { desc = "Open Neogit UI" },
+	})
 end)
 utils.packadd("vim-fugitive", function()
 	-- print("Installed vim-fugitive.")

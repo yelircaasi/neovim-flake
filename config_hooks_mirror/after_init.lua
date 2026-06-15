@@ -102,12 +102,26 @@ end
 
 -- GLOBALS ====================================================================
 
+-- vim\.keymap\.set\((".+?"), "(.+?)", ([^ \n\)]+?)\)$
+
+-- TODO: move to utils
 function map_explicit(spec)
-	vim.keymap.set(spec.mode, spec.sequence or spec.lhs, spec.action or spec.rhs, spec.opts)
+	local opts = spec.opts or {}
+	if spec.desc then
+		opts.desc = spec.desc
+	end
+	vim.keymap.set(spec.mode, spec.sequence or spec.lhs, spec.action or spec.rhs, opts)
 end
 map = utils.map
 setup_plugin = utils.setup_plugin
 packadd = utils.packadd
+
+function mkprint(msg)
+	local function inner()
+		print(msg)
+	end
+	return inner
+end
 
 vim.g.mapleader = " "
 

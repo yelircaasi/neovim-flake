@@ -35,9 +35,15 @@ setup_plugin("jsonpath", function(jsonpath)
 	end
 
 	-- send json path to clipboard
-	vim.keymap.set("n", "y<C-p>", function()
-		vim.fn.setreg("+", require("jsonpath").get())
-	end, { desc = "copy json path", buffer = true })
+	map_explicit({
+		mode = "n",
+		sequence = "y<C-p>",
+		action = function()
+			vim.fn.setreg("+", require("jsonpath").get())
+		end,
+		desc = "copy json path",
+		opts = { buffer = true },
+	})
 end)
 
 -- https://github.com/b0o/SchemaStore.nvim

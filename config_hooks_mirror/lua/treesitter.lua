@@ -209,22 +209,43 @@ setup_plugin("nvim-treesitter-textobjects", function(tsto)
 	local tsto_select = require("nvim-treesitter-textobjects.select")
 	-- keymaps
 	-- You can use the capture groups defined in `textobjects.scm`
-	vim.keymap.set({ "x", "o" }, "am", function()
-		tsto_select.select_textobject("@function.outer", "textobjects")
-	end)
-	vim.keymap.set({ "x", "o" }, "im", function()
-		tsto_select.select_textobject("@function.inner", "textobjects")
-	end)
-	vim.keymap.set({ "x", "o" }, "ac", function()
-		tsto_select.select_textobject("@class.outer", "textobjects")
-	end)
-	vim.keymap.set({ "x", "o" }, "ic", function()
-		tsto_select.select_textobject("@class.inner", "textobjects")
-	end)
+	local xo = { "x", "o" }
+	map_explicit({
+		mode = xo,
+		sequence = "am",
+		action = function()
+			tsto_select.select_textobject("@function.outer", "textobjects")
+		end,
+	})
+	map_explicit({
+		mode = xo,
+		sequence = "im",
+		action = function()
+			tsto_select.select_textobject("@function.inner", "textobjects")
+		end,
+	})
+	map_explicit({
+		mode = xo,
+		sequence = "ac",
+		action = function()
+			tsto_select.select_textobject("@class.outer", "textobjects")
+		end,
+	})
+	map_explicit({
+		mode = xo,
+		sequence = "ic",
+		action = function()
+			tsto_select.select_textobject("@class.inner", "textobjects")
+		end,
+	})
 	-- You can also use captures from other query groups like `locals.scm`
-	vim.keymap.set({ "x", "o" }, "as", function()
-		tsto_select.select_textobject("@local.scope", "locals")
-	end)
+	map_explicit({
+		mode = xo,
+		sequence = "as",
+		action = function()
+			tsto_select.select_textobject("@local.scope", "locals")
+		end,
+	})
 end)
 
 pcall(vim.treesitter.language.register, "markdown", "snacks_notif")

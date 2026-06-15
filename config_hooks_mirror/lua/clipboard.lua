@@ -44,32 +44,107 @@ local yanky_defaults = {
 		enabled = false,
 	},
 }
-setup_plugin("yanky", yanky_defaults)
-vim.keymap.set({ "n", "x" }, "p", "<Plug>(YankyPutAfter)")
-vim.keymap.set({ "n", "x" }, "P", "<Plug>(YankyPutBefore)")
-vim.keymap.set({ "n", "x" }, "gp", "<Plug>(YankyGPutAfter)")
-vim.keymap.set({ "n", "x" }, "gP", "<Plug>(YankyGPutBefore)")
+setup_plugin("yanky", function(yanky)
+	yanky.setup(yanky_defaults)
 
-vim.keymap.set("n", "<c-p>", "<Plug>(YankyPreviousEntry)")
-vim.keymap.set("n", "<c-n>", "<Plug>(YankyNextEntry)")
+	map_explicit({
+		mode = { "n", "x" },
+		sequence = "p",
+		action = "<Plug>(YankyPutAfter)",
+	})
+	map_explicit({
+		mode = { "n", "x" },
+		sequence = "P",
+		action = "<Plug>(YankyPutBefore)",
+	})
+	map_explicit({
+		mode = { "n", "x" },
+		sequence = "gp",
+		action = "<Plug>(YankyGPutAfter)",
+	})
+	map_explicit({
+		mode = { "n", "x" },
+		sequence = "gP",
+		action = "<Plug>(YankyGPutBefore)",
+	})
 
--- And these keymaps for tpope/vim-unimpaired like usage:
-vim.keymap.set("n", "]p", "<Plug>(YankyPutIndentAfterLinewise)")
-vim.keymap.set("n", "[p", "<Plug>(YankyPutIndentBeforeLinewise)")
-vim.keymap.set("n", "]P", "<Plug>(YankyPutIndentAfterLinewise)")
-vim.keymap.set("n", "[P", "<Plug>(YankyPutIndentBeforeLinewise)")
+	map_explicit({
+		mode = "n",
+		sequence = "<c-p>",
+		action = "<Plug>(YankyPreviousEntry)",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<c-n>",
+		action = "<Plug>(YankyNextEntry)",
+	})
 
-vim.keymap.set("n", ">p", "<Plug>(YankyPutIndentAfterShiftRight)")
-vim.keymap.set("n", "<p", "<Plug>(YankyPutIndentAfterShiftLeft)")
-vim.keymap.set("n", ">P", "<Plug>(YankyPutIndentBeforeShiftRight)")
-vim.keymap.set("n", "<P", "<Plug>(YankyPutIndentBeforeShiftLeft)")
+	-- And these keymaps for tpope/vim-unimpaired like usage:
+	map_explicit({
+		mode = "n",
+		sequence = "]p",
+		action = "<Plug>(YankyPutIndentAfterLinewise)",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "[p",
+		action = "<Plug>(YankyPutIndentBeforeLinewise)",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "]P",
+		action = "<Plug>(YankyPutIndentAfterLinewise)",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "[P",
+		action = "<Plug>(YankyPutIndentBeforeLinewise)",
+	})
 
-vim.keymap.set("n", "=p", "<Plug>(YankyPutAfterFilter)")
-vim.keymap.set("n", "=P", "<Plug>(YankyPutBeforeFilter)")
+	map_explicit({
+		mode = "n",
+		sequence = ">p",
+		action = "<Plug>(YankyPutIndentAfterShiftRight)",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<p",
+		action = "<Plug>(YankyPutIndentAfterShiftLeft)",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = ">P",
+		action = "<Plug>(YankyPutIndentBeforeShiftRight)",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<P",
+		action = "<Plug>(YankyPutIndentBeforeShiftLeft)",
+	})
 
--- yank-ring:
-vim.keymap.set("n", "<c-p>", "<Plug>(YankyPreviousEntry)")
-vim.keymap.set("n", "<c-n>", "<Plug>(YankyNextEntry)")
+	map_explicit({
+		mode = "n",
+		sequence = "=p",
+		action = "<Plug>(YankyPutAfterFilter)",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "=P",
+		action = "<Plug>(YankyPutBeforeFilter)",
+	})
+
+	-- yank-ring:
+	map_explicit({
+		mode = "n",
+		sequence = "<c-p>",
+		action = "<Plug>(YankyPreviousEntry)",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<c-n>",
+		action = "<Plug>(YankyNextEntry)",
+	})
+end)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── lazyclip ───────────────────────────────────────────────────────────────
@@ -107,8 +182,16 @@ setup_plugin("lazyclip", lazyclip_defaults)
 --─────────────────────────────────────────────────────────────────────────────
 
 setup_plugin("pasta", function(pasta)
-	vim.keymap.set({ "n", "x" }, "p", require("pasta.mapping").p)
-	vim.keymap.set({ "n", "x" }, "P", require("pasta.mapping").P)
+	map_explicit({
+		mode = { "n", "x" },
+		"p",
+		require("pasta.mapping").p,
+	})
+	map_explicit({
+		mode = { "n", "x" },
+		"P",
+		require("pasta.mapping").P,
+	})
 
 	-- This is the default. You can omit `setup` call if you don't want to change this.
 	local pasta_config = pasta.config

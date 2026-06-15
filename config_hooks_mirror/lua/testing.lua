@@ -20,26 +20,40 @@ setup_plugin("neotest", function(neotest)
 		},
 	})
 
-	local nmap = function(lhs, rhs, desc)
-		vim.keymap.set("n", lhs, rhs, { silent = true, desc = desc })
+	local function nmap(spec)
+		spec.mode = "n"
+		spec.opts = { silent = true }
+		map_explicit(specs)
 	end
 
-	nmap("<leader>tt", function()
-		neotest.run.run({
-			strategy = "integrated",
-			enter = false,
-		})
-	end, "Run nearest test")
+	nmap({
+		sequence = "<leader>tt",
+		action = function()
+			neotest.run.run({
+				strategy = "integrated",
+				enter = false,
+			})
+		end,
+		desc = "Run nearest test",
+	})
 
-	nmap("<leader>to", function()
-		neotest.output.open({ enter = false, short = false })
-	end, "Open test output")
-	nmap("<leader>tO", function()
-		neotest.output_panel.toggle()
-	end, "Toggle output panel")
-	nmap("<leader>tS", function()
-		neotest.summary.toggle()
-	end, "Toggle test summary")
+	nmap({
+		sequence = "<leader>to",
+		action = function()
+			neotest.output.open({ enter = false, short = false })
+		end,
+		desc = "Open test output",
+	})
+	nmap({
+		sequence = "<leader>tO",
+		action = neotest.output_panel.toggle,
+		desc = "Toggle output panel",
+	})
+	nmap({
+		sequence = "<leader>tS",
+		action = neotest.summary.toggle,
+		desc = "Toggle test summary",
+	})
 end)
 
 -- https://github.com/andythigpen/nvim-coverage

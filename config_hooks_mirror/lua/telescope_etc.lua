@@ -18,19 +18,89 @@ local telescope = utils.setup_plugin_default("telescope", function(telescope)
 	-- print("loaded telescope with fzf-native")
 
 	local telescope_builtin = require("telescope.builtin")
-	map("n", "<leader>ff", function()
-		telescope_builtin.find_files()
-	end, { desc = "Find Files" })
-	map("n", "<leader>gf", function()
-		telescope_builtin.git_files()
-	end, { desc = "Find Git Files" })
-	map("n", "<leader>fg", function()
-		telescope_builtin.live_grep()
-	end, { desc = "Live Grep" })
-	map("n", "<leader>fb", function()
-		telescope_builtin.buffers()
-	end, { desc = "Find Buffers" })
-	map("n", "<leader>fh", function()
-		telescope_builtin.help_tags()
-	end, { desc = "Find Help Tags" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>ff",
+		action = function()
+			telescope_builtin.find_files()
+		end,
+		desc = "Find Files",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>gf",
+		action = function()
+			telescope_builtin.git_files()
+		end,
+		desc = "Find Git Files",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>fg",
+		action = function()
+			telescope_builtin.live_grep()
+		end,
+		desc = "Live Grep",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>fb",
+		action = function()
+			telescope_builtin.buffers()
+		end,
+		desc = "Find Buffers",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>fh",
+		action = function()
+			telescope_builtin.help_tags()
+		end,
+		desc = "Find Help Tags",
+	})
 end)
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── mappings ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+map_explicit({
+	mode = "n",
+	sequence = "<leader>ff",
+	action = make_setup_function(function()
+		require("telescope.builtin").find_files()
+	end),
+	desc = "Find Files",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>gf",
+	action = function()
+		require("telescope.builtin").git_files()
+	end,
+	desc = "Find Git Files",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>fg",
+	action = function()
+		require("telescope.builtin").live_grep()
+	end,
+	desc = "Live Grep",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>fb",
+	action = function()
+		require("telescope.builtin").buffers()
+	end,
+	desc = "Find Buffers",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>fh",
+	action = function()
+		require("telescope.builtin").help_tags()
+	end,
+	desc = "Find Help Tags",
+})

@@ -50,21 +50,41 @@ local function setup_luasnip()
 
 	require("luasnip.loaders.from_snipmate").lazy_load()
 
-	vim.keymap.set({ "i" }, "<C-K>", function()
-		ls.expand()
-	end, { silent = true })
-	vim.keymap.set({ "i", "s" }, "<C-L>", function()
-		ls.jump(1)
-	end, { silent = true })
-	vim.keymap.set({ "i", "s" }, "<C-J>", function()
-		ls.jump(-1)
-	end, { silent = true })
+	map_explicit({
+		mode = { "i" },
+		sequence = "<C-K>",
+		action = function()
+			ls.expand()
+		end,
+		opts = { silent = true },
+	})
+	map_explicit({
+		mode = { "i", "s" },
+		sequence = "<C-L>",
+		action = function()
+			ls.jump(1)
+		end,
+		opts = { silent = true },
+	})
+	map_explicit({
+		mode = { "i", "s" },
+		sequence = "<C-J>",
+		action = function()
+			ls.jump(-1)
+		end,
+		opts = { silent = true },
+	})
 
-	vim.keymap.set({ "i", "s" }, "<C-E>", function()
-		if ls.choice_active() then
-			ls.change_choice(1)
-		end
-	end, { silent = true })
+	map_explicit({
+		mode = { "i", "s" },
+		sequence = "<C-E>",
+		action = function()
+			if ls.choice_active() then
+				ls.change_choice(1)
+			end
+		end,
+		opts = { silent = true },
+	})
 end
 setup_luasnip()
 

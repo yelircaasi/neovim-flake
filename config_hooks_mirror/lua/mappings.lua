@@ -1,572 +1,107 @@
--- MAPPINGS ========================================================================================
-vim.keymap.set("t", "<Esc>", "<C-\\><C-n>", { desc = "Exit terminal mode" })
-setup_plugin("which-key", function(which_key)
-	vim.o.timeout = true
-	vim.o.timeoutlen = 300
-	which_key.setup({})
-end)
+--─────────────────────────────────────────────────────────────────────────────
+--──── general mappings ───────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
-setup_plugin("mini.keymap")
+local nvx = { "n", "v", "x" }
+-- map_explicit({
+--     mode = "",
+--     sequence = "",
+--     action = [[]],
+--     desc = "",
+-- })
+map_explicit({
+	mode = "n",
+	sequence = "<leader>o",
+	action = ":update<CR> :source<CR>",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>ww",
+	action = ":write<CR>",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>qq",
+	action = ":quit<CR>",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>wq",
+	action = ":wq<CR>",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>f",
+	action = ":Pick files<CR>",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>lf",
+	action = vim.lsp.buf.format,
+	desc = "",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>h",
+	action = ":Pick help",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>e",
+	action = ":Oil<CR>",
+})
+map_explicit({
+	mode = nvx,
+	sequence = "<leader>y",
+	action = "+y<CR>",
+	desc = "Yank to system clipboard",
+})
+map_explicit({
+	mode = nvx,
+	sequence = "<leader>d",
+	action = "+d<CR>",
+	desc = "Paste from system clipboard",
+})
+map_explicit({
+	mode = "x",
+	sequence = "<leader>mf",
+	action = ":'<,'>lua move_selection_to_new_file()<CR>",
+	desc = "Move selection to new file (split)",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>lu",
+	action = function()
+		-- Create a new empty floating window or split
+		vim.cmd("vsplit | enew")
+		vim.bo.filetype = "lua"
+		vim.bo.bufhidden = "hide"
 
--- WAS:
--- local map = vim.keymap.set
-if false then
-	-- floaterm -----------------------------------------------------------------------------------------------------------
-	vim.keymap.set("n", "<leader>ft", "<Cmd>FloatermToggle<CR>", { desc = "Toggle floaterm" })
-	vim.keymap.set("t", "<leader>ft", "<C-\\><C-n><Cmd>FloatermToggle<CR>", { desc = "Toggle floaterm" })
-
-	-- LSP ----------------------------------------------------------------------------------------------------------------
-	-- We will create an autocommand group to attach keymaps only to buffers with an active LSP client.
-	local lsp_keymaps_group = vim.api.nvim_create_augroup("LspKeymaps", { clear = true })
-
-	vim.api.nvim_create_autocmd("LspAttach", {
-		group = lsp_keymaps_group,
-		callback = function(ev)
-			local lsp_map = function(keys, func, desc)
-				vim.keymap.set("n", keys, func, { buffer = ev.buf, desc = "LSP: " .. desc })
-			end
-
-			-- Navigation and Information
-			lsp_map("gd", vim.lsp.buf.definition, "Go to Definition")
-			lsp_map("gD", vim.lsp.buf.declaration, "Go to Declaration")
-			lsp_map("gr", vim.lsp.buf.references, "Go to References")
-			lsp_map("gI", vim.lsp.buf.implementation, "Go to Implementation")
-			lsp_map("K", vim.lsp.buf.hover, "Hover Documentation")
-			lsp_map("<C-k>", vim.lsp.buf.signature_help, "Signature Help")
-
-			-- Actions
-			lsp_map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
-			lsp_map("<leader>rn", vim.lsp.buf.rename, "Rename")
-
-			-- Diagnostics
-			lsp_map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic")
-			lsp_map("]d", vim.diagnostic.goto_next, "Next Diagnostic")
-			lsp_map("<leader>dl", vim.diagnostic.open_float, "Show Line Diagnostics")
-
-			-- format on save (to use LSP formatter instead of conform)
-			-- vim.api.nvim_buf_create_autocmd("BufWritePre", {
-			--   buffer = ev.buf,
-			--   callback = function() vim.lsp.buf.format { async = false } end
-			-- })
-			--
-			local bufopts = { noremap = true, silent = true, buffer = bufnr }
-		end,
-	})
-
-	-- other LSP maps
-
-	local lsp_map_opts = { buffer = bufnr, silent = true }
-	vim.keymap.set("n", "gd", vim.lsp.buf.definition, lsp_map_opts)
-	vim.keymap.set("n", "K", vim.lsp.buf.hover, lsp_map_opts)
-	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, lsp_map_opts)
-	vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, lsp_map_opts)
-	vim.keymap.set("n", "<leader>cf", function()
-		conform.format({ bufnr = bufnr })
-	end, lsp_map_opts)
-
-	-- quickfix -----------------------------------------------------------------------------------------------------------
-	vim.keymap.set("i", "kj", "<escape>")
-	vim.keymap.set("n", "<leader>wq", function()
-		vim.cmd("wq")
-	end)
-	vim.keymap.set("n", "<leader>ww", function()
-		vim.cmd("w")
-	end)
-	vim.keymap.set("n", "<leader>q", function()
-		-- Populates the Quickfix list with all diagnostics from the current buffer
-		vim.diagnostic.setqflist({ bufnr = 0 })
-		vim.cmd("copen")
-	end, { desc = "Open Quickfix with diagnostics" })
-
-	--- zen-mode ----------------------------------------------------------------------------------------------------------
-
-	map("n", "<leader>zm", function()
-		require("zen-mode").toggle({
-			window = {
-				width = 0.85, -- width will be 85% of the editor width
-			},
+		-- Map <CR> to execute the current line or selection
+		map_explicit({
+			mode = "n",
+			sequence = "<CR>",
+			action = ":.lua<CR>",
+			opts = { buffer = true },
 		})
-	end)
-end
+		map_explicit({
+			mode = "v",
+			sequence = "<CR>",
+			action = ":lua<CR>",
+			opts = { buffer = true },
+		})
+	end,
+	desc = "Open Lua Scratchpad",
+})
+map_explicit({
+	mode = "v",
+	sequence = "<leader>ms",
+	action = move_selection_to_new_file,
+})
 
-if other_mappings then
-	---------------------------------------------------------------------------------------------------------------- KEYMAPS
-	local nvx = { "n", "v", "x" }
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>o",
-		action = ":update<CR> :source<CR>",
-		opts = {},
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>ww",
-		action = ":write<CR>",
-		opts = {},
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>qq",
-		action = ":quit<CR>",
-		opts = {},
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>wq",
-		action = ":wq<CR>",
-		opts = {},
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>f",
-		action = ":Pick files<CR>",
-		opts = {},
-	})
-	map_explicit({
-		mode = "t",
-		sequence = "<Esc>",
-		action = [[<C-\><C-n>]],
-		opts = { desc = "Exit terminal mode" },
-	})
-	map_explicit({
-		mode = "t",
-		sequence = "kj",
-		action = [[<C-\><C-n>]],
-		opts = { desc = "Exit terminal mode" },
-	})
-	map_explicit({
-		mode = "t",
-		sequence = "<C-o>",
-		action = [[<C-\><C-o>]],
-		opts = { desc = "Temporary normal mode" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>lf",
-		action = vim.lsp.buf.format,
-		opts = { desc = "" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>h",
-		action = ":Pick help",
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>e",
-		action = ":Oil<CR>",
-	})
-	map_explicit({
-		mode = nvx,
-		sequence = "<leader>y",
-		action = "+y<CR>",
-		opts = { desc = "Yank to system clipboard" },
-	})
-	map_explicit({
-		mode = nvx,
-		sequence = "<leader>d",
-		action = "+d<CR>",
-		opts = { desc = "Paste from system clipboard" },
-	})
-	-- map_explicit({
-	--     mode = "",
-	--     sequence = "",\
-	--     action = [[]],
-	--     opts = { desc = "" }
-	-- })
-	-- map_explicit({
-	--     mode = "",
-	--     sequence = "",
-	--     action = [[]],
-	--     opts = { desc = "" }
-	-- })
-	-- map('t', '^[', "^\^N")
-	-- map('t', '^O', '^\^O')
-	map_explicit({
-		mode = "x",
-		sequence = "<leader>mf",
-		action = ":'<,'>lua move_selection_to_new_file()<CR>",
-		opts = { desc = "Move selection to new file (split)" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>lu",
-		action = function()
-			-- Create a new empty floating window or split
-			vim.cmd("vsplit | enew")
-			vim.bo.filetype = "lua"
-			vim.bo.bufhidden = "hide"
-
-			-- Map <CR> to execute the current line or selection
-			vim.keymap.set("n", "<CR>", ":.lua<CR>", { buffer = true })
-			vim.keymap.set("v", "<CR>", ":lua<CR>", { buffer = true })
-		end,
-		opts = { desc = "Open Lua Scratchpad" },
-	})
-	map_explicit({
-		mode = "v",
-		sequence = "<leader>ms",
-		action = move_selection_to_new_file,
-	})
-	map_explicit({ ------------------------------------------------------------------------------------------------------ diagnostics
-		mode = "n",
-		sequence = "<leader>dt",
-		action = function()
-			diagnostics_active = not diagnostics_active
-			set_diagnostics_mode()
-		end,
-		opts = { desc = "Toggle LSP Diagnostics" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>dm",
-		action = function()
-			-- only cycle if active; otherwise turn on and reset to 1
-			if not diagnostics_active then
-				diagnostics_active = true
-				current_mode_index = 1
-			else
-				current_mode_index = current_mode_index + 1
-				if current_mode_index > #diagnostic_modes then
-					current_mode_index = 1
-				end
-			end
-			set_diagnostics_mode()
-		end,
-		opts = { desc = "Cycle LSP Diagnostic Modes" },
-	})
-	map_explicit({ -------------------------------------------------------------------------------------------------------- telescope
-		mode = "n",
-		sequence = "<leader>ff",
-		action = make_setup_function(function()
-			require("telescope.builtin").find_files()
-		end),
-		opts = { desc = "Find Files" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>gf",
-		action = function()
-			require("telescope.builtin").git_files()
-		end,
-		opts = { desc = "Find Git Files" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>fg",
-		action = function()
-			require("telescope.builtin").live_grep()
-		end,
-		opts = { desc = "Live Grep" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>fb",
-		action = function()
-			require("telescope.builtin").buffers()
-		end,
-		opts = { desc = "Find Buffers" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>fh",
-		action = function()
-			require("telescope.builtin").help_tags()
-		end,
-		opts = { desc = "Find Help Tags" },
-	})
-	map_explicit({ --------------------------------------------------------------------------------------------------------- floaterm
-		mode = "n",
-		sequence = "<leader>ft",
-		action = "<Cmd>FloatermToggle<CR>",
-		opts = { desc = "Toggle floaterm" },
-	})
-	map_explicit({
-		mode = "t",
-		sequence = "<leader>ft",
-		action = "<C-\\><C-n><Cmd>FloatermToggle<CR>",
-		opts = { desc = "Toggle floaterm" },
-	})
-	-------------------------------------------------------------------------------------------------------------------- LSP
-
-	map_explicit({ --------------------------------------------------------------------------------------------------------- quickfix
-		mode = { "i" },
-		sequence = "kj",
-		action = "<escape>",
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>wq",
-		action = function()
-			vim.cmd("wq")
-		end,
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>ww",
-		action = function()
-			vim.cmd("w")
-		end,
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>q",
-		action = function()
-			-- Populates the Quickfix list with all diagnostics from the current buffer
-			vim.diagnostic.setqflist({ bufnr = 0 })
-			vim.cmd("copen")
-		end,
-		opts = { desc = "Open Quickfix with diagnostics" },
-	})
-	map_explicit({ ------------------------------------------------------------------------------------------------------------- dial
-		mode = "n",
-		sequence = "<C-a>",
-		action = function()
-			require("dial.map").manipulate("increment", "normal")
-		end,
-		opts = { desc = "" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<C-x>",
-		action = function()
-			require("dial.map").manipulate("decrement", "normal")
-		end,
-		opts = { desc = "" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "g<C-a>",
-		action = function()
-			require("dial.map").manipulate("increment", "gnormal")
-		end,
-		opts = { desc = "" },
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "g<C-x>",
-		action = function()
-			require("dial.map").manipulate("decrement", "gnormal")
-		end,
-		opts = { desc = "" },
-	})
-	map_explicit({
-		mode = "x",
-		sequence = "<C-a>",
-		action = function()
-			require("dial.map").manipulate("increment", "visual")
-		end,
-		opts = { desc = "" },
-	})
-	map_explicit({
-		mode = "x",
-		sequence = "<C-x>",
-		action = function()
-			require("dial.map").manipulate("decrement", "visual")
-		end,
-		opts = { desc = "" },
-	})
-	map_explicit({
-		mode = "x",
-		sequence = "g<C-a>",
-		action = function()
-			require("dial.map").manipulate("increment", "gvisual")
-		end,
-		opts = { desc = "" },
-	})
-	map_explicit({
-		mode = "x",
-		sequence = "g<C-x>",
-		action = function()
-			require("dial.map").manipulate("decrement", "gvisual")
-		end,
-		opts = { desc = "" },
-	})
-	map_explicit({ --------------------------------------------------------------------------------------------------------- zen-mode
-		mode = "n",
-		sequence = "<leader>zm",
-		action = function()
-			-- width will be 85% of the editor width
-			require("zen-mode").toggle({ window = { width = 0.85 } })
-		end,
-		opts = { desc = "" },
-	})
-end
-
--- https://github.com/nvimtools/hydra.nvim
--- Create custom submodes and menus
--- TODO: Hydra is too generic for a global setup; just expose the module:
-setup_plugin("hydra")
-
--- https://github.com/hrsh7th/nvim-insx
--- Flexible key mapping manager.
-setup_plugin("insx", function(insx)
-	require("insx.preset.standard").setup()
-	-- insx.add(require("insx.preset.standard").setup())
-end)
-
--- https://github.com/anuvyklack/keymap-amend.nvim
--- Amend the existing keymap in Neovim
-local keymap_amend_nvim_defaults = nil
-setup_plugin("keymap-amend-nvim", function(keymap_amend)
-	local keymap = vim.keymap
-	keymap.amend = keymap_amend
-
-	-- examples
-
-	keymap.amend("n", "k", function(original)
-		print("k key is amended!")
-		original()
-	end)
-
-	keymap.amend("n", "<Esc>", function(original)
-		if vim.v.hlsearch and vim.v.hlsearch == 1 then
-			vim.cmd("nohlsearch")
-		end
-		original()
-	end, { desc = "disable search highlight" })
-end)
-
--- https://github.com/afreakk/unimpaired-which-key.nvim
--- Bridge between vim-unimpaired and which-key.nvim
-setup_plugin("unimpaired-which-key", function(_) end)
-
--- https://github.com/Cassin01/wf.nvim
---  A modern which-key for neovim
-local wf_defaults = {
-	theme = "default",
-	-- you can copy the full list from lua/wf/setup/init.lua
-}
-setup_plugin("wf", function(wf)
-	local which_key = require("wf.builtin.which_key")
-	local register = require("wf.builtin.register")
-	local bookmark = require("wf.builtin.bookmark")
-	local buffer = require("wf.builtin.buffer")
-	local mark = require("wf.builtin.mark")
-
-	-- Register
-	vim.keymap.set(
-		"n",
-		"<Space>wr",
-		-- register(opts?: table) -> function
-		-- opts?: option
-		register(),
-		{ noremap = true, silent = true, desc = "[wf.nvim] register" }
-	)
-
-	-- Bookmark
-	vim.keymap.set(
-		"n",
-		"<Space>wbo",
-		-- bookmark(bookmark_dirs: table, opts?: table) -> function
-		-- bookmark_dirs: directory or file paths
-		-- opts?: option
-		bookmark({
-			nvim = "~/.config/nvim",
-			zsh = "~/.zshrc",
-		}),
-		{ noremap = true, silent = true, desc = "[wf.nvim] bookmark" }
-	)
-
-	-- Buffer
-	vim.keymap.set(
-		"n",
-		"<Space>wbu",
-		-- buffer(opts?: table) -> function
-		-- opts?: option
-		buffer(),
-		{ noremap = true, silent = true, desc = "[wf.nvim] buffer" }
-	)
-
-	-- Mark
-	vim.keymap.set(
-		"n",
-		"'",
-		-- mark(opts?: table) -> function
-		-- opts?: option
-		mark(),
-		{ nowait = true, noremap = true, silent = true, desc = "[wf.nvim] mark" }
-	)
-
-	-- Which Key
-	vim.keymap.set(
-		"n",
-		"<Leader>",
-		-- mark(opts?: table) -> function
-		-- opts?: option
-		which_key({ text_insert_in_advance = "<Leader>" }),
-		{ noremap = true, silent = true, desc = "[wf.nvim] which-key /" }
-	)
-
-	-- set keymaps with `nowait`
-	-- see `:h :map-nowait`
-
-	-- a timer to call a callback after a specified number of milliseconds.
-	local function timeout(ms, callback)
-		local uv = vim.loop
-		local timer = uv.new_timer()
-		local _callback = vim.schedule_wrap(function()
-			uv.timer_stop(timer)
-			uv.close(timer)
-			callback()
-		end)
-		uv.timer_start(timer, ms, 0, _callback)
-	end
-	timeout(100, function()
-		vim.keymap.set(
-			"n",
-			"<Leader>",
-			which_key({ text_insert_in_advance = "<Leader>" }),
-			{ noremap = true, silent = true, desc = "[wf.nvim] which-key /" }
-		)
-	end)
-	vim.api.nvim_create_autocmd({ "BufEnter", "BufAdd" }, {
-		group = vim.api.nvim_create_augroup("my_wf", { clear = true }),
-		callback = function()
-			timeout(100, function()
-				vim.keymap.set(
-					"n",
-					"<Leader>",
-					which_key({ text_insert_in_advance = "<Leader>" }),
-					{ noremap = true, silent = true, desc = "[wf.nvim] which-key /", buffer = true }
-				)
-			end)
-		end,
-	})
-end)
-
--- use which-key to ncreate commands
---[[
-t = {
-	name = "Terminal",
-	["`"] = { "<cmd>Sterm<cr>", "Horizontal Terminal" },
-	e = { "<cmd>Sterm iex<cr>", "Elixir" },
-	f = { "<cmd>Fterm<cr>", "Floating Terminal" },
-	g = { "<cmd>Fterm lazygit<cr>", "Lazygit" },
-	n = { "<cmd>Sterm node<cr>", "Node" },
-	p = { "<cmd>Sterm bpython<cr>", "Python" },
-	r = { "<cmd>Sterm irb<cr>", "Ruby" },
-	s = { "<cmd>Sterm<cr>", "Horizontal Terminal" },
-	t = { "<cmd>Tterm<cr>", "Terminal" },
-	v = { "<cmd>Vterm<cr>", "Vertical Terminal" },
-},
---]]
-
--- TODO
--- https://github.com/cronJohn/keytex.nvim
---  A neovim plugin for keyboard shortcut management
-local keytex_defaults = nil
-setup_plugin("keytex", function(keytex) end)
-
--- https://github.com/bgrohman/nvim-keymapper
--- Neovim Telescope extension for creating, documenting, and searching keymaps.
-local nvim_keymapper_defaults = nil
-setup_plugin("nvim-keymapper", function(keymapper)
-	vim.api.nvim_create_user_command("Keymaps", keymapper.keymaps_picker, { desc = "Telescope: Show keymaps" })
-	vim.api.nvim_create_user_command("AllKeymaps", builtin.keymaps, { desc = "Telescope: Show all keymaps" })
-	keymapper.set("n", "<leader>k", ":Keymaps<CR>", {}, "Telescope: Show keymaps")
-	keymapper.set("n", "<leader>T", "<ESC>:vsplit | term<CR>", {}, "Open a terminal in a vertical split")
-end)
+--─────────────────────────────────────────────────────────────────────────────
+--──── plugins ──────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 
 -- https://github.com/jokajak/keyseer.nvim
 -- Neovim plugin to display which keys have keymaps assigned
@@ -716,3 +251,362 @@ local better_escape_defaults = {
 }
 
 setup_plugin("better-escape", better_escape_defaults)
+
+-- https://github.com/folke/which-key.nvim
+-- Create key bindings that stick. WhichKey helps you remember your Neovim keymaps, by showing available keybindings in a popup as you type.
+local which_key_defaults = {
+	---@type false | "classic" | "modern" | "helix"
+	preset = "classic",
+	-- Delay before showing the popup. Can be a number or a function that returns a number.
+	---@type number | fun(ctx: { keys: string, mode: string, plugin?: string }):number
+	delay = function(ctx)
+		return ctx.plugin and 0 or 200
+	end,
+	---@param mapping wk.Mapping
+	filter = function(mapping)
+		-- example to exclude mappings without a description
+		-- return mapping.desc and mapping.desc ~= ""
+		return true
+	end,
+	--- You can add any mappings here, or use `require('which-key').add()` later
+	---@type wk.Spec
+	spec = {},
+	-- show a warning when issues were detected with your mappings
+	notify = true,
+	-- Which-key automatically sets up triggers for your mappings.
+	-- But you can disable this and setup the triggers manually.
+	-- Check the docs for more info.
+	---@type wk.Spec
+	triggers = {
+		{ "<auto>", mode = "nxso" },
+	},
+	-- Start hidden and wait for a key to be pressed before showing the popup
+	-- Only used by enabled xo mapping modes.
+	---@param ctx { mode: string, operator: string }
+	defer = function(ctx)
+		return ctx.mode == "V" or ctx.mode == "<C-V>"
+	end,
+	plugins = {
+		marks = true, -- shows a list of your marks on ' and `
+		registers = true, -- shows your registers on " in NORMAL or <C-r> in INSERT mode
+		-- the presets plugin, adds help for a bunch of default keybindings in Neovim
+		-- No actual key bindings are created
+		spelling = {
+			enabled = true, -- enabling this will show WhichKey when pressing z= to select spelling suggestions
+			suggestions = 20, -- how many suggestions should be shown in the list?
+		},
+		presets = {
+			operators = true, -- adds help for operators like d, y, ...
+			motions = true, -- adds help for motions
+			text_objects = true, -- help for text objects triggered after entering an operator
+			windows = true, -- default bindings on <c-w>
+			nav = true, -- misc bindings to work with windows
+			z = true, -- bindings for folds, spelling and others prefixed with z
+			g = true, -- bindings for prefixed with g
+		},
+	},
+	---@type wk.Win.opts
+	win = {
+		-- don't allow the popup to overlap with the cursor
+		no_overlap = true,
+		-- width = 1,
+		-- height = { min = 4, max = 25 },
+		-- col = 0,
+		-- row = math.huge,
+		-- border = "none",
+		padding = { 1, 2 }, -- extra window padding [top/bottom, right/left]
+		title = true,
+		title_pos = "center",
+		zindex = 1000,
+		-- Additional vim.wo and vim.bo options
+		bo = {},
+		wo = {
+			-- winblend = 10, -- value between 0-100 0 for fully opaque and 100 for fully transparent
+		},
+	},
+	layout = {
+		width = { min = 20 }, -- min and max width of the columns
+		spacing = 3, -- spacing between columns
+	},
+	keys = {
+		scroll_down = "<c-d>", -- binding to scroll down inside the popup
+		scroll_up = "<c-u>", -- binding to scroll up inside the popup
+	},
+	---@type (string|wk.Sorter)[]
+	--- Mappings are sorted using configured sorters and natural sort of the keys
+	--- Available sorters:
+	--- * local: buffer-local mappings first
+	--- * order: order of the items (Used by plugins like marks / registers)
+	--- * group: groups last
+	--- * alphanum: alpha-numerical first
+	--- * mod: special modifier keys last
+	--- * manual: the order the mappings were added
+	--- * case: lower-case first
+	sort = { "local", "order", "group", "alphanum", "mod" },
+	---@type number|fun(node: wk.Node):boolean?
+	expand = 0, -- expand groups when <= n mappings
+	-- expand = function(node)
+	--   return not node.desc -- expand all nodes without a description
+	-- end,
+	-- Functions/Lua Patterns for formatting the labels
+	---@type table<string, ({[1]:string, [2]:string}|fun(str:string):string)[]>
+	replace = {
+		key = {
+			function(key)
+				return require("which-key.view").format(key)
+			end,
+			-- { "<Space>", "SPC" },
+		},
+		desc = {
+			{ "<Plug>%(?(.*)%)?", "%1" },
+			{ "^%+", "" },
+			{ "<[cC]md>", "" },
+			{ "<[cC][rR]>", "" },
+			{ "<[sS]ilent>", "" },
+			{ "^lua%s+", "" },
+			{ "^call%s+", "" },
+			{ "^:%s*", "" },
+		},
+	},
+	icons = {
+		breadcrumb = "»", -- symbol used in the command line area that shows your active key combo
+		separator = "➜", -- symbol used between a key and it's label
+		group = "+", -- symbol prepended to a group
+		ellipsis = "…",
+		-- set to false to disable all mapping icons,
+		-- both those explicitly added in a mapping
+		-- and those from rules
+		mappings = true,
+		--- See `lua/which-key/icons.lua` for more details
+		--- Set to `false` to disable keymap icons from rules
+		---@type wk.IconRule[]|false
+		rules = {},
+		-- use the highlights from mini.icons
+		-- When `false`, it will use `WhichKeyIcon` instead
+		colors = true,
+		-- used by key format
+		keys = {
+			Up = " ",
+			Down = " ",
+			Left = " ",
+			Right = " ",
+			C = "󰘴 ",
+			M = "󰘵 ",
+			D = "󰘳 ",
+			S = "󰘶 ",
+			CR = "󰌑 ",
+			Esc = "󱊷 ",
+			ScrollWheelDown = "󱕐 ",
+			ScrollWheelUp = "󱕑 ",
+			NL = "󰌑 ",
+			BS = "󰁮",
+			Space = "󱁐 ",
+			Tab = "󰌒 ",
+			F1 = "󱊫",
+			F2 = "󱊬",
+			F3 = "󱊭",
+			F4 = "󱊮",
+			F5 = "󱊯",
+			F6 = "󱊰",
+			F7 = "󱊱",
+			F8 = "󱊲",
+			F9 = "󱊳",
+			F10 = "󱊴",
+			F11 = "󱊵",
+			F12 = "󱊶",
+		},
+	},
+	show_help = true, -- show a help message in the command line for using WhichKey
+	show_keys = true, -- show the currently pressed key and its label as a message in the command line
+	-- disable WhichKey for certain buf types and file types.
+	disable = {
+		ft = {},
+		bt = {},
+	},
+	debug = false, -- enable wk.log in the current directory
+}
+setup_plugin("which-key", function(which_key)
+	vim.o.timeout = true
+	vim.o.timeoutlen = 300
+	which_key.setup(which_key_defaults)
+end)
+
+-- https://github.com/nvim-mini/mini.keymap
+-- Special key mappings. Part of 'mini.nvim' library.
+mini_keymap_defaults = {}
+setup_plugin("mini.keymap", mini_keymap_defaults)
+
+-- https://github.com/nvimtools/hydra.nvim
+-- Create custom submodes and menus
+-- TODO: Hydra is too generic for a global setup; just expose the module:
+setup_plugin("hydra")
+
+-- https://github.com/hrsh7th/nvim-insx
+-- Flexible key mapping manager.
+setup_plugin("insx", function(insx)
+	require("insx.preset.standard").setup()
+	-- insx.add(require("insx.preset.standard").setup())
+end)
+
+-- https://github.com/anuvyklack/keymap-amend.nvim
+-- Amend the existing keymap in Neovim
+local keymap_amend_nvim_defaults = nil
+setup_plugin("keymap-amend-nvim", function(keymap_amend)
+	local keymap = vim.keymap
+	keymap.amend = keymap_amend
+
+	-- examples
+
+	keymap.amend("n", "k", function(original)
+		print("k key is amended!")
+		original()
+	end)
+
+	keymap.amend("n", "<Esc>", function(original)
+		if vim.v.hlsearch and vim.v.hlsearch == 1 then
+			vim.cmd("nohlsearch")
+		end
+		original()
+	end, { desc = "disable search highlight" })
+end)
+
+-- https://github.com/afreakk/unimpaired-which-key.nvim
+-- Bridge between vim-unimpaired and which-key.nvim
+setup_plugin("unimpaired-which-key", function(_) end)
+
+-- https://github.com/Cassin01/wf.nvim
+--  A modern which-key for neovim
+local wf_defaults = {
+	theme = "default",
+	-- you can copy the full list from lua/wf/setup/init.lua
+}
+setup_plugin("wf", function(wf)
+	local which_key = require("wf.builtin.which_key")
+	local register = require("wf.builtin.register")
+	local bookmark = require("wf.builtin.bookmark")
+	local buffer = require("wf.builtin.buffer")
+	local mark = require("wf.builtin.mark")
+
+	-- Register
+	map_explicit({
+		mode = "n",
+		sequence = "<Space>wr",
+		-- register(opts?: table) -> function
+		-- opts?: option
+		action = register(),
+		opts = { noremap = true, silent = true, desc = "[wf.nvim] register" },
+	})
+
+	-- Bookmark
+	map_explicit({
+		mode = "n",
+		sequence = "<Space>wbo",
+		-- bookmark(bookmark_dirs: table, opts?: table) -> function
+		-- bookmark_dirs: directory or file paths
+		-- opts?: option
+		action = bookmark({
+			nvim = "~/.config/nvim",
+			zsh = "~/.zshrc",
+		}),
+		opts = { noremap = true, silent = true, desc = "[wf.nvim] bookmark" },
+	})
+
+	-- Buffer
+	map_explicit({
+		mode = "n",
+		sequence = "<Space>wbu",
+		-- buffer(opts?: table) -> function
+		-- opts?: option
+		action = buffer(),
+		opts = { noremap = true, silent = true, desc = "[wf.nvim] buffer" },
+	})
+
+	-- Mark
+	map_explicit({
+		mode = "n",
+		sequence = "'",
+		-- mark(opts?: table) -> function
+		-- opts?: option
+		mark(),
+		opts = { nowait = true, noremap = true, silent = true, desc = "[wf.nvim] mark" },
+	})
+
+	-- Which Key
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>",
+		-- mark(opts?: table) -> function
+		-- opts?: option
+		action = which_key({ text_insert_in_advance = "<Leader>" }),
+		opts = { noremap = true, silent = true, desc = "[wf.nvim] which-key /" },
+	})
+
+	-- set keymaps with `nowait`
+	-- see `:h :map-nowait`
+
+	-- a timer to call a callback after a specified number of milliseconds.
+	local function timeout(ms, callback)
+		local uv = vim.loop
+		local timer = uv.new_timer()
+		local _callback = vim.schedule_wrap(function()
+			uv.timer_stop(timer)
+			uv.close(timer)
+			callback()
+		end)
+		uv.timer_start(timer, ms, 0, _callback)
+	end
+	timeout(100, function()
+		map_explicit({
+			mode = "n",
+			sequence = "<Leader>",
+			action = which_key({ text_insert_in_advance = "<Leader>" }),
+			opts = { noremap = true, silent = true, desc = "[wf.nvim] which-key /" },
+		})
+	end)
+	vim.api.nvim_create_autocmd({ "BufEnter", "BufAdd" }, {
+		group = vim.api.nvim_create_augroup("my_wf", { clear = true }),
+		callback = function()
+			timeout(100, function()
+				map_explicit({
+					mode("n"),
+					sequence = "<Leader>",
+					action = which_key({ text_insert_in_advance = "<Leader>" }),
+					opts = { noremap = true, silent = true, desc = "[wf.nvim] which-key /", buffer = true },
+				})
+			end)
+		end,
+	})
+end)
+
+-- use which-key to ncreate commands
+--[[
+t = {
+	name = "Terminal",
+	["`"] = { "<cmd>Sterm<cr>", "Horizontal Terminal" },
+	e = { "<cmd>Sterm iex<cr>", "Elixir" },
+	f = { "<cmd>Fterm<cr>", "Floating Terminal" },
+	g = { "<cmd>Fterm lazygit<cr>", "Lazygit" },
+	n = { "<cmd>Sterm node<cr>", "Node" },
+	p = { "<cmd>Sterm bpython<cr>", "Python" },
+	r = { "<cmd>Sterm irb<cr>", "Ruby" },
+	s = { "<cmd>Sterm<cr>", "Horizontal Terminal" },
+	t = { "<cmd>Tterm<cr>", "Terminal" },
+	v = { "<cmd>Vterm<cr>", "Vertical Terminal" },
+},
+--]]
+
+-- TODO
+-- https://github.com/cronJohn/keytex.nvim
+--  A neovim plugin for keyboard shortcut management
+local keytex_defaults = nil
+setup_plugin("keytex", function(keytex) end)
+
+-- https://github.com/bgrohman/nvim-keymapper
+-- Neovim Telescope extension for creating, documenting, and searching keymaps.
+local nvim_keymapper_defaults = nil
+setup_plugin("nvim-keymapper", function(keymapper)
+	vim.api.nvim_create_user_command("Keymaps", keymapper.keymaps_picker, { desc = "Telescope: Show keymaps" })
+	vim.api.nvim_create_user_command("AllKeymaps", builtin.keymaps, { desc = "Telescope: Show all keymaps" })
+	keymapper.set("n", "<leader>k", ":Keymaps<CR>", {}, "Telescope: Show keymaps")
+	keymapper.set("n", "<leader>T", "<ESC>:vsplit | term<CR>", {}, "Open a terminal in a vertical split")
+end)

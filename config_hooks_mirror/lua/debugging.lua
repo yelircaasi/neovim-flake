@@ -2,33 +2,51 @@ setup_plugin("dap-python", function(dap_python)
 	-- local dap_python = utils.get_plugin("dap-python")
 	dap_python.setup("debugpy-adapter")
 	dap_python.test_runner = "pytest"
-	vim.keymap.set("n", "<leader>tt", function()
-		print("Leader is working!")
-	end)
-	vim.keymap.set("n", "<leader>pp", function()
-		print("This works")
-	end)
-	vim.keymap.set("n", "<leader>dn", function()
-		dap_python.test_method()
-	end)
-	vim.keymap.set("n", "<leader>df", function()
-		dap_python.test_class()
-	end)
-	vim.keymap.set("v", "<leader>ds", function()
-		dap_python.debug_selection()
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>tt",
+		action = mkprint("Leader is working!"),
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>pp",
+		action = mkprint("This works"),
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dn",
+		action = dap_python.test_method,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>df",
+		action = dap_python.test_class,
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<leader>ds",
+		action = dap_python.debug_selection,
+	})
 	-- OTHER
 	dap_python.setup("debugpy-adapter")
 	dap_python.test_runner = "pytest"
-	map("n", "<leader>tt", function()
-		print("Leader is working!")
-	end)
-	map("n", "<leader>pp", function()
-		print("This works")
-	end)
-	map("n", "<leader>dn", dap_python.test_method)
-	map("n", "<leader>df", dap_python.test_class)
-	map("v", "<leader>ds", dap_python.debug_selection)
+	map("n", "<leader>tt", mkprint("Leader is working!"))
+	map("n", "<leader>pp", mkprint("This works"))
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dn",
+		action = dap_python.test_method,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>df",
+		action = dap_python.test_class,
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<leader>ds",
+		action = dap_python.debug_selection,
+	})
 end)
 -- TODO: proposed:
 --[[
@@ -36,12 +54,24 @@ setup_plugin("dap-python", function(dap_python)
     dap_python.setup("debugpy-adapter")
     dap_python.test_runner = "pytest"
 
-    vim.keymap.set("n", "<leader>dn", dap_python.test_method)
-    vim.keymap.set("n", "<leader>df", dap_python.test_class)
+    map_explicit({
+    mode = "n",
+    sequence = "<leader>dn",
+    action = dap_python.test_method,
+})
+    map_explicit({
+    mode = "n",
+    sequence = "<leader>df",
+    action = dap_python.test_class,
+})
 
-    vim.keymap.set("v", "<leader>ds", function()
+    map_explicit({
+    mode = "v",
+    sequence = "<leader>ds",
+    action = function()
         dap_python.debug_selection()
-    end)
+    end,
+})
 end)
 ]]
 setup_plugin("dapui", function(dapui)
@@ -70,69 +100,147 @@ setup_plugin("dapui", function(dapui)
 		},
 	})
 
-	dap.listeners.after.event_initialized["dapui_config"] = function()
-		dapui.open()
-	end
+	dap.listeners.after.event_initialized["dapui_config"] = dapui.open
 
-	dap.listeners.before.event_terminated["dapui_config"] = function()
-		dapui.close()
-	end
+	dap.listeners.before.event_terminated["dapui_config"] = dapui.close
 
-	dap.listeners.before.event_exited["dapui_config"] = function()
-		dapui.close()
-	end
+	dap.listeners.before.event_exited["dapui_config"] = dapui.close
 
-	vim.keymap.set("n", "<leader>du", dapui.toggle)
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>du",
+		action = dapui.toggle,
+	})
 end)
 setup_plugin("nvim-dap-virtual-text", {
 	commented = true,
 })
 setup_plugin("dap", function(dap)
-	vim.keymap.set("n", "<F5>", dap.continue)
-	vim.keymap.set("n", "<F10>", dap.step_over)
-	vim.keymap.set("n", "<F11>", dap.step_into)
-	vim.keymap.set("n", "<F12>", dap.step_out)
+	map_explicit({
+		mode = "n",
+		sequence = "<F5>",
+		action = dap.continue,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<F10>",
+		action = dap.step_over,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<F11>",
+		action = dap.step_into,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<F12>",
+		action = dap.step_out,
+	})
 
-	vim.keymap.set("n", "<leader>db", dap.toggle_breakpoint)
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>db",
+		action = dap.toggle_breakpoint,
+	})
 
-	vim.keymap.set("n", "<leader>dB", function()
-		dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dB",
+		action = function()
+			dap.set_breakpoint(vim.fn.input("Breakpoint condition: "))
+		end,
+	})
 
-	vim.keymap.set("n", "<leader>dr", dap.repl.open)
-	vim.keymap.set("n", "<leader>dl", dap.run_last)
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dr",
+		action = dap.repl.open,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dl",
+		action = dap.run_last,
+	})
 
-	vim.keymap.set("n", "<leader>dc", dap.continue)
-	vim.keymap.set("n", "<leader>dx", dap.terminate)
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dc",
+		action = dap.continue,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dx",
+		action = dap.terminate,
+	})
 end)
 
 -- QUICKFIX QOL
-vim.keymap.set("n", "]q", "<cmd>cnext<cr>")
-vim.keymap.set("n", "[q", "<cmd>cprev<cr>")
+map_explicit({
+	mode = "n",
+	sequence = "]q",
+	action = "<cmd>cnext<cr>",
+})
+map_explicit({
+	mode = "n",
+	sequence = "[q",
+	action = "<cmd>cprev<cr>",
+})
 
-vim.keymap.set("n", "]l", "<cmd>lnext<cr>")
-vim.keymap.set("n", "[l", "<cmd>lprev<cr>")
+map_explicit({
+	mode = "n",
+	sequence = "]l",
+	action = "<cmd>lnext<cr>",
+})
+map_explicit({
+	mode = "n",
+	sequence = "[l",
+	action = "<cmd>lprev<cr>",
+})
 
-vim.keymap.set("n", "<leader>q", "<cmd>copen<cr>")
-vim.keymap.set("n", "<leader>Q", "<cmd>cclose<cr>")
+map_explicit({
+	mode = "n",
+	sequence = "<leader>q",
+	action = "<cmd>copen<cr>",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>Q",
+	action = "<cmd>cclose<cr>",
+})
 
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "qf" },
 	callback = function(ev)
-		vim.keymap.set("n", "q", "<cmd>close<cr>", { buffer = ev.buf })
+		map_explicit({ mode = "n", sequence = "q", action = "<cmd>close<cr>", opts = { buffer = ev.buf } })
 	end,
 })
 
 -- OPTIONAL DIAGNOSTIC MAPPINGS
-vim.keymap.set("n", "[d", vim.diagnostic.goto_prev)
-vim.keymap.set("n", "]d", vim.diagnostic.goto_next)
+map_explicit({
+	mode = "n",
+	sequence = "[d",
+	action = vim.diagnostic.goto_prev,
+})
+map_explicit({
+	mode = "n",
+	sequence = "]d",
+	action = vim.diagnostic.goto_next,
+})
 
-vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float)
+map_explicit({
+	mode = "n",
+	sequence = "<leader>e",
+	action = vim.diagnostic.open_float,
+})
 
-vim.keymap.set("n", "<leader>xx", function()
-	vim.diagnostic.setloclist()
-end)
+map_explicit({
+	mode = "n",
+	sequence = "<leader>xx",
+	action = vim.diagnostic.setloclist,
+})
 
-vim.keymap.set("n", "<leader>xX", function()
-	vim.diagnostic.setqflist()
-end)
+map_explicit({
+	mode = "n",
+	sequence = "<leader>xX",
+	action = vim.diagnostic.setqflist,
+})

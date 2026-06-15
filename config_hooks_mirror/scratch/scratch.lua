@@ -46,9 +46,11 @@ vim.filetype.add({
 	},
 })
 
-vim.keymap.set({ "n", "v" }, "<leader>pp", function()
-	print("This is working!")
-end)
+map_explicit({
+	mode = { "n", "v" },
+	sequence = "<leader>pp",
+	action = mkprint("This is working!"),
+})
 
 vim.fn.expand("%:p") -- full path
 vim.fn.expand("%") -- path as opened (may be relative)

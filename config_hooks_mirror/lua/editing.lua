@@ -763,7 +763,11 @@ setup_plugin("treesj", function(treesj)
 		max_join_length = 120,
 	})
 
-	vim.keymap.set("n", "gS", treesj.toggle)
+	map_explicit({
+		mode = "n",
+		sequence = "gS",
+		action = treesj.toggle,
+	})
 end)
 
 -- https://github.com/kaymmm/bullets.nvim | lua port of dkarter/bullets.vim
@@ -1034,14 +1038,37 @@ setup_plugin("date-time-inserter", function(dti)
 		presets = {},
 	})
 
-	vim.keymap.set("n", "<leader>dt", ':r! date "+\\%d-\\%m-\\%Y" <CR>', { noremap = true })
-	vim.keymap.set("n", "<leader>tt", ':r! date "+\\%H:\\%M:\\%S" <CR>', { noremap = true })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dt",
+		action = ':r! date "+\\%d-\\%m-\\%Y" <CR>',
+		opts = { noremap = true },
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>tt",
+		action = ':r! date "+\\%H:\\%M:\\%S" <CR>',
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dt",
+		action = "<cmd>InsertDate<CR>",
+		opts = { noremap = true, silent = true },
+	})
 
-	vim.keymap.set("n", "<leader>dt", "<cmd>InsertDate<CR>", { noremap = true, silent = true })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>tt",
+		action = "<cmd>InsertTime<CR>",
+		opts = { noremap = true, silent = true },
+	})
 
-	vim.keymap.set("n", "<leader>tt", "<cmd>InsertTime<CR>", { noremap = true, silent = true })
-
-	vim.keymap.set("n", "<leader>dtt", "<cmd>InsertDateTime<CR>", { noremap = true, silent = true })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dtt",
+		action = "<cmd>InsertDateTime<CR>",
+		opts = { noremap = true, silent = true },
+	})
 end)
 
 -- likely strictly dominated by dial
@@ -1068,37 +1095,77 @@ setup_plugin("dial", function(dial)
 			augend.constant.alias.Alpha,
 		},
 	})
-	map("n", "<C-a>", function()
-		manipulate("increment", "normal")
-	end)
-	map("n", "<C-x>", function()
-		manipulate("decrement", "normal")
-	end)
-	map("n", "g<C-a>", function()
-		manipulate("increment", "gnormal")
-	end)
-	map("n", "g<C-x>", function()
-		manipulate("decrement", "gnormal")
-	end)
-	map("x", "<C-a>", function()
-		manipulate("increment", "visual")
-	end)
-	map("x", "<C-x>", function()
-		manipulate("decrement", "visual")
-	end)
-	map("x", "g<C-a>", function()
-		manipulate("increment", "gvisual")
-	end)
-	map("x", "g<C-x>", function()
-		manipulate("decrement", "gvisual")
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "<C-a>",
+		action = function()
+			manipulate("increment", "normal")
+		end,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<C-x>",
+		function()
+			manipulate("decrement", "normal")
+		end,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "g<C-a>",
+		action = function()
+			manipulate("increment", "gnormal")
+		end,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "g<C-x>",
+		action = function()
+			manipulate("decrement", "gnormal")
+		end,
+	})
+	map_explicit({
+		mode = "x",
+		sequence = "<C-a>",
+		action = function()
+			manipulate("increment", "visual")
+		end,
+	})
+	map_explicit({
+		mode = "x",
+		sequence = "<C-x>",
+		action = function()
+			manipulate("decrement", "visual")
+		end,
+	})
+	map_explicit({
+		mode = "x",
+		sequence = "g<C-a>",
+		action = function()
+			manipulate("increment", "gvisual")
+		end,
+	})
+	map_explicit({
+		mode = "x",
+		sequence = "g<C-x>",
+		action = function()
+			manipulate("decrement", "gvisual")
+		end,
+	})
 
-	map("x", "<C-a>", function()
-		require("dial.map").manipulate("increment", "visual", "only_in_visual")
-	end)
-	map("x", "<C-x>", function()
-		require("dial.map").manipulate("decrement", "visual", "only_in_visual")
-	end)
+	map_explicit({
+		mode = "x",
+		sequence = "<C-a>",
+		action = function()
+			require("dial.map").manipulate("increment", "visual", "only_in_visual")
+		end,
+	})
+	map_explicit({
+		mode = "x",
+		sequence = "<C-x>",
+		action = function()
+			require("dial.map").manipulate("decrement", "visual", "only_in_visual")
+		end,
+	})
 
 	require("dial.config").augends:on_filetype({
 		typescript = {
@@ -1108,13 +1175,82 @@ setup_plugin("dial", function(dial)
 		},
 	})
 end)
+-- TODO: fold in above
+map_explicit({ ------------------------------------------------------------------------------------------------------------- dial
+	mode = "n",
+	sequence = "<C-a>",
+	action = function()
+		require("dial.map").manipulate("increment", "normal")
+	end,
+	desc = "",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<C-x>",
+	action = function()
+		require("dial.map").manipulate("decrement", "normal")
+	end,
+	desc = "",
+})
+map_explicit({
+	mode = "n",
+	sequence = "g<C-a>",
+	action = function()
+		require("dial.map").manipulate("increment", "gnormal")
+	end,
+	desc = "",
+})
+map_explicit({
+	mode = "n",
+	sequence = "g<C-x>",
+	action = function()
+		require("dial.map").manipulate("decrement", "gnormal")
+	end,
+	desc = "",
+})
+map_explicit({
+	mode = "x",
+	sequence = "<C-a>",
+	action = function()
+		require("dial.map").manipulate("increment", "visual")
+	end,
+	desc = "",
+})
+map_explicit({
+	mode = "x",
+	sequence = "<C-x>",
+	action = function()
+		require("dial.map").manipulate("decrement", "visual")
+	end,
+	desc = "",
+})
+map_explicit({
+	mode = "x",
+	sequence = "g<C-a>",
+	action = function()
+		require("dial.map").manipulate("increment", "gvisual")
+	end,
+	desc = "",
+})
+map_explicit({
+	mode = "x",
+	sequence = "g<C-x>",
+	action = function()
+		require("dial.map").manipulate("decrement", "gvisual")
+	end,
+	desc = "",
+})
 
 utils.packadd("vim-sandwich", function()
 	vim.g["sandwich#magicchar#f#patterns"] = { { header = "f", bra = "", ket = "" } }
 end)
 
 utils.packadd("vim-mundo", function()
-	vim.keymap.set("n", "<leader>u", "<cmd>MundoToggle<cr>")
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>u",
+		action = "<cmd>MundoToggle<cr>",
+	})
 end)
 
 utils.packadd("indent-blankline", function()
@@ -1143,8 +1279,16 @@ local indent_tools_defaults = {
 setup_plugin("indent-tools", indent_tools_defaults)
 
 utils.packadd("tabular", function()
-	vim.keymap.set("n", "<leader>a=", ":Tabularize /=<cr>")
-	vim.keymap.set("v", "<leader>a=", ":Tabularize /=<cr>")
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>a=",
+		action = ":Tabularize /=<cr>",
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<leader>a=",
+		action = ":Tabularize /=<cr>",
+	})
 end)
 
 utils.packadd("nvim-various-textobjs", function()
@@ -1160,10 +1304,26 @@ end)
 -- https://github.com/willothy/moveline.nvim
 -- Neovim plugin for moving lines up and down
 setup_plugin("moveline", function(moveline)
-	vim.keymap.set("n", "<M-k>", moveline.up)
-	vim.keymap.set("n", "<M-j>", moveline.down)
-	vim.keymap.set("v", "<M-k>", moveline.block_up)
-	vim.keymap.set("v", "<M-j>", moveline.block_down)
+	map_explicit({
+		mode = "n",
+		sequence = "<M-k>",
+		action = moveline.up,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<M-j>",
+		action = moveline.down,
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<M-k>",
+		action = moveline.block_up,
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<M-j>",
+		action = moveline.block_down,
+	})
 end)
 
 -- https://github.com/Wansmer/sibling-swap.nvim
@@ -1233,18 +1393,68 @@ setup_plugin("move", function(move)
 
 	local opts = { noremap = true, silent = true }
 	-- Normal-mode commands
-	vim.keymap.set("n", "<A-j>", ":MoveLine(1)<CR>", opts)
-	vim.keymap.set("n", "<A-k>", ":MoveLine(-1)<CR>", opts)
-	vim.keymap.set("n", "<A-h>", ":MoveHChar(-1)<CR>", opts)
-	vim.keymap.set("n", "<A-l>", ":MoveHChar(1)<CR>", opts)
-	vim.keymap.set("n", "<leader>wf", ":MoveWord(1)<CR>", opts)
-	vim.keymap.set("n", "<leader>wb", ":MoveWord(-1)<CR>", opts)
+	map_explicit({
+		mode = "n",
+		sequence = "<A-j>",
+		":MoveLine(1)<CR>",
+		action = opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<A-k>",
+		":MoveLine(-1)<CR>",
+		action = opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<A-h>",
+		":MoveHChar(-1)<CR>",
+		action = opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<A-l>",
+		":MoveHChar(1)<CR>",
+		action = opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>wf",
+		":MoveWord(1)<CR>",
+		action = opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>wb",
+		":MoveWord(-1)<CR>",
+		action = opts,
+	})
 
 	-- Visual-mode commands
-	vim.keymap.set("v", "<A-j>", ":MoveBlock(1)<CR>", opts)
-	vim.keymap.set("v", "<A-k>", ":MoveBlock(-1)<CR>", opts)
-	vim.keymap.set("v", "<A-h>", ":MoveHBlock(-1)<CR>", opts)
-	vim.keymap.set("v", "<A-l>", ":MoveHBlock(1)<CR>", opts)
+	map_explicit({
+		mode = "v",
+		sequence = "<A-j>",
+		":MoveBlock(1)<CR>",
+		action = opts,
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<A-k>",
+		":MoveBlock(-1)<CR>",
+		action = opts,
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<A-h>",
+		":MoveHBlock(-1)<CR>",
+		action = opts,
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<A-l>",
+		":MoveHBlock(1)<CR>",
+		action = opts,
+	})
 end)
 
 --─────────────────────────────────────────────────────────────────────────────
@@ -1848,8 +2058,11 @@ setup_plugin("mini.align", mini_align_defaults)
 vim.api.nvim_create_autocmd("FileType", {
 	pattern = { "help", "qf", "man", "lspinfo" },
 	callback = function(ev)
-		vim.keymap.set("n", "q", "<cmd>quit<cr>", {
-			buffer = ev.buf,
+		map_explicit({
+			mode = "n",
+			sequence = "q",
+			action = "<cmd>quit<cr>",
+			opts = { buffer = ev.buf },
 		})
 	end,
 })

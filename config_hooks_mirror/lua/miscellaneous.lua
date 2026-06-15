@@ -14,8 +14,16 @@ setup_plugin("Launch", launch_defaults)
 local minimal_narrow_region_defaults = nil
 setup_plugin("minimal-narrow-region", function(mnr)
 	-- No mappings by default, create them explicitly:
-	vim.keymap.set("x", "<Leader><Leader>nr", mnr.NarrowRegionOpen)
-	vim.keymap.set("n", "<Leader><Leader>NR", mnr.NarrowRegionClose)
+	map_explicit({
+		mode = "x",
+		sequence = "<Leader><Leader>nr",
+		action = mnr.NarrowRegionOpen,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader><Leader>NR",
+		action = mnr.NarrowRegionClose,
+	})
 end)
 
 -- TODO: adapt for just/taskfile/etc.
@@ -41,7 +49,12 @@ setup_plugin("advanced_new_file", function(anf)
 	anf.notify = true
 	anf.show_cwd = false
 	anf.prompt = "File name (or Folder): "
-	vim.keymap.set("n", "<C-n>", "<cmd>AdvancedNewFile<CR>", { noremap = true })
+	map_explicit({
+		mode = "n",
+		sequence = "<C-n>",
+		action = "<cmd>AdvancedNewFile<CR>",
+		opts = { noremap = true },
+	})
 end)
 
 -- TODO: move to modules?
@@ -204,12 +217,36 @@ setup_plugin("timew", function(timew)
 	timew.setup(timew_defaults)
 
 	-- Set Timew bindings
-	vim.keymap.set("n", "<leader>tn", "<Cmd>Timew start<CR>")
-	vim.keymap.set("n", "<leader>ts", "<Cmd>Timew stop<CR>")
-	vim.keymap.set("n", "<leader>tc", "<Cmd>Timew continue<CR>")
-	vim.keymap.set("n", "<leader>tC", "<Cmd>Timew cancel<CR>")
-	vim.keymap.set("n", "<leader>td", "<Cmd>Timew delete<CR>")
-	vim.keymap.set("n", "<leader>tS", "<Cmd>Timew summary<CR>")
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>tn",
+		action = "<Cmd>Timew start<CR>",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>ts",
+		action = "<Cmd>Timew stop<CR>",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>tc",
+		action = "<Cmd>Timew continue<CR>",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>tC",
+		action = "<Cmd>Timew cancel<CR>",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>td",
+		action = "<Cmd>Timew delete<CR>",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>tS",
+		action = "<Cmd>Timew summary<CR>",
+	})
 end)
 
 -- https://github.com/dbinagi/nomodoro
@@ -488,14 +525,39 @@ setup_plugin("doing", function(doing)
 
 	doing.setup(doing_defaults)
 
-	vim.keymap.set("n", "<leader>da", doing.add, { desc = "[D]oing: [A]dd" })
-	vim.keymap.set("n", "<leader>de", doing.edit, { desc = "[D]oing: [E]dit" })
-	vim.keymap.set("n", "<leader>dn", doing.done, { desc = "[D]oing: Do[n]e" })
-	vim.keymap.set("n", "<leader>dt", doing.toggle, { desc = "[D]oing: [T]oggle" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>da",
+		action = doing.add,
+		opts = { desc = "[D]oing: [A]dd" },
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>de",
+		action = doing.edit,
+		opts = { desc = "[D]oing: [E]dit" },
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dn",
+		action = doing.done,
+		opts = { desc = "[D]oing: Do[n]e" },
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>dt",
+		action = doing.toggle,
+		opts = { desc = "[D]oing: [T]oggle" },
+	})
 
-	vim.keymap.set("n", "<leader>ds", function()
-		vim.notify(doing.status(true), vim.log.levels.INFO, { title = "Doing:", icon = "" })
-	end, { desc = "[D]oing: [S]tatus" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>ds",
+		action = function()
+			vim.notify(doing.status(true), vim.log.levels.INFO, { title = "Doing:", icon = "" })
+		end,
+		opts = { desc = "[D]oing: [S]tatus" },
+	})
 end)
 
 -- https://github.com/vimwiki/vimwiki
@@ -593,25 +655,63 @@ setup_plugin("neowell-lua", function(neowell)
 
 	local NOREF_NOERR_TRUNC = { noremap = true, silent = true, nowait = true }
 
-	vim.keymap.set("n", "\\", function()
-		vim.cmd("NeoWellToggle")
-	end, NOREF_NOERR_TRUNC)
-	vim.keymap.set("n", "<Leader>/", function()
-		vim.cmd("NeoWellAppend")
-	end, NOREF_NOERR_TRUNC)
-	vim.keymap.set("n", "<CR>", function()
-		-- vim.cmd('NeoZoomToggle') -- remove this if you don't know what it is
-		vim.cmd("NeoWellJump")
-	end, NOREF_NOERR_TRUNC)
-	vim.keymap.set("n", "<Leader>r", function()
-		vim.cmd("NeoWellEdit")
-	end, NOREF_NOERR_TRUNC)
-	vim.keymap.set("n", "<Leader>d", function()
-		vim.cmd("NeoWellOut")
-	end, NOREF_NOERR_TRUNC)
-	vim.keymap.set("n", "<Leader>D", function()
-		vim.cmd("NeoWellWipeOut")
-	end, NOREF_NOERR_TRUNC)
+	map_explicit({
+		mode = "n",
+		sequence = "\\",
+		action = function()
+			vim.cmd("NeoWellToggle")
+		end,
+		opts = NOREF_NOERR_TRUNC,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>/",
+		action = function()
+			vim.cmd("NeoWellAppend")
+		end,
+		opts = NOREF_NOERR_TRUNC,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<CR>",
+		action = function()
+			-- vim.cmd('NeoZoomToggle') -- remove this if you don't know what it is
+			vim.cmd("NeoWellJump")
+		end,
+		opts = NOREF_NOERR_TRUNC,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>r",
+		action = function()
+			vim.cmd("NeoWellEdit")
+		end,
+		opts = NOREF_NOERR_TRUNC,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>r",
+		action = function()
+			vim.cmd("NeoWellEdit")
+		end,
+		opts = NOREF_NOERR_TRUNC,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>d",
+		action = function()
+			vim.cmd("NeoWellOut")
+		end,
+		opts = NOREF_NOERR_TRUNC,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>D",
+		action = function()
+			vim.cmd("NeoWellWipeOut")
+		end,
+		opts = NOREF_NOERR_TRUNC,
+	})
 end)
 
 -- https://github.com/RutaTang/quicknote.nvim
@@ -801,11 +901,32 @@ setup_plugin("color-picker", function(color_picker)
 
 	local opts = { noremap = true, silent = true }
 
-	vim.keymap.set("n", "<C-c>", "<cmd>PickColor<cr>", opts)
-	vim.keymap.set("i", "<C-c>", "<cmd>PickColorInsert<cr>", opts)
+	map_explicit({
+		mode = "n",
+		sequence = "<C-c>",
+		"<cmd>PickColor<cr>",
+		action = opts,
+	})
+	map_explicit({
+		mode = "i",
+		sequence = "<C-c>",
+		"<cmd>PickColorInsert<cr>",
+		action = opts,
+	})
 
-	-- vim.keymap.set("n", "your_keymap", "<cmd>ConvertHEXandRGB<cr>", opts)
-	-- vim.keymap.set("n", "your_keymap", "<cmd>ConvertHEXandHSL<cr>", opts)
+	-- TODO
+	-- map_explicit({
+	-- 	mode = "n",
+	-- 	sequence = "your_keymap",
+	-- 	"<cmd>ConvertHEXandRGB<cr>",
+	-- 	action = opts,
+	-- })
+	-- map_explicit({
+	-- 	mode = "n",
+	-- 	sequence = "your_keymap",
+	-- 	"<cmd>ConvertHEXandHSL<cr>",
+	-- 	action = opts,
+	-- })
 
 	vim.cmd([[hi FloatBorder guibg=NONE]]) -- if you don't want weird border background colors around the popup.
 end)
@@ -953,7 +1074,12 @@ local carbon_now_nvim_defaults = {
 }
 setup_plugin("carbon-now-nvim", function(cn)
 	cn.setup(carbon_now_nvim_defaults)
-	vim.keymap.set("v", "<leader>cn", ":CarbonNow<CR>", { silent = true })
+	map_explicit({
+		mode = "v",
+		sequence = "<leader>cn",
+		action = ":CarbonNow<CR>",
+		opts = { silent = true },
+	})
 end)
 
 -- https://github.com/nvzone/showkeys
@@ -1128,8 +1254,18 @@ local nerdy_defaults = {
 }
 setup_plugin("nerdy", function(nerdy)
 	nerdy.setup(nerdy_defaults)
-	vim.keymap.set("n", "<leader>in", "<cmd>Nerdy list<CR>", { desc = "Browse nerd icons" })
-	vim.keymap.set("n", "<leader>iN", "<cmd>Nerdy recents<CR>", { desc = "Browse recent nerd icons" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>in",
+		action = "<cmd>Nerdy list<CR>",
+		desc = "Browse nerd icons",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>iN",
+		action = "<cmd>Nerdy recents<CR>",
+		desc = "Browse recent nerd icons",
+	})
 end)
 
 -- https://github.com/nativerv/cyrillic.nvim

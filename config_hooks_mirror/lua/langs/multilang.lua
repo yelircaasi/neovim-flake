@@ -33,28 +33,35 @@ vim.g.knap_settings = {
 	delay = 250,
 }
 setup_plugin("knap", function(knap)
-	-- set shorter name for keymap function
-	local kmap = vim.keymap.set
+	local nvi = { "n", "v", "i" }
 
 	-- F5 processes the document once, and refreshes the view
-	kmap({ "n", "v", "i" }, "<F5>", function()
-		require("knap").process_once()
-	end)
+	map_explicit({
+		mode = nvi,
+		sequence = "<F5>",
+		action = knap.process_once,
+	})
 
 	-- F6 closes the viewer application, and allows settings to be reset
-	kmap({ "n", "v", "i" }, "<F6>", function()
-		require("knap").close_viewer()
-	end)
+	map_explicit({
+		mode = nvi,
+		sequence = "<F6>",
+		action = knap.close_viewer,
+	})
 
 	-- F7 toggles the auto-processing on and off
-	kmap({ "n", "v", "i" }, "<F7>", function()
-		require("knap").toggle_autopreviewing()
-	end)
+	map_explicit({
+		mode = nvi,
+		sequence = "<F7>",
+		action = knap.toggle_autopreviewing,
+	})
 
 	-- F8 invokes a SyncTeX forward search, or similar, where appropriate
-	kmap({ "n", "v", "i" }, "<F8>", function()
-		require("knap").forward_jump()
-	end)
+	map_explicit({
+		mode = nvi,
+		sequence = "<F8>",
+		action = knap.forward_jump,
+	})
 end)
 
 --─────────────────────────────────────────────────────────────────────────────

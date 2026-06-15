@@ -29,13 +29,21 @@ wezterm-integration.nvim
 -- manual setup
 local wts = require("wezterm_send")
 
-vim.keymap.set("v", "<leader>wr", function()
+map_explicit({
+    mode = "v",
+    sequence = "<leader>wr",
+    action = function()
   wts.send_selection({ direction = "Right" })
-end)
+end,
+})
 
-vim.keymap.set("v", "<leader>wp", function()
+map_explicit({
+    mode = "v",
+    sequence = "<leader>wp",
+    action = function()
   wts.send_selection({ match = "python" })  -- matches title or cwd
-end)
+end,
+})
 
 -- with default keymaps
 require("wezterm_send").setup()

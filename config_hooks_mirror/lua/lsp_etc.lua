@@ -16,15 +16,45 @@ local function on_attach(ev)
 		vim.lsp.completion.enable(true, client.id, ev.buf, { autotrigger = true })
 	end
 
-	local opts = { buffer = ev.buf, silent = true }
-	vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-	vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
-	vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
-	vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-	vim.keymap.set("n", "<leader>cf", function()
-		require("conform").format({ bufnr = ev.buf })
-	end, opts)
-	vim.keymap.set("n", "<leader>cl", vim.lsp.codelens.run, opts)
+	local shared_opts = { buffer = ev.buf, silent = true }
+	map_explicit({
+		mode = "n",
+		sequence = "gd",
+		action = vim.lsp.buf.definition,
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "K",
+		action = vim.lsp.buf.hover,
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rn",
+		action = vim.lsp.buf.rename,
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>ca",
+		action = vim.lsp.buf.code_action,
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>cf",
+		action = function()
+			require("conform").format({ bufnr = ev.buf })
+		end,
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>cl",
+		action = vim.lsp.codelens.run,
+		opts = shared_opts,
+	})
 end
 
 vim.api.nvim_create_autocmd("LspAttach", { callback = on_attach })
@@ -140,23 +170,32 @@ local function set_diagnostics_mode()
 	utils.printv("LSP Mode: " .. mode.name)
 end
 
-vim.keymap.set("n", "<leader>dt", function()
-	diagnostics_active = not diagnostics_active
-	set_diagnostics_mode()
-end, { desc = "Toggle LSP Diagnostics" })
-
-vim.keymap.set("n", "<leader>dm", function()
-	if not diagnostics_active then
-		diagnostics_active = true
-		current_mode_index = 1
-	else
-		current_mode_index = current_mode_index + 1
-		if current_mode_index > #diagnostic_modes then
+map_explicit({
+	mode = "n",
+	sequence = "<leader>dt",
+	action = function()
+		diagnostics_active = not diagnostics_active
+		set_diagnostics_mode()
+	end,
+	opts = { desc = "Toggle LSP Diagnostics" },
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>dm",
+	action = function()
+		if not diagnostics_active then
+			diagnostics_active = true
 			current_mode_index = 1
+		else
+			current_mode_index = current_mode_index + 1
+			if current_mode_index > #diagnostic_modes then
+				current_mode_index = 1
+			end
 		end
-	end
-	set_diagnostics_mode()
-end, { desc = "Cycle LSP Diagnostic Modes" })
+		set_diagnostics_mode()
+	end,
+	desc = "Cycle LSP Diagnostic Modes",
+})
 
 set_diagnostics_mode()
 
@@ -427,8 +466,16 @@ local lspsaga_defaults = {
 	},
 }
 setup_plugin("lspsaga", lspsaga_defaults)
-vim.keymap.set({ "n", "t" }, "<A-d>", "<cmd>Lspsaga term_toggle")
-vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc")
+map_explicit({
+	mode = { "n", "t" },
+	action = "<A-d>",
+	desc = "<cmd>Lspsaga term_toggle",
+})
+map_explicit({
+	mode = "n",
+	action = "K",
+	desc = "<cmd>Lspsaga hover_doc",
+})
 
 -- QUICKFIX
 
@@ -870,10 +917,30 @@ setup_plugin("bqf", bqf_config)
 -- https://github.com/Dr-42/error-jump.nvim
 -- Gives basic functionality for error messages with format filename:line:column
 setup_plugin("error-jump", function(error_jump)
-	vim.keymap.set("n", "<leader>es", error_jump.jump_to_error, { desc = "[E]rror [S]ource" })
-	vim.keymap.set("n", "<leader>en", error_jump.next_error, { desc = "[E]rror [N]ext" })
-	vim.keymap.set("n", "<leader>eN", error_jump.next_error, { desc = "[E]rror [N]previous" })
-	vim.keymap.set("n", "<leader>ec", error_jump.compile, { desc = "[E]rror [C]ompile" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>es",
+		action = error_jump.jump_to_error,
+		desc = "[E]rror [S]ource",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>en",
+		action = error_jump.next_error,
+		desc = "[E]rror [N]ext",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>eN",
+		action = error_jump.previous_error,
+		desc = "[E]rror [N]previous",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>ec",
+		action = error_jump.compile,
+		desc = "[E]rror [C]ompile",
+	})
 end)
 
 -- https://github.com/ashfinal/qfview.nvim
@@ -1493,3 +1560,81 @@ local nvim_lightbulb_defaults = {
 	filter = nil,
 }
 setup_plugin("nvim-lightbulb", nvim_lightbulb_defaults)
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── mappings ───────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+local lsp_map_opts = { buffer = bufnr, silent = true }
+
+map_explicit({
+	mode = { "i" },
+	sequence = "kj",
+	action = "<escape>",
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>wq",
+	action = function()
+		vim.cmd("wq")
+	end,
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>ww",
+	action = function()
+		vim.cmd("w")
+	end,
+})
+map_explicit({
+	mode = "n",
+	sequence = "<leader>q",
+	action = function()
+		-- Populates the Quickfix list with all diagnostics from the current buffer
+		vim.diagnostic.setqflist({ bufnr = 0 })
+		vim.cmd("copen")
+	end,
+	desc = "Open Quickfix with diagnostics",
+})
+
+-- TODO: check duplication; fold into above
+local lsp_keymaps_group = vim.api.nvim_create_augroup("LspKeymaps", { clear = true })
+
+vim.api.nvim_create_autocmd("LspAttach", {
+	group = lsp_keymaps_group,
+	callback = function(ev)
+		local lsp_map = function(keys, func, desc)
+			map_explicit({
+				mode = "n",
+				sequence = keys,
+				action = func,
+				opts = { buffer = ev.buf, desc = "LSP: " .. desc },
+			})
+		end
+
+		-- Navigation and Information
+		lsp_map("gd", vim.lsp.buf.definition, "Go to Definition")
+		lsp_map("gD", vim.lsp.buf.declaration, "Go to Declaration")
+		lsp_map("gr", vim.lsp.buf.references, "Go to References")
+		lsp_map("gI", vim.lsp.buf.implementation, "Go to Implementation")
+		lsp_map("K", vim.lsp.buf.hover, "Hover Documentation")
+		lsp_map("<C-k>", vim.lsp.buf.signature_help, "Signature Help")
+
+		-- Actions
+		lsp_map("<leader>ca", vim.lsp.buf.code_action, "Code Action")
+		lsp_map("<leader>rn", vim.lsp.buf.rename, "Rename")
+
+		-- Diagnostics
+		lsp_map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic")
+		lsp_map("]d", vim.diagnostic.goto_next, "Next Diagnostic")
+		lsp_map("<leader>dl", vim.diagnostic.open_float, "Show Line Diagnostics")
+
+		-- format on save (to use LSP formatter instead of conform)
+		-- vim.api.nvim_buf_create_autocmd("BufWritePre", {
+		--   buffer = ev.buf,
+		--   callback = function() vim.lsp.buf.format { async = false } end
+		-- })
+		--
+		local bufopts = { noremap = true, silent = true, buffer = bufnr }
+	end,
+})

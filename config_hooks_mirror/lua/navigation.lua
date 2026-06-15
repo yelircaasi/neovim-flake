@@ -36,31 +36,109 @@ setup_plugin("smart-splits", function(ss)
 		multiplexer_integration = "wezterm",
 	})
 
-	local map = vim.keymap.set
 	-- Resize
-	map("n", "<A-h>", ss.resize_left, { desc = "Resize window left" })
-	map("n", "<A-j>", ss.resize_down, { desc = "Resize window down" })
-	map("n", "<A-k>", ss.resize_up, { desc = "Resize window up" })
-	map("n", "<A-l>", ss.resize_right, { desc = "Resize window right" })
+	map_explicit({
+		mode = "n",
+		sequence = "<A-h>",
+		action = ss.resize_left,
+		desc = "Resize window left",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<A-j>",
+		action = ss.resize_down,
+		desc = "Resize window down",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<A-k>",
+		action = ss.resize_up,
+		desc = "Resize window up",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<A-l>",
+		action = ss.resize_right,
+		desc = "Resize window right",
+	})
 	-- Swap buffers between windows
-	map("n", "<leader><leader>h", ss.swap_buf_left, { desc = "Swap buffer left" })
-	map("n", "<leader><leader>j", ss.swap_buf_down, { desc = "Swap buffer down" })
-	map("n", "<leader><leader>k", ss.swap_buf_up, { desc = "Swap buffer up" })
-	map("n", "<leader><leader>l", ss.swap_buf_right, { desc = "Swap buffer right" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader><leader>h",
+		action = ss.swap_buf_left,
+		desc = "Swap buffer left",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader><leader>j",
+		action = ss.swap_buf_down,
+		desc = "Swap buffer down",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader><leader>k",
+		action = ss.swap_buf_up,
+		desc = "Swap buffer up",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader><leader>l",
+		action = ss.swap_buf_right,
+		desc = "Swap buffer right",
+	})
 end)
 
 setup_plugin("swm", function(swm)
-	local map = vim.keymap.set
 	-- Window navigation: swm makes these smart about floating windows
-	map("n", "<C-w>h", swm.h, { desc = "Window left" })
-	map("n", "<C-w>j", swm.j, { desc = "Window down" })
-	map("n", "<C-w>k", swm.k, { desc = "Window up" })
-	map("n", "<C-w>l", swm.l, { desc = "Window right" })
+	map_explicit({
+		mode = "n",
+		sequence = "<C-w>h",
+		action = swm.h,
+		desc = "Window left",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<C-w>j",
+		action = swm.j,
+		desc = "Window down",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<C-w>k",
+		action = swm.k,
+		desc = "Window up",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<C-w>l",
+		action = swm.l,
+		desc = "Window right",
+	})
 	-- Also bind to plain <C-hjkl> for convenience
-	map("n", "<C-h>", swm.h, { desc = "Window left" })
-	map("n", "<C-j>", swm.j, { desc = "Window down" })
-	map("n", "<C-k>", swm.k, { desc = "Window up" })
-	map("n", "<C-l>", swm.l, { desc = "Window right" })
+	map_explicit({
+		mode = "n",
+		sequence = "<C-h>",
+		action = swm.h,
+		desc = "Window left",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<C-j>",
+		action = swm.j,
+		desc = "Window down",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<C-k>",
+		action = swm.k,
+		desc = "Window up",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<C-l>",
+		action = swm.l,
+		desc = "Window right",
+	})
 end)
 
 -- https://github.com/DrKGD/pragma.nvim
@@ -360,7 +438,12 @@ utils.setup_plugin("flybuf", function(flybuf)
 		-- Show relative line numbers in the buffer list
 		rnu = true,
 	})
-	vim.keymap.set("n", "<leader>bf", "FlyBuf", { desc = "FlyBuf: buffer list" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>bf",
+		action = "FlyBuf",
+		desc = "FlyBuf: buffer list",
+	})
 end)
 
 -- https://github.com/Hajime-Suzuki/vuffers.nvim
@@ -823,18 +906,38 @@ utils.packadd("clever-f.vim")
 -- https://github.com/smoka7/hop.nvim
 setup_plugin("hop", function(hop)
 	local directions = require("hop.hint").HintDirection
-	vim.keymap.set("", "f", function()
-		hop.hint_char1({ direction = directions.AFTER_CURSOR, current_line_only = true })
-	end, { remap = true })
-	vim.keymap.set("", "F", function()
-		hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true })
-	end, { remap = true })
-	vim.keymap.set("", "t", function()
-		hop.hint_char1({ direction = directions.AFTER_CURSOR, current_line_only = true, hint_offset = -1 })
-	end, { remap = true })
-	vim.keymap.set("", "T", function()
-		hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 })
-	end, { remap = true })
+	map_explicit({
+		mode = "",
+		sequence = "f",
+		action = function()
+			hop.hint_char1({ direction = directions.AFTER_CURSOR, current_line_only = true })
+		end,
+		opts = { remap = true },
+	})
+	map_explicit({
+		mode = "",
+		sequence = "F",
+		action = function()
+			hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true })
+		end,
+		opts = { remap = true },
+	})
+	map_explicit({
+		mode = "",
+		sequence = "t",
+		action = function()
+			hop.hint_char1({ direction = directions.AFTER_CURSOR, current_line_only = true, hint_offset = -1 })
+		end,
+		opts = { remap = true },
+	})
+	map_explicit({
+		mode = "",
+		sequence = "T",
+		action = function()
+			hop.hint_char1({ direction = directions.BEFORE_CURSOR, current_line_only = true, hint_offset = 1 })
+		end,
+		opts = { remap = true },
+	})
 end) -- PROBABLY NOT, BUT WORTH A TRY
 
 local mini_jump_defaults = {
@@ -920,8 +1023,16 @@ setup_plugin("neowords", function(_) end) -- https://github.com/backdround/neowo
 setup_plugin("leap", function(leap)
 	leap.opts.safe_labels = {}
 
-	vim.keymap.set({ "n", "x", "o" }, "s", "<Plug>(leap-forward)")
-	vim.keymap.set({ "n", "x", "o" }, "S", "<Plug>(leap-backward)")
+	map_explicit({
+		mode = { "n", "x", "o" },
+		sequence = "s",
+		action = "<Plug>(leap-forward)",
+	})
+	map_explicit({
+		mode = { "n", "x", "o" },
+		sequence = "S",
+		action = "<Plug>(leap-backward)",
+	})
 end)
 
 local flash_defaults = {
@@ -1184,21 +1295,31 @@ local flash_defaults = {
 setup_plugin("flash", function(flash)
 	flash.setup(flash_defaults)
 
-	vim.keymap.set({ "n", "x", "o" }, "s", function()
-		require("flash").jump()
-	end)
+	map_explicit({
+		mode = { "n", "x", "o" },
+		sequence = "s",
+		action = flash.jump,
+	})
 
-	vim.keymap.set({ "n", "x", "o" }, "S", function()
-		require("flash").treesitter()
-	end)
+	map_explicit({
+		mode = { "n", "x", "o" },
+		sequence = "S",
+		action = flash.treesitter,
+	})
 
-	vim.keymap.set("o", "r", function()
-		require("flash").remote()
-	end)
+	map_explicit({
+		mode = "o",
+		sequence = "r",
+		action = flash.remote,
+	})
 
-	vim.keymap.set({ "o", "x" }, "R", function()
-		require("flash").treesitter_search()
-	end)
+	map_explicit({
+		mode = { "o", "x" },
+		sequence = "R",
+		action = function()
+			require("flash").treesitter_search()
+		end,
+	})
 end)
 
 local hop_defaults = {
@@ -1232,9 +1353,13 @@ local hop_defaults = {
 setup_plugin("hop", function(hop)
 	hop.setup(hop_defaults)
 
-	vim.keymap.set("", "s", function()
-		hop.hint_char1()
-	end)
+	map_explicit({
+		mode = "",
+		sequence = "s",
+		action = function()
+			hop.hint_char1()
+		end,
+	})
 end)
 
 setup_plugin("treemonkey", function(_) end)
@@ -1383,25 +1508,49 @@ setup_plugin("harpoon", function(harpoon)
 	harpoon.setup({})
 	local list = harpoon:list()
 
-	local map = vim.keymap.set
-	map("n", "<leader>ha", function()
-		list:add()
-	end, { desc = "Harpoon: add file" })
-	map("n", "<leader>hh", function()
-		harpoon.ui:toggle_quick_menu(list)
-	end, { desc = "Harpoon: menu" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>ha",
+		action = function()
+			list:add()
+		end,
+		desc = "Harpoon: add file",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>hh",
+		action = function()
+			harpoon.ui:toggle_quick_menu(list)
+		end,
+		desc = "Harpoon: menu",
+	})
 	-- Quick jump to slots 1-4
 	for i = 1, 4 do
-		map("n", "<leader>" .. i, function()
-			list:select(i)
-		end, { desc = "Harpoon: jump to " .. i })
+		map_explicit({
+			mode = "n",
+			sequence = "<leader>" .. i,
+			action = function()
+				list:select(i)
+			end,
+			desc = "Harpoon: jump to " .. i,
+		})
 	end
-	map("n", "<leader>hp", function()
-		list:prev()
-	end, { desc = "Harpoon: prev" })
-	map("n", "<leader>hn", function()
-		list:next()
-	end, { desc = "Harpoon: next" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>hp",
+		action = function()
+			list:prev()
+		end,
+		desc = "Harpoon: prev",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>hn",
+		function()
+			list:next()
+		end,
+		desc = "Harpoon: next",
+	})
 end)
 
 setup_plugin("marks", function(marks)
@@ -1417,9 +1566,18 @@ setup_plugin("marks", function(marks)
 		},
 	})
 
-	local map = vim.keymap.set
-	map("n", "<leader>mlb", "MarksListBuf", { desc = "Marks: list buffer marks" })
-	map("n", "<leader>mqb", "MarksQFListBuf", { desc = "Marks: list buffer marks in quickfix" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>mlb",
+		action = "MarksListBuf",
+		desc = "Marks: list buffer marks",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>mqb",
+		action = "MarksQFListBuf",
+		desc = "Marks: list buffer marks in quickfix",
+	})
 	-- map("n", "<leader>md", marks.delete_buf,  { desc = "Marks: delete all buffer marks" })
 end)
 
@@ -1432,9 +1590,18 @@ setup_plugin("markit", function(markit)
 		marks_in_signs = true,
 	})
 
-	local map = vim.keymap.set
-	map("n", "m;", "Markit mark toggle<cr>", { desc = "Markit: toggle mark" })
-	map("n", "m:", "Markit mark list all<cr>", { desc = "Markit: list marks" })
+	map_explicit({
+		mode = "n",
+		sequence = "m;",
+		action = "Markit mark toggle<cr>",
+		desc = "Markit: toggle mark",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "m:",
+		action = "Markit mark list all<cr>",
+		desc = "Markit: list marks",
+	})
 end)
 
 -- https://github.com/otavioschwanck/arrow.nvim
@@ -1572,8 +1739,16 @@ setup_plugin("urlview", urlview_defaults)
 local highlight_current_n_defaults = nil
 setup_plugin("highlight-current-n-nvim", function(highlight_current_n)
 	-- Map keys
-	vim.keymap.set("n", "n", "<Plug>(highlight-current-n-n")
-	vim.keymap.set("n", "n", "<Plug>(highlight-current-n-N")
+	map_explicit({
+		mode = "n",
+		sequence = "n",
+		action = "<Plug>(highlight-current-n-n",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "n",
+		action = "<Plug>(highlight-current-n-N",
+	})
 
 	-- If you want the highlighting to take effect in other maps they must
 	-- also be nmaps (or rather, not "nore").
@@ -1582,7 +1757,11 @@ setup_plugin("highlight-current-n-nvim", function(highlight_current_n)
 	-- simply fill the / register with the current <cword>, which makes future
 	-- commands like cgn "feel better". This effectively does that by performing
 	-- "search ahead <cword> (*), go back to last match (N)".
-	vim.keymap.set("n", "*", "*N")
+	map_explicit({
+		mode = "n",
+		sequence = "*",
+		action = "*N",
+	})
 
 	-- Some QOL autocommands
 	--[[ TODO: translate

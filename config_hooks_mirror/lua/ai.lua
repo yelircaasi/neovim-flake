@@ -204,26 +204,56 @@ setup_plugin("opencode", function(opencode)
 	vim.o.autoread = true -- Required for `vim.g.opencode_opts.events.reload`
 
 	-- Recommended/example keymaps
-	vim.keymap.set({ "n", "x" }, "<leader>oa", function()
-		require("opencode").ask("@this: ")
-	end, { desc = "Ask opencode…" })
-	vim.keymap.set({ "n", "x" }, "<leader>os", function()
-		require("opencode").select()
-	end, { desc = "Select opencode…" })
+	map_explicit({
+		mode = { "n", "x" },
+		sequence = "<leader>oa",
+		action = function()
+			require("opencode").ask("@this: ")
+		end,
+		desc = "Ask opencode…",
+	})
+	map_explicit({
+		mode = { "n", "x" },
+		sequence = "<leader>os",
+		action = function()
+			require("opencode").select()
+		end,
+		desc = "Select opencode…",
+	})
 
-	vim.keymap.set({ "n", "x" }, "go", function()
-		return require("opencode").operator("@this ")
-	end, { desc = "Add range to opencode", expr = true })
-	vim.keymap.set("n", "goo", function()
-		return require("opencode").operator("@this ") .. "_"
-	end, { desc = "Add line to opencode", expr = true })
+	map_explicit({
+		mode = { "n", "x" },
+		sequence = "go",
+		action = function()
+			return require("opencode").operator("@this ")
+		end,
+		opts = { desc = "Add range to opencode", expr = true },
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "goo",
+		action = function()
+			return require("opencode").operator("@this ") .. "_"
+		end,
+		opts = { desc = "Add line to opencode", expr = true },
+	})
 
-	vim.keymap.set("n", "<S-C-u>", function()
-		require("opencode").command("session.half.page.up")
-	end, { desc = "Scroll opencode up" })
-	vim.keymap.set("n", "<S-C-d>", function()
-		require("opencode").command("session.half.page.down")
-	end, { desc = "Scroll opencode down" })
+	map_explicit({
+		mode = "n",
+		sequence = "<S-C-u>",
+		action = function()
+			require("opencode").command("session.half.page.up")
+		end,
+		opts = { desc = "Scroll opencode up" },
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<S-C-d>",
+		action = function()
+			require("opencode").command("session.half.page.down")
+		end,
+		opts = { desc = "Scroll opencode down" },
+	})
 
 	-- Optionally show upon submitting prompt
 	vim.api.nvim_create_autocmd("User", {
@@ -258,9 +288,14 @@ setup_plugin("opencode", function(opencode)
 			},
 		}
 
-		vim.keymap.set({ "n", "t" }, "<C-.>", function()
-			require("snacks.terminal").toggle(opencode_cmd, snacks_terminal_opts)
-		end, { desc = "Toggle opencode" })
+		map_explicit({
+			mode = { "n", "t" },
+			sequence = "<C-.>",
+			action = function()
+				require("snacks.terminal").toggle(opencode_cmd, snacks_terminal_opts)
+			end,
+			desc = "Toggle opencode",
+		})
 
 		vim.api.nvim_create_autocmd("User", {
 			pattern = "OpencodeEvent:*", -- Optionally filter event types
@@ -507,14 +542,24 @@ local codecompanion_opts = {
 setup_plugin("codecompanion", function(codecompanion)
 	codecompanion.setup(codecompanion_opts)
 
-	vim.keymap.set({ "n", "v" }, "<C-a>", "<cmd>CodeCompanionActions<cr>", { noremap = true, silent = true })
-	vim.keymap.set(
-		{ "n", "v" },
-		"<LocalLeader>a",
-		"<cmd>CodeCompanionChat Toggle<cr>",
-		{ noremap = true, silent = true }
-	)
-	vim.keymap.set("v", "ga", "<cmd>CodeCompanionChat Add<cr>", { noremap = true, silent = true })
+	map_explicit({
+		mode = { "n", "v" },
+		sequence = "<C-a>",
+		action = "<cmd>CodeCompanionActions<cr>",
+		opts = { noremap = true, silent = true },
+	})
+	map_explicit({
+		mode = { "n", "v" },
+		sequence = "<LocalLeader>a",
+		action = "<cmd>CodeCompanionChat Toggle<cr>",
+		opts = { noremap = true, silent = true },
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "ga",
+		action = "<cmd>CodeCompanionChat Add<cr>",
+		opts = { noremap = true, silent = true },
+	})
 
 	-- Expand 'cc' into 'CodeCompanion' in the command line
 	vim.cmd([[cab cc CodeCompanion]])

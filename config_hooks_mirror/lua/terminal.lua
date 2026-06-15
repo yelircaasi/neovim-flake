@@ -1,8 +1,48 @@
+--─────────────────────────────────────────────────────────────────────────────
+--──── general mappings ───────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+map_explicit({
+	mode = "t",
+	sequence = "<Esc>",
+	action = [[<C-\><C-n>]],
+	desc = "Exit terminal mode",
+})
+map_explicit({
+	mode = "t",
+	sequence = "kj",
+	action = [[<C-\><C-n>]],
+	desc = "Exit terminal mode",
+})
+map_explicit({
+	mode = "t",
+	sequence = "<C-o>",
+	action = [[<C-\><C-o>]],
+	desc = "Temporary normal mode",
+})
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── terminal plugins ───────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
 -- https://github.com/voldikss/vim-floaterm
 -- Terminal manager for (neo)vim
 utils.packadd("vim-floaterm", function()
 	vim.g.floaterm_width = 0.8
 	vim.g.floaterm_height = 0.8
+
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>ft",
+		action = "<Cmd>FloatermToggle<CR>",
+		desc = "Toggle floaterm",
+	})
+	map_explicit({
+		mode = "t",
+		sequence = "<leader>ft",
+		action = "<C-\\><C-n><Cmd>FloatermToggle<CR>",
+		desc = "Toggle floaterm",
+	})
 end)
 
 -- https://github.com/akinsho/toggleterm.nvim

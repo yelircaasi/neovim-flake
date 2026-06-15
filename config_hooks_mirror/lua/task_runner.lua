@@ -312,7 +312,12 @@ local function taskfile_picker()
 		:find()
 end
 
-vim.keymap.set("n", "<leader>tk", taskfile_picker, { desc = "Pick Taskfile task" })
+map_explicit({
+	mode = "n",
+	sequence = "<leader>tk",
+	action = taskfile_picker,
+	opts = { desc = "Pick Taskfile task" },
+})
 
 -- common formats for
 -- Python (Ruff/Flake8):** `%f:%l:%c: %m`

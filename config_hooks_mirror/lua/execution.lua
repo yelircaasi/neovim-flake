@@ -290,8 +290,16 @@ setup_plugin("iron-nvim", function(iron)
 	})
 
 	-- iron also has a list of commands, see :h iron-commands for all available commands
-	vim.keymap.set("n", "<space>rf", "<cmd>IronFocus<cr>")
-	vim.keymap.set("n", "<space>rh", "<cmd>IronHide<cr>")
+	map_explicit({
+		mode = "n",
+		sequence = "<space>rf",
+		action = "<cmd>IronFocus<cr>",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<space>rh",
+		action = "<cmd>IronHide<cr>",
+	})
 end)
 
 -- https://github.com/fdschmidt93/resin.nvim

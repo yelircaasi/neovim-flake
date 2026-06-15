@@ -329,9 +329,21 @@ local aerial_config = {
 setup_plugin("aerial", function(aerial)
 	aerial.setup(aerial_config)
 
-	vim.keymap.set("n", "<leader>o", "<cmd>AerialToggle<cr>")
-	vim.keymap.set("n", "{", "<cmd>AerialPrev<cr>")
-	vim.keymap.set("n", "}", "<cmd>AerialNext<cr>")
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>o",
+		action = "<cmd>AerialToggle<cr>",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "{",
+		action = "<cmd>AerialPrev<cr>",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "}",
+		action = "<cmd>AerialNext<cr>",
+	})
 end)
 
 -- utils.packadd("nui") -- TODO: comment out after next build
@@ -344,9 +356,13 @@ setup_plugin("nvim-navbuddy", function(navbuddy)
 		},
 	})
 
-	vim.keymap.set("n", "<leader>nb", function()
-		navbuddy.open()
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>nb",
+		action = function()
+			navbuddy.open()
+		end,
+	})
 end)
 
 --─────────────────────────────────────────────────────────────────────────────
@@ -382,17 +398,29 @@ setup_plugin("dropbar", function(dropbar)
 
 	vim.ui.select = require("dropbar.utils.menu").select
 
-	vim.keymap.set("n", "<leader>;", function()
-		require("dropbar.api").pick()
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>;",
+		action = function()
+			require("dropbar.api").pick()
+		end,
+	})
 
-	vim.keymap.set("n", "[;", function()
-		require("dropbar.api").goto_context_start()
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "[;",
+		action = function()
+			require("dropbar.api").goto_context_start()
+		end,
+	})
 
-	vim.keymap.set("n", "];", function()
-		require("dropbar.api").select_next_context()
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "];",
+		action = function()
+			require("dropbar.api").select_next_context()
+		end,
+	})
 end)
 
 -- https://github.com/SmiteshP/nvim-navic
@@ -589,13 +617,21 @@ end
 -- Alternative command-line window plugin for neovim
 local cmdbuf_defaults = nil
 setup_plugin("cmdbuf", function(cmdbuf)
-	vim.keymap.set("n", "q:", function()
-		cmdbuf.split_open(vim.o.cmdwinheight)
-	end)
-	vim.keymap.set("c", "<C-f>", function()
-		cmdbuf.split_open(vim.o.cmdwinheight, { line = vim.fn.getcmdline(), column = vim.fn.getcmdpos() })
-		vim.api.nvim_feedkeys(vim.keycode("<C-c>"), "n", true)
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "q:",
+		action = function()
+			cmdbuf.split_open(vim.o.cmdwinheight)
+		end,
+	})
+	map_explicit({
+		mode = "c",
+		sequence = "<C-f>",
+		action = function()
+			cmdbuf.split_open(vim.o.cmdwinheight, { line = vim.fn.getcmdline(), column = vim.fn.getcmdpos() })
+			vim.api.nvim_feedkeys(vim.keycode("<C-c>"), "n", true)
+		end,
+	})
 
 	-- Custom buffer mappings
 	vim.api.nvim_create_autocmd({ "User" }, {
@@ -603,11 +639,26 @@ setup_plugin("cmdbuf", function(cmdbuf)
 		pattern = { "CmdbufNew" },
 		callback = function(args)
 			vim.bo.bufhidden = "wipe" -- if you don't need previous opened buffer state
-			vim.keymap.set("n", "q", [[<Cmd>quit<CR>]], { nowait = true, buf = 0 })
-			vim.keymap.set("n", "dd", [[<Cmd>lua require('cmdbuf').delete()<CR>]], { buf = 0 })
-			vim.keymap.set({ "n", "i" }, "<C-c>", function()
-				return cmdbuf.cmdline_expr()
-			end, { buf = 0, expr = true })
+			map_explicit({
+				mode = "n",
+				"q",
+				[[<Cmd>quit<CR>]],
+				opts = { nowait = true, buf = 0 },
+			})
+			map_explicit({
+				mode = "n",
+				"dd",
+				[[<Cmd>lua require('cmdbuf').delete()<CR>]],
+				opts = { buf = 0 },
+			})
+			map_explicit({
+				mode = { "n", "i" },
+				"<C-c>",
+				function()
+					return cmdbuf.cmdline_expr()
+				end,
+				opts = { buf = 0, expr = true },
+			})
 
 			local typ = cmdbuf.get_context().type
 			if typ == "vim/cmd" then
@@ -623,17 +674,29 @@ setup_plugin("cmdbuf", function(cmdbuf)
 	})
 
 	-- open lua command-line window
-	vim.keymap.set("n", "ql", function()
-		cmdbuf.split_open(vim.o.cmdwinheight, { type = "lua/cmd" })
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "ql",
+		action = function()
+			cmdbuf.split_open(vim.o.cmdwinheight, { type = "lua/cmd" })
+		end,
+	})
 
 	-- q/, q? alternative
-	vim.keymap.set("n", "q/", function()
-		cmdbuf.split_open(vim.o.cmdwinheight, { type = "vim/search/forward" })
-	end)
-	vim.keymap.set("n", "q?", function()
-		cmdbuf.split_open(vim.o.cmdwinheight, { type = "vim/search/backward" })
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "q/",
+		action = function()
+			cmdbuf.split_open(vim.o.cmdwinheight, { type = "vim/search/forward" })
+		end,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "q?",
+		action = function()
+			cmdbuf.split_open(vim.o.cmdwinheight, { type = "vim/search/backward" })
+		end,
+	})
 end)
 
 -- https://github.com/nvim-mini/mini.cmdline
@@ -1029,13 +1092,26 @@ setup_plugin("vimade", {
 
 -- https://github.com/folke/zen-mode.nvim
 -- Distraction-free coding for Neovim
-setup_plugin("zen-mode", {
+local zenmode_defaults = {
 	wezterm = {
 		enabled = true,
 		-- can be either an absolute font size or the number of incremental steps
 		font = "+4", -- (10% increase per step)
 	},
-})
+}
+setup_plugin("zen-mode", function(zenmode)
+	zenmode.setup(zenmode_defaults)
+
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>zm",
+		action = function()
+			-- width will be 85% of the editor width
+			zenmode.toggle({ window = { width = 0.85 } })
+		end,
+		desc = "",
+	})
+end)
 vim.o.laststatus = 3
 
 -- https://github.com/rewhile/fsread.nvim

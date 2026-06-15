@@ -178,26 +178,100 @@ setup_plugin("fzf-lua", function(fzf)
 		},
 	})
 
-	local map = vim.keymap.set
 	-- Files
-	map("n", "<leader>ff", fzf.files, { desc = "Find files" })
-	map("n", "<leader>fr", fzf.oldfiles, { desc = "Recent files" })
-	map("n", "<leader>fb", fzf.buffers, { desc = "Buffers" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>ff",
+		action = fzf.files,
+		desc = "Find files",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>fr",
+		action = fzf.oldfiles,
+		desc = "Recent files",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>fb",
+		action = fzf.buffers,
+		desc = "Buffers",
+	})
 	-- Search
-	map("n", "<leader>fg", fzf.live_grep, { desc = "Live grep" })
-	map("n", "<leader>fw", fzf.grep_cword, { desc = "Grep word under cursor" })
-	map("v", "<leader>fw", fzf.grep_visual, { desc = "Grep selection" })
-	map("n", "<leader>f/", fzf.grep_curbuf, { desc = "Grep current buffer" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>fg",
+		action = fzf.live_grep,
+		desc = "Live grep",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>fw",
+		action = fzf.grep_cword,
+		desc = "Grep word under cursor",
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<leader>fw",
+		action = fzf.grep_visual,
+		desc = "Grep selection",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>f/",
+		action = fzf.grep_curbuf,
+		desc = "Grep current buffer",
+	})
 	-- LSP
-	map("n", "<leader>fs", fzf.lsp_document_symbols, { desc = "Document symbols" })
-	map("n", "<leader>fS", fzf.lsp_workspace_symbols, { desc = "Workspace symbols" })
-	map("n", "<leader>fd", fzf.diagnostics_document, { desc = "Buffer diagnostics" })
-	map("n", "<leader>fD", fzf.diagnostics_workspace, { desc = "Workspace diagnostics" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>fs",
+		action = fzf.lsp_document_symbols,
+		desc = "Document symbols",
+	})
+	map_explicit({
+		mode = "n",
+		"<leader>fS",
+		action = fzf.lsp_workspace_symbols,
+		desc = "Workspace symbols",
+	})
+	map_explicit({
+		mode = "n",
+		"<leader>fd",
+		action = fzf.diagnostics_document,
+		desc = "Buffer diagnostics",
+	})
+	map_explicit({
+		mode = "n",
+		"<leader>fD",
+		action = fzf.diagnostics_workspace,
+		desc = "Workspace diagnostics",
+	})
 	-- Misc
-	map("n", "<leader>fh", fzf.help_tags, { desc = "Help tags" })
-	map("n", "<leader>fc", fzf.commands, { desc = "Commands" })
-	map("n", "<leader>fq", fzf.quickfix, { desc = "Quickfix list" })
-	map("n", "<leader>f.", fzf.resume, { desc = "Resume last picker" })
+	map_explicit({
+		mode = "n",
+		"<leader>fh",
+		action = fzf.help_tags,
+		desc = "Help tags",
+	})
+	map_explicit({
+		mode = "n",
+		"<leader>fc",
+		action = fzf.commands,
+		desc = "Commands",
+	})
+	map_explicit({
+		mode = "n",
+		"<leader>fq",
+		action = fzf.quickfix,
+		desc = "Quickfix list",
+	})
+	map_explicit({
+		mode = "n",
+		"<leader>f.",
+		action = fzf.resume,
+		desc = "Resume last picker",
+	})
 end)
 
 -- NOTE: deck.nvim (hrsh7th) is a low-level async UI framework, not typically
@@ -269,27 +343,55 @@ setup_plugin("deck", function(deck)
 	})
 
 	-- Example key bindings for launching nvim-deck sources. (These mapping required `deck.easy` calls.)
-	vim.keymap.set("n", "<Leader>ff", "<Cmd>Deck files<CR>", { desc = "Show recent files, buffers, and more" })
-	vim.keymap.set("n", "<Leader>gr", "<Cmd>Deck grep<CR>", { desc = "Start grep search" })
-	vim.keymap.set("n", "<Leader>gi", "<Cmd>Deck git<CR>", { desc = "Open git launcher" })
-	vim.keymap.set("n", "<Leader>he", "<Cmd>Deck helpgrep<CR>", { desc = "Live grep all help tags" })
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>ff",
+		action = "<Cmd>Deck files<CR>",
+		desc = "Show recent files, buffers, and more",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>gr",
+		action = "<Cmd>Deck grep<CR>",
+		desc = "Start grep search",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>gi",
+		action = "<Cmd>Deck git<CR>",
+		desc = "Open git launcher",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>he",
+		action = "<Cmd>Deck helpgrep<CR>",
+		desc = "Live grep all help tags",
+	})
 
 	-- Show the latest deck context.
-	vim.keymap.set("n", "<Leader>;", function()
-		local context = deck.get_history()[vim.v.count == 0 and 1 or vim.v.count]
-		if context then
-			context.show()
-		end
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>;",
+		action = function()
+			local context = deck.get_history()[vim.v.count == 0 and 1 or vim.v.count]
+			if context then
+				context.show()
+			end
+		end,
+	})
 
 	-- Do default action on next item.
-	vim.keymap.set("n", "<Leader>n", function()
-		local ctx = require("deck").get_history()[1]
-		if ctx then
-			ctx.set_cursor(ctx.get_cursor() + 1)
-			ctx.do_action("default")
-		end
-	end)
+	map_explicit({
+		mode = "n",
+		sequence = "<Leader>n",
+		action = function()
+			local ctx = require("deck").get_history()[1]
+			if ctx then
+				ctx.set_cursor(ctx.get_cursor() + 1)
+				ctx.do_action("default")
+			end
+		end,
+	})
 end)
 
 setup_plugin("snacks", function(snacks)
@@ -304,39 +406,89 @@ setup_plugin("snacks", function(snacks)
 		scroll = { enabled = false }, -- smooth scroll, can conflict with other plugins
 	})
 
-	local map = vim.keymap.set
-	map("n", "<leader>n", function()
-		snacks.notifier.show_history()
-	end, { desc = "Notification history" })
-	map("n", "<leader>bd", function()
-		snacks.bufdelete()
-	end, { desc = "Delete buffer" })
-	map("n", "<leader>gB", function()
-		snacks.gitbrowse()
-	end, { desc = "Git browse (open in browser)" })
-	map("n", "<leader>gl", function()
-		snacks.lazygit.log()
-	end, { desc = "Lazygit log" })
-	map("n", "]]", function()
-		snacks.words.jump(1)
-	end, { desc = "Next reference" })
-	map("n", "[[", function()
-		snacks.words.jump(-1)
-	end, { desc = "Prev reference" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>n",
+		action = snacks.notifier.show_history,
+		desc = "Notification history",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>bd",
+		action = snacks.bufdelete,
+		desc = "Delete buffer",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>gB",
+		action = snacks.gitbrowse,
+		desc = "Git browse (open in browser)",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>gl",
+		action = snacks.lazygit.log,
+		desc = "Lazygit log",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "]]",
+		action = function()
+			snacks.words.jump(1)
+		end,
+		desc = "Next reference",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "[[",
+		action = function()
+			snacks.words.jump(-1)
+		end,
+		desc = "Prev reference",
+	})
 end)
 
 setup_plugin("hlslens", function(lens)
 	lens.setup({ calm_down = true })
 
 	-- Augment n/N/*/# with match count virtual text
-	local map = vim.keymap.set
-	local opts = { noremap = true, silent = true }
-	map("n", "n", [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]], opts)
-	map("n", "N", [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]], opts)
-	map("n", "*", [[*<Cmd>lua require('hlslens').start()<CR>]], opts)
-	map("n", "#", [[#<Cmd>lua require('hlslens').start()<CR>]], opts)
-	map("n", "g*", [[g*<Cmd>lua require('hlslens').start()<CR>]], opts)
-	map("n", "g#", [[g#<Cmd>lua require('hlslens').start()<CR>]], opts)
+	local shared_opts = { noremap = true, silent = true }
+	map_explicit({
+		mode = "n",
+		sequence = "n",
+		action = [[<Cmd>execute('normal! ' . v:count1 . 'n')<CR><Cmd>lua require('hlslens').start()<CR>]],
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "N",
+		action = [[<Cmd>execute('normal! ' . v:count1 . 'N')<CR><Cmd>lua require('hlslens').start()<CR>]],
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "*",
+		action = [[*<Cmd>lua require('hlslens').start()<CR>]],
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "#",
+		action = [[#<Cmd>lua require('hlslens').start()<CR>]],
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "g*",
+		action = [[g*<Cmd>lua require('hlslens').start()<CR>]],
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "g#",
+		action = [[g#<Cmd>lua require('hlslens').start()<CR>]],
+		opts = shared_opts,
+	})
 end)
 
 -- nvim-hlsearch: auto-clears search highlight when cursor moves off a match
@@ -347,16 +499,28 @@ setup_plugin("nvim-hlsearch", { auto_restore = true })
 setup_plugin("grug-far", function(grug)
 	grug.setup({ headerMaxWidth = 80 })
 
-	local map = vim.keymap.set
-	map("n", "<leader>sr", function()
-		grug.open()
-	end, { desc = "Search and replace" })
-	map("n", "<leader>sw", function()
-		grug.open({ prefills = { search = vim.fn.expand("<cword>") } })
-	end, { desc = "Search and replace word under cursor" })
-	map("v", "<leader>sr", function()
-		grug.open({ prefills = { search = grug.get_visual_selection() } })
-	end, { desc = "Search and replace selection" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>sr",
+		grug.open,
+		opts = { desc = "Search and replace" },
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>sw",
+		action = function()
+			grug.open({ prefills = { search = vim.fn.expand("<cword>") } })
+		end,
+		opts = { desc = "Search and replace word under cursor" },
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<leader>sr",
+		action = function()
+			grug.open({ prefills = { search = grug.get_visual_selection() } })
+		end,
+		opts = { desc = "Search and replace selection" },
+	})
 end)
 
 -- https://github.com/nvim-pack/nvim-spectre
@@ -569,19 +733,38 @@ local spectre_defaults = {
 setup_plugin("spectre", function(spectre)
 	spectre.setup({ live_update = true })
 
-	local map = vim.keymap.set
-	map("n", "<leader>sR", function()
-		spectre.toggle()
-	end, { desc = "Spectre toggle" })
-	map("n", "<leader>sW", function()
-		spectre.open_visual({ select_word = true })
-	end, { desc = "Spectre word under cursor" })
-	map("v", "<leader>sR", function()
-		spectre.open_visual()
-	end, { desc = "Spectre selection" })
-	map("n", "<leader>sf", function()
-		spectre.open_file_search()
-	end, { desc = "Spectre current file" })
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>sR",
+		action = function()
+			spectre.toggle()
+		end,
+		desc = "Spectre toggle",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>sW",
+		action = function()
+			spectre.open_visual({ select_word = true })
+		end,
+		desc = "Spectre word under cursor",
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<leader>sR",
+		action = function()
+			spectre.open_visual()
+		end,
+		desc = "Spectre selection",
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>sf",
+		action = function()
+			spectre.open_file_search()
+		end,
+		desc = "Spectre current file",
+	})
 end)
 
 -- TODO: make lazy
@@ -686,24 +869,99 @@ local search_replace_defaults = {
 }
 setup_plugin("search-replace", function(search_replace)
 	search_replace.setup(search_replace_defaults)
-	local opts = {}
-	vim.api.nvim_set_keymap("v", "<C-r>", "<CMD>SearchReplaceSingleBufferVisualSelection<CR>", opts)
-	vim.api.nvim_set_keymap("v", "<C-s>", "<CMD>SearchReplaceWithinVisualSelection<CR>", opts)
-	vim.api.nvim_set_keymap("v", "<C-b>", "<CMD>SearchReplaceWithinVisualSelectionCWord<CR>", opts)
+	local shared_opts = {}
+	map_explicit({
+		mode = "v",
+		sequence = "<C-r>",
+		action = "<CMD>SearchReplaceSingleBufferVisualSelection<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<C-s>",
+		action = "<CMD>SearchReplaceWithinVisualSelection<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "v",
+		sequence = "<C-b>",
+		action = "<CMD>SearchReplaceWithinVisualSelectionCWord<CR>",
+		opts = shared_opts,
+	})
 
-	vim.api.nvim_set_keymap("n", "<leader>rs", "<CMD>SearchReplaceSingleBufferSelections<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<leader>ro", "<CMD>SearchReplaceSingleBufferOpen<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<leader>rw", "<CMD>SearchReplaceSingleBufferCWord<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<leader>rW", "<CMD>SearchReplaceSingleBufferCWORD<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<leader>re", "<CMD>SearchReplaceSingleBufferCExpr<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<leader>rf", "<CMD>SearchReplaceSingleBufferCFile<CR>", opts)
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rs",
+		action = "<CMD>SearchReplaceSingleBufferSelections<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>ro",
+		action = "<CMD>SearchReplaceSingleBufferOpen<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rw",
+		action = "<CMD>SearchReplaceSingleBufferCWord<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rW",
+		action = "<CMD>SearchReplaceSingleBufferCWORD<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>re",
+		action = "<CMD>SearchReplaceSingleBufferCExpr<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rf",
+		action = "<CMD>SearchReplaceSingleBufferCFile<CR>",
+		opts = shared_opts,
+	})
 
-	vim.api.nvim_set_keymap("n", "<leader>rbs", "<CMD>SearchReplaceMultiBufferSelections<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<leader>rbo", "<CMD>SearchReplaceMultiBufferOpen<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<leader>rbw", "<CMD>SearchReplaceMultiBufferCWord<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<leader>rbW", "<CMD>SearchReplaceMultiBufferCWORD<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<leader>rbe", "<CMD>SearchReplaceMultiBufferCExpr<CR>", opts)
-	vim.api.nvim_set_keymap("n", "<leader>rbf", "<CMD>SearchReplaceMultiBufferCFile<CR>", opts)
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rbs",
+		action = "<CMD>SearchReplaceMultiBufferSelections<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rbo",
+		action = "<CMD>SearchReplaceMultiBufferOpen<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rbw",
+		action = "<CMD>SearchReplaceMultiBufferCWord<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rbW",
+		action = "<CMD>SearchReplaceMultiBufferCWORD<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rbe",
+		action = "<CMD>SearchReplaceMultiBufferCExpr<CR>",
+		opts = shared_opts,
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "<leader>rbf",
+		action = "<CMD>SearchReplaceMultiBufferCFile<CR>",
+		opts = shared_opts,
+	})
 
 	-- show the effects of a search / replace in a live preview window
 	vim.o.inccommand = "split"
@@ -776,10 +1034,30 @@ local substitute_defaults = {
 }
 setup_plugin("substitute", function(substitute)
 	substitute.setup(substitute_defaults)
-	vim.keymap.set("n", "s", substitute.operator, { noremap = true })
-	vim.keymap.set("n", "ss", substitute.line, { noremap = true })
-	vim.keymap.set("n", "S", substitute.eol, { noremap = true })
-	vim.keymap.set("x", "s", substitute.visual, { noremap = true })
+	map_explicit({
+		mode = "n",
+		sequence = "s",
+		action = substitute.operator,
+		opts = { noremap = true },
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "ss",
+		action = substitute.line,
+		opts = { noremap = true },
+	})
+	map_explicit({
+		mode = "n",
+		sequence = "S",
+		action = substitute.eol,
+		opts = { noremap = true },
+	})
+	map_explicit({
+		mode = "x",
+		sequence = "s",
+		action = substitute.visual,
+		opts = { noremap = true },
+	})
 end)
 
 -- https://github.com/aznhe21/actions-preview.nvim
@@ -873,11 +1151,12 @@ local spider_defaults = {
 }
 setup_plugin("spider", function(spider)
 	spider.setup(spider_defaults)
+	local nox = { "n", "o", "x" }
 
-	vim.keymap.set({ "n", "o", "x" }, "w", "<cmd>lua require('spider').motion('w')<CR>")
-	vim.keymap.set({ "n", "o", "x" }, "e", "<cmd>lua require('spider').motion('e')<CR>")
-	vim.keymap.set({ "n", "o", "x" }, "b", "<cmd>lua require('spider').motion('b')<CR>")
-	vim.keymap.set({ "n", "o", "x" }, "ge", "<cmd>lua require('spider').motion('ge')<CR>")
+	map_explicit({ mode = nox, sequence = "w", action = "<cmd>lua require('spider').motion('w')<CR>" })
+	map_explicit({ mode = nox, sequence = "e", action = "<cmd>lua require('spider').motion('e')<CR>" })
+	map_explicit({ mode = nox, sequence = "b", action = "<cmd>lua require('spider').motion('b')<CR>" })
+	map_explicit({ mode = nox, sequence = "ge", action = "<cmd>lua require('spider').motion('ge')<CR>" })
 end)
 
 -- PROBABLY NOT, BUT WORTH A TRY
@@ -894,19 +1173,47 @@ provides:
 --]]
 local improved_search_nvim_defaults = nil
 setup_plugin("improved-search-nvim", function(search)
-	vim.keymap.set({ "n", "x", "o" }, "n", search.stable_next)
-	vim.keymap.set({ "n", "x", "o" }, "N", search.stable_previous)
+	map_explicit({
+		mode = { "n", "x", "o" },
+		sequence = "n",
+		action = search.stable_next,
+	})
+	map_explicit({
+		mode = { "n", "x", "o" },
+		sequence = "N",
+		action = search.stable_previous,
+	})
 
 	-- Search current word without moving.
-	vim.keymap.set("n", "!", search.current_word)
+	map_explicit({
+		mode = "n",
+		sequence = "!",
+		action = search.current_word,
+	})
 
 	-- Search selected text in visual mode
-	vim.keymap.set("x", "!", search.in_place) -- search selection without moving
-	vim.keymap.set("x", "*", search.forward) -- search selection forward
-	vim.keymap.set("x", "#", search.backward) -- search selection backward
+	map_explicit({
+		mode = "x",
+		sequence = "!",
+		search.in_place,
+	}) -- search selection without moving
+	map_explicit({
+		mode = "x",
+		sequence = "*",
+		search.forward,
+	}) -- search selection forward
+	map_explicit({
+		mode = "x",
+		sequence = "#",
+		search.backward,
+	}) -- search selection backward
 
 	-- Search by motion in place
-	vim.keymap.set("n", "|", search.in_place)
+	map_explicit({
+		mode = "n",
+		sequence = "|",
+		action = search.in_place,
+	})
 	-- You can also use search.forward / search.backward for motion selection.
 end)
 
