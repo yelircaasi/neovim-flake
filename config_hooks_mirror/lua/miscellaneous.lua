@@ -4,12 +4,12 @@
 
 -- https://github.com/LunarVim/Launch.nvim
 -- Launch.nvim is modular starter for Neovim.
-local Launch_defaults = {} -- TODO
-setup_plugin("Launch", Launch_defaults)
+local launch_defaults = nil
+setup_plugin("Launch", launch_defaults)
 
 -- https://github.com/bagohart/minimal-narrow-region.nvim
 -- Opinionated minimal implementation of Emacs' narrowing feature (https://www.gnu.org/software/emacs/manual/html_node/emacs/Narrowing.html)
-local minimal_narrow_region_defaults = {} -- TODO
+local minimal_narrow_region_defaults = nil
 setup_plugin("minimal-narrow-region", function(mnr)
 	-- No mappings by default, create them explicitly:
 	vim.keymap.set("x", "<Leader><Leader>nr", mnr.NarrowRegionOpen)
@@ -19,10 +19,9 @@ end)
 -- TODO: adapt for just/taskfile/etc.
 -- https://github.com/ChSotiriou/nvim-telemake
 -- nvim extension with nvim-telescope to select and run any Makefile target
-local telemake_defaults = {} -- TODO
-setup_plugin("telemake", telemake_defaults)
+setup_plugin("telemake") -- TODO: set up as telescope extension
 
--- https://github.com/anuvyklack/nvim-api-wrappers
+-- https://github.com/anuvyklack/nvim-api-wrappersI've eb
 -- library with OOP wrappers around Neovim api.
 --     This library itself depend on middleclass library.
 local nvim_api_wrappers_defaults = nil
@@ -36,12 +35,13 @@ setup_plugin("k8vim", k8vim_defaults)
 -- TODO: compare https://github.com/lukas-reineke/virt-column.nvim (may be better)
 -- https://github.com/xiyaowong/virtcolumn.nvim
 -- Display a line as the colorcolumn
-local virtcolumn_defaults = {} -- TODO
+local virtcolumn_defaults = nil
 setup_plugin("virtcolumn", function(virtcolumn)
 	vim.g.virtcolumn_char = "▕" -- char to display the line
 	vim.g.virtcolumn_priority = 10 -- priority of extmark
 end)
 
+-- :help virt-column.txt
 -- https://github.com/lukas-reineke/virt-column.nvim
 -- Display a character as the colorcolumn
 local virt_column_defaults = {} -- TODO: https://github.com/lukas-reineke/virt-column.nvim/blob/master/lua/virt-column/config.lua
@@ -51,28 +51,34 @@ end)
 
 -- https://github.com/willothy/wezterm.nvim
 -- Utilities for interacting with Wezterm from within Neovim
-local wezterm_nvim_defaults = {} -- TODO
+local wezterm_nvim_defaults = { create_commands = true }
 setup_plugin("wezterm-nvim", wezterm_nvim_defaults)
 
 -- https://github.com/Mohammed-Taher/AdvancedNewFile.nvim
 -- A simple plugin for neovim to create files and folders quickly.
-local AdvancedNewFile_defaults = {} -- TODO
-setup_plugin("AdvancedNewFile", AdvancedNewFile_defaults)
-
--- https://github.com/rewhile/fsread.nvim
--- Flow state reading in neovim
-local fsread_defaults = {} -- TODO
-setup_plugin("fsread", fsread_defaults)
+setup_plugin("advanced_new_file", function(anf)
+	anf.goto_file = true
+	anf.notify = true
+	anf.show_cwd = false
+	anf.prompt = "File name (or Folder): "
+	vim.keymap.set("n", "<C-n>", "<cmd>AdvancedNewFile<CR>", { noremap = true })
+end)
 
 -- TODO: move to modules?
 -- https://github.com/notomo/tracebundler.nvim
 -- Trace and bundle neovim lua for debugging
-local tracebundler_defaults = {} -- TODO
+local tracebundler_defaults = nil
 setup_plugin("tracebundler", tracebundler_defaults)
 
 -- https://github.com/chaitanyabsprip/present.nvim
 -- Presentation plugin for neovim written in lua
-local present_defaults = {} -- TODO
+local present_defaults = {
+	default_mappings = true,
+	kitty = {
+		normal_font_size = 12,
+		zoomed_font_size = 28,
+	},
+}
 setup_plugin("present", present_defaults)
 -- https://github.com/letieu/wezterm-move.nvim
 -- https://github.com/mawkler/move-mode.nvim
@@ -81,10 +87,61 @@ setup_plugin("present", present_defaults)
 --──── live preview ───────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
+-- TODO: move to multi-lang
+-- TODO: set up with qutebrowser, sioyek
 -- https://github.com/frabjous/knap
 -- Neovim plugin for creating live-updating-as-you-type previews of LaTeX, markdown, and other files in the viewer of your choice.
-local knap_defaults = {} -- TODO
-setup_plugin("knap", knap_defaults)
+vim.g.knap_settings = {
+	htmloutputext = "html",
+	htmltohtml = "none",
+	htmltohtmlviewerlaunch = "falkon %outputfile%",
+	htmltohtmlviewerrefresh = "none",
+	mdoutputext = "html",
+	mdtohtml = "pandoc --standalone %docroot% -o %outputfile%",
+	mdtohtmlviewerlaunch = "falkon %outputfile%",
+	mdtohtmlviewerrefresh = "none",
+	mdtopdf = "pandoc %docroot% -o %outputfile%",
+	mdtopdfviewerlaunch = "sioyek %outputfile%",
+	mdtopdfviewerrefresh = "none",
+	markdownoutputext = "html",
+	markdowntohtml = "pandoc --standalone %docroot% -o %outputfile%",
+	markdowntohtmlviewerlaunch = "falkon %outputfile%",
+	markdowntohtmlviewerrefresh = "none",
+	markdowntopdf = "pandoc %docroot% -o %outputfile%",
+	markdowntopdfviewerlaunch = "sioyek %outputfile%",
+	markdowntopdfviewerrefresh = "none",
+	texoutputext = "pdf",
+	textopdf = "pdflatex -interaction=batchmode -halt-on-error -synctex=1 %docroot%",
+	textopdfviewerlaunch = "sioyek --inverse-search 'nvim --headless -es --cmd \"lua require('\"'\"'knaphelper'\"'\"').relayjump('\"'\"'%servername%'\"'\"','\"'\"'%1'\"'\"',%2,%3)\"' --new-window %outputfile%",
+	textopdfviewerrefresh = "none",
+	textopdfforwardjump = "sioyek --inverse-search 'nvim --headless -es --cmd \"lua require('\"'\"'knaphelper'\"'\"').relayjump('\"'\"'%servername%'\"'\"','\"'\"'%1'\"'\"',%2,%3)\"' --reuse-window --forward-search-file %srcfile% --forward-search-line %line% %outputfile%",
+	textopdfshorterror = 'A=%outputfile% ; LOGFILE="${A%.pdf}.log" ; rubber-info "$LOGFILE" 2>&1 | head -n 1',
+	delay = 250,
+}
+setup_plugin("knap", function(knap)
+	-- set shorter name for keymap function
+	local kmap = vim.keymap.set
+
+	-- F5 processes the document once, and refreshes the view
+	kmap({ "n", "v", "i" }, "<F5>", function()
+		require("knap").process_once()
+	end)
+
+	-- F6 closes the viewer application, and allows settings to be reset
+	kmap({ "n", "v", "i" }, "<F6>", function()
+		require("knap").close_viewer()
+	end)
+
+	-- F7 toggles the auto-processing on and off
+	kmap({ "n", "v", "i" }, "<F7>", function()
+		require("knap").toggle_autopreviewing()
+	end)
+
+	-- F8 invokes a SyncTeX forward search, or similar, where appropriate
+	kmap({ "n", "v", "i" }, "<F8>", function()
+		require("knap").forward_jump()
+	end)
+end)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── nvim-/lua-related ──────────────────────────────────────────────────────
@@ -96,19 +153,64 @@ setup_plugin("runtimetable", function(_) end)
 
 -- https://github.com/tastyep/structlog.nvim
 -- Structured Logging for nvim, using Lua
-local structlog_defaults = {} -- TODO
-setup_plugin("structlog", structlog_defaults)
+setup_plugin("structlog", function(log)
+	log.configure({
+		my_logger = {
+			pipelines = {
+				{
+					level = log.level.INFO,
+					processors = {
+						log.processors.StackWriter({ "line", "file" }, { max_parents = 0, stack_level = 0 }),
+						log.processors.Timestamper("%H:%M:%S"),
+					},
+					formatter = log.formatters.FormatColorizer( --
+						"%s [%s] %s: %-30s",
+						{ "timestamp", "level", "logger_name", "msg" },
+						{ level = log.formatters.FormatColorizer.color_level() }
+					),
+					sink = log.sinks.Console(),
+				},
+				{
+					level = log.level.WARN,
+					processors = {},
+					formatter = log.formatters.Format( --
+						"%s",
+						{ "msg" },
+						{ blacklist = { "level", "logger_name" } }
+					),
+					sink = log.sinks.NvimNotify(),
+				},
+				{
+					level = log.level.TRACE,
+					processors = {
+						log.processors.StackWriter({ "line", "file" }, { max_parents = 3 }),
+						log.processors.Timestamper("%H:%M:%S"),
+					},
+					formatter = log.formatters.Format( --
+						"%s [%s] %s: %-30s",
+						{ "timestamp", "level", "logger_name", "msg" }
+					),
+					sink = log.sinks.File("./test.log"),
+				},
+			},
+		},
+		-- other_logger = {...}
+	})
+
+	-- local logger = log.get_logger("my_logger")
+	-- logger:info("A log message")
+	-- logger:warn("A log message with keyword arguments", { warning = "something happened" })
+end)
 
 -- PROBABLY NOT, BUT WORTH A TRY
 -- https://github.com/svermeulen/nvim-teal-maker
 -- Neovim plugin that adds plugin support for teal language
-local nvim_teal_maker_defaults = {} -- TODO
-setup_plugin("nvim-teal-maker", nvim_teal_maker_defaults)
+local nvim_teal_maker_defaults = nil
+setup_plugin("tealmaker", nvim_teal_maker_defaults)
 
 -- https://github.com/CWood-sdf/cmdTree.nvim
 --  Declaratively make your neovim user commands
-local cmdTree_defaults = {} -- TODO
-setup_plugin("cmdTree", cmdTree_defaults)
+setup_plugin("cmdTree", function(cmdtree) end)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── timer, time tracking ───────────────────────────────────────────────────
@@ -147,13 +249,48 @@ setup_plugin("pomodoro", pomodoro_defaults)
 
 -- https://github.com/nvzone/timerly
 -- Beautiful countdown timer plugin for Neovim
-local timerly_defaults = {} -- TODO
-setup_plugin("timerly", timerly_defaults)
+local timerly_defaults = {
+	minutes = { 25, 5 },
+	on_start = nil, -- func
+	on_finish = function()
+		vim.notify("Timerly: time's up!")
+	end,
+	mapping = nil, -- is func
+	position = "center", -- top-left, top-right, bottom-left, bottom-right
+	-- or function(w, h) return row, col end , w - w of window, arg passed by plugin
+}
+setup_plugin("timerly", function(timerly)
+	timerly.setup(timerly_defaults)
+
+	vim.api.nvim_create_user_command("Timer", function()
+		vim.o.showtabline = 0
+		vim.o.laststatus = 0
+		vim.wo.number = false
+		vim.o.scl = "no"
+		vim.o.cmdheight = 0
+		vim.cmd("TimerlyToggle")
+	end, {})
+end)
 
 -- https://github.com/eliasCVII/timew.nvim
 -- Run some timewarrior commands from neovim
-local timew_defaults = {} -- TODO
-setup_plugin("timew", timew_defaults)
+local timew_defaults = {
+	-- these two settings follow the same format as they do in the timew command.
+	-- they are shorthand for "timew summary :ids :{your setting}"
+	summary_sort = "week", -- day, week, month or year. Display your summary based on a given timeframe.
+	delete_sort = "week", -- day, week, month or year. I use summary to display a list of your tracked tasks
+}
+setup_plugin("timew", function(timew)
+	timew.setup(timew_defaults)
+
+	-- Set Timew bindings
+	vim.keymap.set("n", "<leader>tn", "<Cmd>Timew start<CR>")
+	vim.keymap.set("n", "<leader>ts", "<Cmd>Timew stop<CR>")
+	vim.keymap.set("n", "<leader>tc", "<Cmd>Timew continue<CR>")
+	vim.keymap.set("n", "<leader>tC", "<Cmd>Timew cancel<CR>")
+	vim.keymap.set("n", "<leader>td", "<Cmd>Timew delete<CR>")
+	vim.keymap.set("n", "<leader>tS", "<Cmd>Timew summary<CR>")
+end)
 
 -- https://github.com/dbinagi/nomodoro
 -- Pomodoro time tracker for NeoVim written entirely in LUA
@@ -175,13 +312,63 @@ local nomodoro_defaults = {
 setup_plugin("nomodoro", nomodoro_defaults)
 
 -- https://github.com/Cassin01/sche.nvim
--- A text-based schedule plugin for neovim
-local sche_defaults = {} -- TODO
+-- A text-based schedule plugin for neovim (fennel)
+local sche_defaults = {
+	default_keymap = true,
+	notify_todays_schedule = true,
+	notify_tomorrows_schedule = true,
+	hl = {
+		GCalendarMikan = { fg = "#F4511E" },
+		GCalendarPeacock = { fg = "#039BE5" },
+		GCalendarGraphite = { fg = "#616161" },
+		GCalendarSage = { fg = "#33B679" },
+		GCalendarBanana = { fg = "#f6bf26" },
+		GCalendarLavender = { fg = "#7986cb" },
+		GCalendarTomato = { fg = "#d50000" },
+		GCalendarFlamingo = { fg = "#e67c73" },
+	},
+	notify = {
+		["@"] = function(annex)
+			return "There is a chedule: " .. annex
+		end,
+		["#"] = function(annex)
+			return "There is a memo: " .. annex
+		end,
+		["+"] = function(annex)
+			return "There is a todo: " .. annex
+		end,
+		["-"] = function(annex)
+			return "There is a remainder: " .. annex
+		end,
+		["!"] = function(annex)
+			return "There is a deadline: " .. annex
+		end,
+		["."] = function(annex)
+			return "You have completed: " .. annex
+		end,
+	},
+	sche_path = "none",
+	syntax = {
+		on = true,
+		date = {
+			vim_regex = "\\d\\d\\d\\d/\\d\\d/\\d\\d",
+			lua_regex = "%d%d%d%d/%d%d/%d%d",
+			vimstrftime = "%Y/%m/%d",
+		},
+		month = "abridged",
+		weekday = "abridged",
+		sunday = "'\\<Sun\\>'",
+		saturday = "'\\<Sat\\>'",
+	},
+}
 setup_plugin("sche", sche_defaults)
 
 -- https://github.com/hugginsio/twig.nvim
 -- taskwarrior integration
-local twig_defaults = {} -- TODO
+local twig_defaults = {
+	project_pattern = ".+", -- an additional Lua match pattern to apply to the buffer name
+	fallback = true, -- if `project_pattern` does not match, fall back to the buffer name alone
+}
 setup_plugin("twig", twig_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
@@ -215,11 +402,11 @@ local dashboard_defaults = {
 		file_width, --  preview file width
 	},
 }
--- local function setup_dashboard()
--- 	utils.packadd("dashboard-nvim")
--- 	local dashboard = require("dashboard")
--- 	dashboard.setup()
--- end
+local function setup_nvimdev_dashboard()
+	utils.packadd("dashboard-nvim")
+	local dashboard = require("dashboard")
+	dashboard.setup(dashboard_defaults)
+end
 
 -- https://github.com/MeanderingProgrammer/dashboard.nvim
 --[[
@@ -229,17 +416,110 @@ Provide directories and this plugin will:
   - Make them accessible with single letter hotkey
 Input is ordered and hotkeys are generated sequentially, making for a consistent experience
 --]]
-local dashboard_defaults = {} -- TODO
+local dashboard_defaults = {
+	-- Sequence that determines keymaps
+	autokeys = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890",
+	-- Dashboard header
+	header = {},
+	-- Format to display date in
+	date_format = nil,
+	-- List of directory paths, or functions that return paths
+	directories = {},
+	-- Sections to add at bottom, these can be string references to
+	-- functions in sections.lua, custom strings, or custom functions
+	footer = {},
+	-- Buffer local options
+	bo = {
+		bufhidden = "wipe",
+		buflisted = false,
+		filetype = "dashboard",
+		swapfile = false,
+	},
+	-- Window local options
+	wo = {
+		cursorcolumn = false,
+		cursorline = false,
+		number = false,
+		relativenumber = false,
+		spell = false,
+		statuscolumn = "",
+		wrap = false,
+	},
+	-- Gets called after directory is changed and is provided with the
+	-- directory path as an argument
+	on_load = function(path)
+		-- do nothing
+	end,
+	-- Highlight groups to use for various components
+	highlight_groups = {
+		header = "Constant",
+		icon = "Type",
+		directory = "Delimiter",
+		hotkey = "Statement",
+	},
+}
 setup_plugin("dashboard", dashboard_defaults)
 
 -- https://github.com/jovanlanik/fsplash.nvim
 -- Show a custom splash screen in a floating window
-local fsplash_defaults = {} -- TODO
+local fsplash_defaults = {
+	-- lines of text containing the splash
+	lines = {
+		" _  ___   _____ __  __ ",
+		"| \\| \\ \\ / /_ _|  \\/  |",
+		"| .` |\\ V / | || |\\/| |",
+		"|_|\\_| \\_/ |___|_|  |_|",
+	},
+	-- autocmds that close the splash
+	autocmds = {
+		"ModeChanged",
+		"CursorMoved",
+		"TextChanged",
+		"VimResized",
+		"WinScrolled",
+	},
+	-- highlights in this table will be set using vim.api.nvim_set_hl()
+	highlights = {
+		-- this resets NormalFloat
+		["NormalFloat"] = {},
+		-- the following line would set it to gray
+		-- ['NormalFloat'] = { ctermfg = 'darkgray' };
+	},
+	-- floting window border
+	border = "solid",
+	-- winblend option
+	winblend = 0,
+}
 setup_plugin("fsplash", fsplash_defaults)
 
 -- https://github.com/folke/drop.nvim
 --  Fun little plugin that can be used as a screensaver and on your dashboard
-local drop_defaults = {} -- TODO
+local drop_defaults = {
+
+	---@type DropTheme|string
+	theme = "auto", -- when auto, it will choose a theme based on the date
+	---@type ({theme: string}|DropDate|{from:DropDate, to:DropDate}|{holiday:"us_thanksgiving"|"easter"})[]
+	themes = {
+		{ theme = "new_year", month = 1, day = 1 },
+		{ theme = "valentines_day", month = 2, day = 14 },
+		{ theme = "st_patricks_day", month = 3, day = 17 },
+		{ theme = "easter", holiday = "easter" },
+		{ theme = "april_fools", month = 4, day = 1 },
+		{ theme = "us_independence_day", month = 7, day = 4 },
+		{ theme = "halloween", month = 10, day = 31 },
+		{ theme = "us_thanksgiving", holiday = "us_thanksgiving" },
+		{ theme = "xmas", from = { month = 12, day = 24 }, to = { month = 12, day = 25 } },
+		{ theme = "leaves", from = { month = 9, day = 22 }, to = { month = 12, day = 20 } },
+		{ theme = "snow", from = { month = 12, day = 21 }, to = { month = 3, day = 19 } },
+		{ theme = "spring", from = { month = 3, day = 20 }, to = { month = 6, day = 20 } },
+		{ theme = "summer", from = { month = 6, day = 21 }, to = { month = 9, day = 21 } },
+	},
+	max = 75, -- maximum number of drops on the screen
+	interval = 100, -- every 150ms we update the drops
+	screensaver = 1000 * 60 * 5, -- show after 5 minutes. Set to false, to disable
+	filetypes = { "dashboard", "alpha", "ministarter" }, -- will enable/disable automatically for the following filetypes
+	winblend = 100, -- winblend for the drop window
+}
 setup_plugin("drop", drop_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
@@ -248,8 +528,55 @@ setup_plugin("drop", drop_defaults)
 
 -- https://github.com/Hashino/doing.nvim
 -- A minimal task manager for neovim
-local doing_defaults = {} -- TODO
-setup_plugin("doing", doing_defaults)
+local doing_defaults = {
+	message_timeout = 2000,
+	doing_prefix = "Doing: ",
+
+	-- doesn't display on buffers that match filetype/filename/filepath to
+	-- entries. can be either a string array or a function that returns a
+	-- string array. filepath can be relative to cwd or absolute
+	ignored_buffers = { "NvimTree" },
+
+	-- if should append "+n more" to the status when there's tasks remaining
+	show_remaining = true,
+
+	-- if should show messages on the status string
+	show_messages = true,
+
+	-- window configs of the floating tasks editor
+	-- see :h nvim_open_win() for available options
+	edit_win_config = {
+		width = 50,
+		height = 15,
+		border = "rounded",
+	},
+
+	-- if plugin should manage the winbar
+	winbar = { enabled = true },
+
+	store = {
+		-- name of tasks file
+		file_name = ".tasks",
+		-- if true, tasks file is always in sync with
+		-- tasklist, otherwise, tasks get saved to file on
+		-- closing neovim or changing cwd
+		sync_tasks = false,
+	},
+}
+setup_plugin("doing", function(doing)
+	vim.api.nvim_set_hl(0, "WinBar", { link = "Search" })
+
+	doing.setup(doing_defaults)
+
+	vim.keymap.set("n", "<leader>da", doing.add, { desc = "[D]oing: [A]dd" })
+	vim.keymap.set("n", "<leader>de", doing.edit, { desc = "[D]oing: [E]dit" })
+	vim.keymap.set("n", "<leader>dn", doing.done, { desc = "[D]oing: Do[n]e" })
+	vim.keymap.set("n", "<leader>dt", doing.toggle, { desc = "[D]oing: [T]oggle" })
+
+	vim.keymap.set("n", "<leader>ds", function()
+		vim.notify(doing.status(true), vim.log.levels.INFO, { title = "Doing:", icon = "" })
+	end, { desc = "[D]oing: [S]tatus" })
+end)
 
 -- https://github.com/vimwiki/vimwiki
 -- Personal Wiki for Vim
@@ -295,32 +622,100 @@ setup_plugin("Calendar", Calendar_defaults)
 
 -- https://github.com/Furkanzmc/zettelkasten.nvim
 -- A Vim Philosophy Oriented Zettelkasten Note Taking Plugin
-local zettelkasten_defaults = {} -- TODO
+local zettelkasten_defaults = {
+	notes_path = "",
+	preview_command = "pedit",
+	browseformat = "%f - %h [%r Refs] [%b B-Refs] %t",
+	id_inference_location = M.TITLE,
+	id_pattern = "%d+-%d+-%d+-%d+-%d+-%d+",
+	id_format = "%Y-%m-%d-%H-%M-%S",
+	filename_pattern = "%d+-%d+-%d+-%d+-%d+-%d+.md",
+	title_pattern = "# %d+-%d+-%d+-%d+-%d+-%d+ .+",
+}
 setup_plugin("zettelkasten", zettelkasten_defaults)
 
 -- https://github.com/JellyApple102/flote.nvim
 -- Easily accessible, per-project markdown notes in Neovim.
-local flote_defaults = {} -- TODO
+local flote_defaults = {
+	q_to_quit = true,
+	window_style = "minimal",
+	window_border = "solid",
+	window_title = true,
+	notes_dir = vim.fn.stdpath("cache") .. "/flote",
+	files = {
+		global = "flote-global.md",
+		cwd = function()
+			return vim.fn.getcwd()
+		end,
+		file_name = function(cwd)
+			local base_name = vim.fs.basename(cwd)
+			local parent_base_name = vim.fs.basename(vim.fs.dirname(cwd))
+			return parent_base_name .. "_" .. base_name .. ".md"
+		end,
+	},
+}
 setup_plugin("flote", flote_defaults)
 
 -- https://github.com/2kabhishek/tdo.nvim
 -- Fast & Simple Notes in Neovim
-local tdo_defaults = {} -- TODO
+local tdo_config = { with_lsp = false }
 setup_plugin("tdo", tdo_defaults)
 -- TODO: vendor/PR to fix old LspStart command -> new Lua LSP API
 setup_plugin("scratch-buffer", function(scratch_buffer)
-	scratch_buffer.setup({ with_lsp = false })
+	scratch_buffer.setup(tdo_config)
 end)
 
 -- https://github.com/nyngwang/NeoWell.lua
 -- Well... I will fix this line later
-local neowell_lua_defaults = {} -- TODO
-setup_plugin("neowell-lua", neowell_lua_defaults)
+local neowell_defaults = { height = 10 }
+setup_plugin("neowell-lua", function(neowell)
+	neowell.setup(neowell_defaults)
+
+	local NOREF_NOERR_TRUNC = { noremap = true, silent = true, nowait = true }
+
+	vim.keymap.set("n", "\\", function()
+		vim.cmd("NeoWellToggle")
+	end, NOREF_NOERR_TRUNC)
+	vim.keymap.set("n", "<Leader>/", function()
+		vim.cmd("NeoWellAppend")
+	end, NOREF_NOERR_TRUNC)
+	vim.keymap.set("n", "<CR>", function()
+		-- vim.cmd('NeoZoomToggle') -- remove this if you don't know what it is
+		vim.cmd("NeoWellJump")
+	end, NOREF_NOERR_TRUNC)
+	vim.keymap.set("n", "<Leader>r", function()
+		vim.cmd("NeoWellEdit")
+	end, NOREF_NOERR_TRUNC)
+	vim.keymap.set("n", "<Leader>d", function()
+		vim.cmd("NeoWellOut")
+	end, NOREF_NOERR_TRUNC)
+	vim.keymap.set("n", "<Leader>D", function()
+		vim.cmd("NeoWellWipeOut")
+	end, NOREF_NOERR_TRUNC)
+end)
 
 -- https://github.com/RutaTang/quicknote.nvim
 -- Quickly take notes, in-place
-local quicknote_defaults = {} -- TODO
-setup_plugin("quicknote", quicknote_defaults)
+local quicknote_defaults = {
+	{
+		"RutaTang/quicknote.nvim",
+		config = function()
+			require("quicknote").setup({
+				mode = "portable", -- "portable" | "resident", default to "portable"
+				sign = "N", -- This is used for the signs on the left side (refer to ShowNoteSigns() api).
+				-- You can change it to whatever you want (eg. some nerd fonts icon), 'N' is default
+				filetype = "md",
+				git_branch_recognizable = true, -- If true, quicknote will separate notes by git branch
+				-- But it should only be used with resident mode,  it has not effect used with portable mode
+			})
+		end,
+		dependencies = { "nvim-lua/plenary.nvim" },
+	},
+}
+setup_plugin("quicknote", function(quicknote)
+	quicknote.setup(quicknote_defaults)
+	vim.api.nvim_set_keymap("n", "<leader>p", "<cmd>:lua require('quicknote').NewNoteAtCurrentLine()<cr>", {})
+end)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── diagrams ───────────────────────────────────────────────────────────────
@@ -334,17 +729,133 @@ setup_plugin("quicknote", quicknote_defaults)
 
 -- https://github.com/brenoprata10/nvim-highlight-colors
 -- Highlight colors for neovim
-local nvim_highlight_colors_defaults = {} -- TODO
+local nvim_highlight_colors_defaults = {
+	---Render style
+	---@usage 'background'|'foreground'|'virtual'
+	render = "background",
+
+	---Set virtual symbol (requires render to be set to 'virtual')
+	virtual_symbol = "■",
+
+	---Set virtual symbol suffix (defaults to '')
+	virtual_symbol_prefix = "",
+
+	---Set virtual symbol suffix (defaults to ' ')
+	virtual_symbol_suffix = " ",
+
+	---Set virtual symbol position()
+	---@usage 'inline'|'eol'|'eow'
+	---inline mimics VS Code style
+	---eol stands for `end of column` - Recommended to set `virtual_symbol_suffix = ''` when used.
+	---eow stands for `end of word` - Recommended to set `virtual_symbol_prefix = ' ' and virtual_symbol_suffix = ''` when used.
+	virtual_symbol_position = "inline",
+
+	---Highlight hex colors, e.g. '#FFFFFF'
+	enable_hex = true,
+
+	---Highlight short hex colors e.g. '#fff'
+	enable_short_hex = true,
+
+	---Highlight rgb colors, e.g. 'rgb(0 0 0)'
+	enable_rgb = true,
+
+	---Highlight hsl colors, e.g. 'hsl(150deg 30% 40%)'
+	enable_hsl = true,
+
+	---Highlight ansi colors, e.g '\033[0;34m'
+	enable_ansi = true,
+
+	---Highlight xterm 256 (8bit) colors, e.g '\033[38;5;118m'
+	enable_xterm256 = true,
+
+	---Highlight xterm True Color (24bit) colors, e.g '\033[38;2;118;64;90m'
+	enable_xtermTrueColor = true,
+
+	-- Highlight hsl colors without function, e.g. '--foreground: 0 69% 69%;'
+	enable_hsl_without_function = true,
+
+	---Highlight CSS variables, e.g. 'var(--testing-color)'
+	enable_var_usage = true,
+
+	---Highlight named colors, e.g. 'green'
+	enable_named_colors = true,
+
+	---Highlight tailwind colors, e.g. 'bg-blue-500'
+	enable_tailwind = false,
+
+	---Set custom colors
+	---Label must be properly escaped with '%' to adhere to `string.gmatch`
+	--- :help string.gmatch
+	custom_colors = {
+		{ label = "%-%-theme%-primary%-color", color = "#0f1219" },
+		{ label = "%-%-theme%-secondary%-color", color = "#5a5d64" },
+	},
+
+	-- Exclude filetypes or buftypes from highlighting e.g. 'exclude_buftypes = {'text'}'
+	exclude_filetypes = {},
+	exclude_buftypes = {},
+	-- Exclude buffer from highlighting e.g. 'exclude_buffer = function(bufnr) return vim.fn.getfsize(vim.api.nvim_buf_get_name(bufnr)) > 1000000 end'
+	exclude_buffer = function(bufnr) end,
+}
 setup_plugin("nvim-highlight-colors", nvim_highlight_colors_defaults)
 
 -- https://github.com/svermeulen/text-to-colorscheme
 -- Neovim colorschemes generated on the fly with a text prompt using ChatGPT
-local text_to_colorscheme_defaults = {} -- TODO
+local text_to_colorscheme_defaults = {
+	ai = {
+		gpt_model = "gpt-4",
+		openai_api_key = nil, -- Set your own OpenAI API key to this value
+		green_darkening_amount = 0.85, -- Often, the generated theme results in green colors that seem to our human eyes to be more bright than it actually is, therefore this is a fudge factor to account for this, to darken greens to better match the brightness of other colors.  Enabled or disabled with auto_darken_greens flag
+		auto_darken_greens = true,
+		minimum_foreground_contrast = 0.4, -- This is used to touch up the generated theme to avoid generating foregrounds that match the background too closely.  Enabled or disabled with enable_minimum_foreground_contrast flag
+		enable_minimum_foreground_contrast = true,
+		temperature = 0, -- Set this to a value between 0 and 1, where 0 means it will generate similar looking color schemes every time, and 1 means that each time will be very different.  See openai docs for more information on this setting
+	},
+	disable_builtin_schemes = false, -- Set to true to disable all pre-generated color schemes, so that only your custom ones show in T2CSelect
+	undercurl = true,
+	underline = true,
+	verbose_logs = false, -- When true, will output logs to echom, to help debugging issues with this plugin
+	bold = true,
+	italic = {
+		strings = true,
+		comments = true,
+		operators = false,
+		folds = true,
+	},
+	strikethrough = true,
+	invert_selection = false,
+	save_as_hsv = false, -- When true, T2CSave will save colors as HSV instead of hex
+	invert_signs = false,
+	invert_tabline = false,
+	invert_intend_guides = false,
+	inverse = true,
+	dim_inactive = false,
+	transparent_mode = false,
+	hsv_palettes = {},
+	hex_palettes = {},
+	overrides = {},
+	default_palette = "gruvbox",
+}
 setup_plugin("text-to-colorscheme", text_to_colorscheme_defaults)
 
 -- https://github.com/nvzone/minty
 -- Most Beautifully crafted color tools for Neovim
-local minty_defaults = {} -- TODO
+local minty_defaults = {
+	huefy = {
+		border = false,
+		prompt = "   Enter color : ",
+
+		-- func must return { row, col }
+		position = "cursor", -- cursor | center | func(w, h)
+	},
+	shades = {
+		border = true,
+		prompt = "   Enter color : ",
+
+		-- func must return { row, col }
+		position = "cursor", -- cursor | center | func(w, h)
+	},
+}
 setup_plugin("minty", minty_defaults)
 
 -- https://github.com/ziontee113/color-picker.nvim
@@ -379,10 +890,36 @@ setup_plugin("color-picker", function(color_picker)
 	vim.cmd([[hi FloatBorder guibg=NONE]]) -- if you don't want weird border background colors around the popup.
 end)
 
--- Colorize text with ANSI escape sequences (8, 16, 256 or TrueColor)
+-- TODO: set up with conjure
 -- https://github.com/m00qek/baleia.nvim
 -- Colorize text with ANSI escape sequences (8, 16, 256 or TrueColor)
-local baleia_defaults = {} -- TODO
+local baleia_defaults = {
+	strip_ansi_codes = true,
+	line_starts_at = 1,
+	namespace = "BaleiaColors",
+	colors = {
+		[00] = "Black",
+		[01] = "DarkRed",
+		[02] = "DarkGreen",
+		[03] = "DarkYellow",
+		[04] = "DarkBlue",
+		[05] = "DarkMagenta",
+		[06] = "DarkCyan",
+		[07] = "LightGrey",
+		[08] = "DarkGrey",
+		[09] = "LightRed",
+		[10] = "LightGreen",
+		[11] = "LightYellow",
+		[12] = "LightBlue",
+		[13] = "LightMagenta",
+		[14] = "LightCyan",
+		[15] = "White",
+	},
+	async = true,
+	chunk_size = 500,
+	highlight_cache = {},
+	name = "BaleiaColors",
+}
 setup_plugin("baleia", baleia_defaults)
 
 -- https://github.com/neph-iap/easycolor.nvim
@@ -546,12 +1083,79 @@ setup_plugin("showkeys", showkeys_defaults)
 
 -- https://github.com/tomiis4/hypersonic.nvim
 -- A Neovim plugin that provides an explanation for regular expressions.", {})
-local hypersonic_defaults = {} -- TODO
+local hypersonic_defaults = {
+	---@type 'none'|'single'|'double'|'rounded'|'solid'|'shadow'|table
+	border = "rounded",
+	---@type number 0-100
+	winblend = 0,
+	---@type boolean
+	add_padding = true,
+	---@type string
+	hl_group = "Keyword",
+	---@type string
+	wrapping = '"',
+	---@type boolean
+	enable_cmdline = true,
+}
 setup_plugin("hypersonic", hypersonic_defaults)
 
 -- https://github.com/bennypowers/nvim-regexplainer
 -- Describe the regexp under the cursor
-local regexplainer_defaults = {} -- TODO
+local regexplainer_defaults = {
+	-- 'narrative', 'graphical'
+	mode = "narrative",
+
+	-- automatically show the explainer when the cursor enters a regexp
+	auto = false,
+
+	-- filetypes in which to activate regexplainer
+	filetypes = {
+		"html",
+		"javascript",
+		"javascriptreact",
+		"typescript",
+		"typescriptreact",
+		"ruby",
+		"python",
+		"go",
+		"rust",
+		"php",
+		"java",
+		"cs",
+	},
+
+	-- Whether to log debug messages
+	debug = false,
+
+	-- 'split', 'popup'
+	display = "popup",
+
+	mappings = {
+		toggle = "gR",
+		-- examples, not defaults:
+		-- show = 'gS',
+		-- hide = 'gH',
+		-- show_split = 'gP',
+		-- show_popup = 'gU',
+	},
+
+	narrative = {
+		indendation_string = "> ", -- default '  '
+	},
+
+	graphical = {
+		width = 800, -- image width in pixels
+		height = 600, -- image height in pixels
+		python_cmd = nil, -- python command (auto-detected)
+	},
+
+	deps = {
+		auto_install = true, -- automatically install Python dependencies
+		python_cmd = nil, -- python command (auto-detected)
+		venv_path = nil, -- virtual environment path (auto-generated)
+		check_interval = 3600, -- dependency check interval in seconds
+	},
+}
 setup_plugin("regexplainer", regexplainer_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
@@ -570,8 +1174,11 @@ setup_plugin("tldr", tldr_defaults)
 
 -- https://github.com/emiasims/nvim-luaref
 -- Add a vim :help reference for lua
-local nvim_luaref_defaults = {} -- TODO
+local nvim_luaref_defaults = nil
 setup_plugin("nvim-luaref", nvim_luaref_defaults)
+-- :help lua_reference_toc
+-- :help math.pi
+-- :help coroutine.yield
 
 -- https://github.com/jghauser/auto-pandoc.nvim
 -- Use pandoc to convert markdown files according to options from a yaml block
@@ -614,7 +1221,7 @@ setup_plugin("cyrillic", cyrillic_defaults)
 
 -- https://github.com/ivanesmantovich/xkbswitch.nvim
 -- Smart automatic keyboard layout switching in 110 LOC
-local xkbswitch_defaults = {} -- TODO
+local xkbswitch_defaults = { events_get_focus = false }
 setup_plugin("xkbswitch", xkbswitch_defaults)
 --─────────────────────────────────────────────────────────────────────────────
 --──── web utils ──────────────────────────────────────────────────────────────
@@ -688,16 +1295,47 @@ setup_plugin("keylab", keylab_defaults)
 
 -- https://github.com/pseudocc/nvim-apm
 -- calculate your APM, also show your key strokes in a buffer.
-local nvim_apm_defaults = {} -- TODO
+local nvim_apm_defaults = nil
 setup_plugin("nvim-apm", nvim_apm_defaults)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── other ──────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
+-- TODO: move to multi-lang, install quicktype
 -- https://github.com/midoBB/nvim-quicktype
 -- Generate types from JSON all inside Neovim
-local nvim_quicktype_defaults = {} -- TODO
+local nvim_quicktype_defaults = {
+	global = {
+		-- Quicktype global options
+		cmd = "quicktype", -- Path to the quicktype executable
+		src_lang = "json", -- The language of the input
+		no_combine_classes = false, -- Do not combine classes with shared properties into a single base class
+		all_properties_optional = false, -- Make all properties optional
+		alphabetize_properties = false, -- Alphabetize properties
+		telemetry = "disable", -- Send telemetry data to Quicktype (can be "enable", or "disable")
+		output_file = nil, -- Output file (if not specified, output is printed to stdout)
+		debug_dir = nil, -- Directory to write debug info to (if not specified, no debug info is written)
+		clipboard_source_register = nil, -- Register from which to read the copied JSON (if not specified, if will default to system then to unnamed and lastly to 0 register)
+	},
+	filetypes = {
+		-- Quicktype language-specific options
+		typescript = {
+			lang = "typescript", -- The language to generate types for
+			additional_options = {
+				-- Add any additional options here
+				-- Example:
+				-- ["just-types"] = true,
+				-- ["prefer-unions"] = true,
+			},
+		},
+		python = {
+			lang = "python", -- The language to generate types for
+			additional_options = {},
+		},
+		-- Add more filetypes as needed
+	},
+}
 setup_plugin("nvim-quicktype", nvim_quicktype_defaults)
 
 -- Neovim plugin for aligning bilingual parallel texts
@@ -789,17 +1427,111 @@ setup_plugin("nvmm", nvmm_defaults)
 -- https://github.com/glacambre/firenvim
 -- Embed Neovim in Chrome, Firefox & others.
 setup_plugin("firenvim", function(_) end)
+
 -- https://github.com/Apeiros-46B/qalc.nvim
 -- Neovim-integrated calculator based on Qalculate
-local qalc_defaults = {} -- TODO
+local qalc_defaults = {
+	-- extra command arguments for Qalculate
+	-- do NOT use the option `-t`/`--terse`; it will break the plugin
+	-- example: { '--set', 'angle deg' } to use degrees as the default angle unit
+	cmd_args = {}, -- table
+
+	-- default name of a newly opened buffer
+	-- set to '' to open an unnamed buffer
+	bufname = "", -- string
+
+	-- the plugin will set all attached buffers to have this filetype
+	-- set to '' to disable setting the filetype
+	-- the default is provided for basic syntax highlighting
+	set_ft = "config", -- string
+
+	-- file extension to automatically attach qalc to
+	-- set to '' to disable automatic attaching
+	attach_extension = "*.qalc", -- string
+
+	-- default register to yank results to
+	-- default register = '@'
+	-- clipboard        = '+'
+	-- X11 selection    = '*'
+	-- other registers not listed are also supported
+	-- see `:h setreg()`
+	yank_default_register = "@", -- string
+
+	-- sign shown before result
+	sign = "=", -- string
+
+	-- whether or not to show a sign before the result
+	show_sign = true, -- boolean
+
+	-- whether or not to right align virtual text
+	right_align = false, -- boolean
+
+	-- highlight groups
+	highlights = {
+		sign = "@conceal", -- sign before result
+		result = "@string", -- result in virtual text
+	},
+
+	-- diagnostic options
+	-- set to nil to respect the options in your neovim configuration
+	-- (see `:h vim.diagnostic.config()`)
+	diagnostics = { -- table?
+		underline = true,
+		virtual_text = false,
+		signs = true,
+		update_in_insert = true,
+		severity_sort = true,
+	},
+
+	-- use pty for job communication (MS Windows w/o WSL do not support pty)
+	use_pty = not ((vim.fn.has("win32") == 1) and (vim.fn.has("wsl") == 0)),
+
+	-- End-Of-File character (MS Windows uses ^Z (EOF), others use ^D (EOT))
+	eof = string.char(((vim.fn.has("win32") == 1) and (vim.fn.has("wsl") == 0)) and 26 or 4),
+}
 setup_plugin("qalc", qalc_defaults)
 
 -- https://github.com/alex-laycalvert/flashcards.nvim
 -- A Neovim plugin for Flashcards written in Lua
-local flashcards_defaults = {} -- TODO
+local flashcards_defaults = {
+	dir = home .. "/.config/flashcards",
+	flashcards = {
+		show_terms = true,
+		mappings = {
+			l = "next()",
+			h = "prev()",
+			n = "next()",
+			b = "prev()",
+			f = "flip()",
+			q = "close()",
+			a = "add()",
+			e = "edit()",
+			d = "delete()",
+			g = "browse_cards()",
+			o = "browse_subjects()",
+			k = "know()",
+			["<CR>"] = "flip()",
+			[" "] = "flip()",
+		},
+	},
+	subjects = {
+		mappings = {
+			j = "next()",
+			k = "prev()",
+			q = "close()",
+			e = "edit()",
+			a = "add()",
+			d = "delete()",
+			r = "reset()",
+			["<CR>"] = "select()",
+		},
+	},
+}
 setup_plugin("flashcards", flashcards_defaults)
 
 -- https://github.com/cfrt-dev/license.nvim
 -- Simple plugin that generates a LICENSE file
-local nvim_license_defaults = {} -- TODO
-setup_plugin("nvim-license", nvim_license_defaults)
+local nvim_license_defaults = nil
+setup_plugin("nvim-license", function(nvim_license) end)
+-- TODO: If you have telescope, you can use '<leader>gl' to open the license list
+--     and select the license you want to add to your project.

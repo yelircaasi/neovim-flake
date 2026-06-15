@@ -1003,11 +1003,15 @@ setup_plugin("bye-nerdfont", bye_nerdfont_defaults)
 --──── focus ──────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
+-- https://github.com/tadaa/vimade
+-- Vimade let's you dim, fade, tint, animate, and customize colors in your windows and buffers for (Neo)vim
 setup_plugin("vimade", {
 	recipe = { "default", { animate = true } },
 	fadelevel = 0.4,
 })
 
+-- https://github.com/folke/zen-mode.nvim
+-- Distraction-free coding for Neovim
 setup_plugin("zen-mode", {
 	wezterm = {
 		enabled = true,
@@ -1016,6 +1020,19 @@ setup_plugin("zen-mode", {
 	},
 })
 vim.o.laststatus = 3
+
+-- https://github.com/rewhile/fsread.nvim
+-- Flow state reading in neovim
+local fsread_defaults = {} -- TODO
+setup_plugin("fsread", function(fsread)
+	vim.g.flow_strength = 0.7 -- low: 0.3, middle: 0.5, high: 0.7 (default)
+	vim.api.nvim_set_hl(0, "FSPrefix", { fg = "#cdd6f4" })
+	vim.api.nvim_set_hl(0, "FSSuffix", { fg = "#6C7086" })
+
+	-- :FSRead " Flow state visual range
+	-- :FSClear " Clear all flow states
+	-- :FSToggle " Toggle flow state
+end)
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── mode-related ───────────────────────────────────────────────────────────
@@ -1092,14 +1109,15 @@ setup_plugin("modes", {
 
 -- https://github.com/rasulomaroff/reactive.nvim
 -- Reactivity. Right in your neovim.
-local reactive_config = { -- TODO
+local reactive_config = { -- TODO; not currently using this so I can explore
 	builtin = {},
 	configs = {},
 	load = {},
 }
 setup_plugin("reactive")
 
--- https://github.com/lukas-reineke/headlines.nvim | adds horizontal highlights for text filetypes, like markdown, orgmode, and neorg
+-- https://github.com/lukas-reineke/headlines.nvim
+-- adds horizontal highlights for text filetypes, like markdown, orgmode, and neorg
 setup_plugin("headlines", { -- TODO: move to colors (?)
 	markdown = {
 		headline_highlights = {

@@ -1522,7 +1522,7 @@ in rec {
         description = "";
       };
     };
-    AdvancedNewFile = pkgs.vimUtils.buildVimPlugin {
+    advanced_new_file = pkgs.vimUtils.buildVimPlugin {
       pname = "AdvancedNewFile";
       version = "2022-07-31";
       src = pkgs.fetchFromGitHub {
@@ -3327,7 +3327,7 @@ in rec {
       path = promise-async;
     }
     {
-      name = "nvim-teal-maker";
+      name = "tealmaker";
       path = nvim-teal-maker;
     }
     {
