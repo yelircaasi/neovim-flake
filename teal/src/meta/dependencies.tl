@@ -11,7 +11,7 @@ local M: {string: {string}} = {
 		"jsregexp",
 		"say"
 	},
-	["nvim-navbuddy"]  = { "nui" },
+	["nvim-navbuddy"]  = { "nui", "nvim-navic" },
 	["yazi"]           = { "plenary" },
 	["telescope"]      = { "plenary", "telescope-fzf-native", "telescope-project", "advanced_git_search" },
 	["luasnip"]        = { "friendly-snippets", "jsregexp" },

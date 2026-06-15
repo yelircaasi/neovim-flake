@@ -172,7 +172,7 @@ vim.api.nvim_set_hl(0, "@variable", { link = "Identifier" })
 
 local config_modules = {
 	["options"] = true,
-	["core"] = true,
+	["core"] = true, -- empty
 	["ui"] = true,
 
 	["clipboard"] = true,
@@ -222,7 +222,13 @@ local config_modules = {
 
 	["miscellaneous"] = false, -- TODO
 }
-config_modules = {} -- TMP
+-- TMP
+config_modules = {
+
+	["options"] = true,
+	["core"] = true, -- empty
+	["ui"] = true,
+}
 for mod_name, include in pairs(config_modules) do
 	if include then
 		require(mod_name)

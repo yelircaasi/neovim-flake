@@ -2,13 +2,13 @@
 --──── to vendor ──────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- <EXPERIMENTAL>
+-- EXPERIMENTAL
 -- https://github.com/LunarVim/Launch.nvim
 -- Launch.nvim is modular starter for Neovim.
 local launch_defaults = nil
 setup_plugin("Launch", launch_defaults)
 
--- <EXPERIMENTAL>
+-- EXPERIMENTAL
 -- https://github.com/bagohart/minimal-narrow-region.nvim
 -- Opinionated minimal implementation of Emacs' narrowing feature (https://www.gnu.org/software/emacs/manual/html_node/emacs/Narrowing.html)
 local minimal_narrow_region_defaults = nil

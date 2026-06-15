@@ -1,19 +1,11 @@
--- OPTIONS ========================================================================================
-
--- local o = vim.opt
--- local g = vim.g
-vim.opt.number = true -- Show absolute line number on the current line
-vim.opt.relativenumber = true -- Show relative numbers on other lines
-vim.g.mapleader = " "
-vim.opt.termguicolors = true
-
 local function set_options()
 	local global_options = {
 		mapleader = " ",
+		loaded_netrwPlugin = 1, -- for yazi
 	}
 	local options = {
-		number = true,
-		relativenumber = true,
+		number = true, -- Show absolute line number on the current line
+		relativenumber = true, -- Show relative numbers on other lines
 		shiftwidth = 4,
 		wrap = false,
 		signcolumn = "yes",
@@ -26,14 +18,14 @@ local function set_options()
 		timeout = true,
 		timeoutlen = 300,
 	}
-	for name, value in pairs(options) do
-		vim.opt[name] = value
-	end
+
 	for name, value in pairs(global_options) do
 		vim.g[name] = value
+	end
+
+	for name, value in pairs(options) do
+		vim.opt[name] = value
 	end
 end
 
 set_options()
-
-vim.g.loaded_netrwPlugin = 1 -- for yazi

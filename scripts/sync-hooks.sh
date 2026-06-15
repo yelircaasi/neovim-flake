@@ -64,7 +64,7 @@ sync_hooks lua/tmp.lua
 sync_hooks lua/treesitter.lua
 sync_hooks lua/ui.lua
 sync_hooks lua/wezterm.lua
-sync_hooks lua/wezterm_send.lua
+# sync_hooks lua/wezterm_send.lua
 
 sync_hooks lua/langs/init.lua
 sync_hooks lua/langs/go.lua
