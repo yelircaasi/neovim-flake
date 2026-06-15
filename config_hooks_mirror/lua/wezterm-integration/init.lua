@@ -288,6 +288,16 @@ function M.setup(config)
 		map("v", prefix_run .. "r", function()
 			M.send_selection({ pick = true })
 		end, { desc = "Run file: pick WezTerm pane", silent = true })
+
+		map("n", prefix .. "o", function()
+			M.retrieve_and_deliver()
+		end, { desc = "weave: retrieve pane output" })
+
+		-- Toggle capture mode on the fly
+		map("n", prefix .. "tc", function()
+			options.capture = options.capture == "auto" and "explicit" or "auto"
+			vim.notify("weave: capture mode = " .. options.capture, vim.log.levels.INFO)
+		end, { desc = "weave: toggle auto/explicit capture" })
 	end
 end
 

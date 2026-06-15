@@ -132,4 +132,127 @@ function M.send_to_pane(pane_id, text)
 	return true
 end
 
+-- LATEST
+
+-- Call this just before sending
+function M.mark_pane(opts)
+	local pane_id, err = resolve_pane(opts)
+	if not pane_id then
+		vim.notify("weave: " .. (err or "unknown error"), vim.log.levels.WARN)
+		return
+	end
+
+	local output = M.get_output({ pane_id = pane_id }) or ""
+	-- Store the pre-snapshot keyed by pane_id
+	M._marks[pane_id] = vim.split(output, "\n", { plain = true })
+	vim.notify("weave: pane marked", vim.log.levels.INFO)
+end
+
+-- Call this after the command has visibly finished
+function M.retrieve_output(opts)
+	local pane_id, err = resolve_pane(opts)
+	if not pane_id then
+		vim.notify("weave: " .. (err or "unknown error"), vim.log.levels.WARN)
+		return
+	end
+
+	local pre_lines = M._marks[pane_id]
+	if not pre_lines then
+		vim.notify("weave: pane not marked — call mark_pane first", vim.log.levels.WARN)
+		return
+	end
+
+	local post = M.get_output({ pane_id = pane_id }) or ""
+	local post_lines = vim.split(post, "\n", { plain = true })
+
+	-- Find where pre ends in post and take everything after
+	local pre_tail = pre_lines[#pre_lines]
+	for i = #post_lines, 1, -1 do
+		if post_lines[i] == pre_tail then
+			local new_lines = vim.list_slice(post_lines, i + 1)
+			M._marks[pane_id] = nil
+			return table.concat(new_lines, "\n")
+		end
+	end
+
+	-- Fallback: pre_tail scrolled out of view, return everything
+	M._marks[pane_id] = nil
+	return post
+end
+
+function M.send_selection(opts)
+	opts = opts or {}
+	local text = get_visual_selection()
+	if text == "" then
+		vim.notify("weave: empty selection", vim.log.levels.WARN)
+		return
+	end
+
+	-- Auto-mark so retrieve_output works without a separate mark step
+	M.mark_pane(opts)
+	M.send_text(text, opts)
+end
+
+-- NEXT
+
+local function deliver_output(output, target)
+	if target == "clipboard" then
+		vim.fn.setreg("+", output)
+		vim.fn.setreg('"', output)
+		vim.notify("weave: output copied to clipboard", vim.log.levels.INFO)
+	elseif target == "scratch" then
+		local buf = vim.api.nvim_create_buf(false, true)
+		vim.bo[buf].filetype = "text"
+		vim.api.nvim_buf_set_lines(buf, 0, -1, false, vim.split(output, "\n", { plain = true }))
+		vim.cmd.split()
+		vim.api.nvim_win_set_buf(0, buf)
+	elseif target == "quickfix" then
+		local items = {}
+		for _, line in ipairs(vim.split(output, "\n", { plain = true })) do
+			table.insert(items, { text = line })
+		end
+		vim.fn.setqflist(items, "r")
+		vim.cmd.copen()
+	end
+end
+
+function M.send_selection(opts)
+	opts = vim.tbl_deep_extend("force", {
+		capture = options.capture,
+		capture_target = options.capture_target,
+	}, opts)
+
+	local text = get_visual_selection()
+	if text == "" then
+		vim.notify("weave: empty selection", vim.log.levels.WARN)
+		return
+	end
+
+	M.mark_pane(opts)
+	M.send_text(text, opts)
+
+	if opts.capture == "auto" then
+		-- Poll until output changes, then deliver
+		local pane_id = resolve_pane(opts)
+		poll_for_change(pane_id, M._marks[pane_id], function()
+			local output = M.retrieve_output(opts)
+			if output then
+				deliver_output(output, opts.capture_target)
+			end
+		end)
+	end
+end
+
+-- Explicit retrieval: user calls this when ready
+function M.retrieve_and_deliver(opts)
+	opts = vim.tbl_deep_extend("force", {
+		capture_target = options.capture_target,
+	}, opts or {})
+
+	local output = M.retrieve_output(opts)
+	if output then
+		deliver_output(output, opts.capture_target)
+	end
+end
+
 return M
