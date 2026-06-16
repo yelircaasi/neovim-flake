@@ -2,6 +2,7 @@ local function set_options()
 	local global_options = {
 		mapleader = " ",
 		loaded_netrwPlugin = 1, -- for yazi
+		nerdfont = true,
 	}
 	local options = {
 		number = true, -- Show absolute line number on the current line
@@ -13,6 +14,7 @@ local function set_options()
 		swapfile = false,
 		winborder = "rounded",
 		termguicolors = true,
+		cursorline = true,
 		undofile = true,
 		incsearch = true,
 		timeout = true,

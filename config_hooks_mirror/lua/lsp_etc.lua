@@ -469,12 +469,12 @@ setup_plugin("lspsaga", lspsaga_defaults)
 map_explicit({
 	mode = { "n", "t" },
 	action = "<A-d>",
-	desc = "<cmd>Lspsaga term_toggle",
+	sequence = "<cmd>Lspsaga term_toggle",
 })
 map_explicit({
 	mode = "n",
 	action = "K",
-	desc = "<cmd>Lspsaga hover_doc",
+	sequence = "<cmd>Lspsaga hover_doc",
 })
 
 -- QUICKFIX
@@ -1359,7 +1359,7 @@ local lsp_signature_defaults = {
 	-- can be either a number or function
 	floating_window_off_y = 0, -- adjust float windows y position. e.g -2 move window up 2 lines; 2 move down 2 lines
 	-- can be either number or function, see examples
-	ignore_error = func(err, ctx, config), -- this scilence errors, check init.lua for more details
+	-- ignore_error = func(err, ctx, config), -- this scilence errors, check init.lua for more details
 
 	close_timeout = 4000, -- close floating window after ms when laster parameter is entered
 	fix_pos = false, -- set to true, the floating window will not auto-close until finish all parameters
@@ -1559,7 +1559,7 @@ local nvim_lightbulb_defaults = {
 	---@type (fun(client_name:string, result:lsp.CodeAction|lsp.Command):boolean)|nil
 	filter = nil,
 }
-setup_plugin("nvim-lightbulb", nvim_lightbulb_defaults)
+setup_plugin("nvim-lightbulb")
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── mappings ───────────────────────────────────────────────────────────────

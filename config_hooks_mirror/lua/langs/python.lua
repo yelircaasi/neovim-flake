@@ -27,8 +27,8 @@ vim.lsp.config["ruff"] = { -----------------------------------------------------
 	-- example: https://raw.githubusercontent.com/LuaLS/vscode-lua/master/setting/schema.json
 	settings = {},
 }
-vim.lsp.config["pyright"] = {
-	cmd = { "pyright-langserver", "--stdio" },
+vim.lsp.config["basedpyright"] = {
+	cmd = { "basedpyright-langserver", "--stdio" },
 	filetypes = { "python" },
 	root_markers = {
 		{ "pyproject.toml", "setup.py", "setup.cfg", "requirements.txt", "Pipfile" },
@@ -52,7 +52,7 @@ vim.lsp.config["nixd"] = {
 }
 
 vim.lsp.enable("pylsp")
-vim.lsp.enable("pyright")
+vim.lsp.enable("basedpyright")
 vim.lsp.enable("ruff")
 
 -- https://github.com/liborw/equals

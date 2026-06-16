@@ -273,25 +273,39 @@ pcall(vim.treesitter.language.register, "markdown", "oil")
 
 -- NEEDED TO PREVENT WARNINGS ON NON-CODE BUFFERS
 
-local ts_disabled = {
-	snacks_notif = true,
-	["blink-cmp-menu"] = true,
-	yazi = true,
-	oil = true,
-	telescope = true,
-	TelescopePrompt = true,
-	TelescopeResults = true,
-	TelescopePreview = true,
-	dmap = true,
-}
-
 local orig_ts_start = vim.treesitter.start
+
+-- local ts_disabled = {
+-- 	snacks_notif = true,
+-- 	["blink-cmp-menu"] = true,
+-- 	yazi = true,
+-- 	oil = true,
+-- 	telescope = true,
+-- 	TelescopePrompt = true,
+-- 	TelescopeResults = true,
+-- 	TelescopePreview = true,
+-- 	dmap = true,
+-- 	SymbolsSearch = true,
+-- 	SymbolsSidebar = true,
+-- 	["zenmode-bg"] = true,
+-- }
+
+-- vim.treesitter.start = function(bufnr, lang)
+-- 	bufnr = bufnr or 0
+-- 	local ft = vim.bo[bufnr].filetype
+
+-- 	if ts_disabled[ft] then
+-- 		return
+-- 	end
+
+-- 	return orig_ts_start(bufnr, lang)
+-- end
 
 vim.treesitter.start = function(bufnr, lang)
 	bufnr = bufnr or 0
-	local ft = vim.bo[bufnr].filetype
 
-	if ts_disabled[ft] then
+	local bt = vim.bo[bufnr].buftype
+	if bt ~= "" then
 		return
 	end
 

@@ -150,6 +150,10 @@ require("nui.input")
 require("jsregexp")
 require("pathlib")
 
+--─────────────────────────────────────────────────────────────────────────────
+--──── colorscheme ────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
 vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
 local odenwald = require("odenwald")
 odenwald.setup()
@@ -170,6 +174,10 @@ map_explicit({
 })
 vim.api.nvim_set_hl(0, "@variable", { link = "Identifier" })
 
+--─────────────────────────────────────────────────────────────────────────────
+--──── modules ────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
 local config_modules = {
 	["options"] = true,
 	["core"] = true, -- empty
@@ -177,12 +185,12 @@ local config_modules = {
 
 	["clipboard"] = true,
 	["cloud"] = true,
+	["colors"] = true,
 	["execution"] = true,
 
 	["completion"] = true,
 	["explorers"] = true,
 	["testing"] = true,
-	["treesitter"] = true,
 	["lsp_etc"] = true,
 
 	["editing"] = true,
@@ -214,7 +222,6 @@ local config_modules = {
 	["langs.lua_language"] = false,
 	["langs.markdown"] = false,
 	["langs.nix"] = true,
-	["langs.python"] = true,
 	["langs.rust"] = true,
 	["langs.tex"] = false,
 	["langs.typst"] = false,
@@ -223,22 +230,48 @@ local config_modules = {
 	["miscellaneous"] = false, -- TODO
 }
 -- TMP
-config_modules = {
-
+config_modules_DEV = {
 	["options"] = true,
-	["core"] = true, -- empty
-	["ui"] = true,
+	["lsp_etc"] = true,
+	["treesitter"] = true,
+	["core"] = true, -- currently: staging ground for ui
+	["langs.python"] = true,
+	["colors"] = true,
+	["ui"] = false,
 }
-for mod_name, include in pairs(config_modules) do
+local function maybe_require(mod_name)
+	local include = config_modules_DEV[mod_name]
 	if include then
+		print("Requiring " .. mod_name)
 		require(mod_name)
 	end
 end
 
-local include_experimental = false
+maybe_require("options")
+maybe_require("lsp_etc")
+maybe_require("treesitter")
+maybe_require("core")
+maybe_require("langs.python")
+maybe_require("colors")
+maybe_require("ui")
+
+local include_experimental = true
 if include_experimental then
+	setup_plugin("fsread", function(fsread)
+		vim.g.flow_strength = 0.7 -- low: 0.3, middle: 0.5, high: 0.7 (default)
+		vim.api.nvim_set_hl(0, "FSPrefix", { fg = "#cdd6f4" })
+		vim.api.nvim_set_hl(0, "FSSuffix", { fg = "#6C7086" })
+
+		-- :FSRead " Flow state visual range
+		-- :FSClear " Clear all flow states
+		-- :FSToggle " Toggle flow state
+	end)
+
 	-- TODO
-	require("wezterm_send").setup()
+	-- require("wezterm_send").setup()
+	vim.opt.runtimepath:prepend("/home/isaac/repos/wezterm-run.nvim")
+	local wezrun = require("wezterm-run")
+	wezrun.setup()
 
 	-- TODO
 	vim.opt.runtimepath:prepend("/home/isaac/repos/consilium.nvim")

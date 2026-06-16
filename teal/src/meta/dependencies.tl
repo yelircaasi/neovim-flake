@@ -36,5 +36,6 @@ local M: {string: {string}} = {
 	["knap"]           = { "commons" },
 	["indent-tools"]   = { "plenary", "nui", "arshlib" },
 	["structlog"]      = { "ts_context_commentstring" },
+	["bye-nerdfont"]   = { "nvim-web-devicons" },
 }
 return M

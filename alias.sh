@@ -1,1 +1,1 @@
-alias pde="sh scripts/sync-hooks.sh && result/bin/pde"
+alias pde="sh $HOME/repos/neovim-flake/scripts/sync-hooks.sh && $HOME/repos/neovim-flake/result/bin/pde"

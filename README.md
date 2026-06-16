@@ -6,7 +6,10 @@ https://github.com/va9iff/lil
 https://github.com/uga-rosa/ccc.nvim
 https://github.com/eero-lehtinen/oklch-color-picker.nvim
 
-Add cloud.lua
+- [ ] Add cloud.lua
+- [ ] add factory functions and `make_setup_function` and `make_packadd` in utils to simplify 
+      toggling plugin setup and passing around (wrapped) setup calls, adding them to keymaps and commands, etc
+- [ ] Add basedpyright to nix-config, along with other language servers I want available from anywhere. 
 
 ```lua
 	-------------------------------------------------------------------------------
