@@ -144,11 +144,11 @@ vim.api.nvim_create_autocmd("ColorScheme", {
 -------------------------------------------------------------------------------
 -- MODULES: ---------------------------------------------------------------------
 -------------------------------------------------------------------------------
-require("commons.fio")
-require("nio")
-require("nui.input")
-require("jsregexp")
-require("pathlib")
+-- require("commons.fio")
+-- require("nio")
+-- require("nui.input")
+-- require("jsregexp")
+-- require("pathlib")
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── colorscheme ────────────────────────────────────────────────────────────
@@ -178,7 +178,7 @@ vim.api.nvim_set_hl(0, "@variable", { link = "Identifier" })
 --──── modules ────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-local config_modules = {
+local ALL_config_modules = {
 	["options"] = true,
 	["core"] = true, -- empty
 	["ui"] = true,
@@ -230,17 +230,17 @@ local config_modules = {
 	["miscellaneous"] = false, -- TODO
 }
 -- TMP
-config_modules_DEV = {
+config_modules = {
 	["options"] = true,
+	["ui"] = false,
 	["lsp_etc"] = true,
-	["treesitter"] = true,
-	["core"] = true, -- currently: staging ground for ui
+	["treesitter"] = false,
+	["core"] = false,
 	["langs.python"] = true,
 	["colors"] = true,
-	["ui"] = false,
 }
 local function maybe_require(mod_name)
-	local include = config_modules_DEV[mod_name]
+	local include = config_modules[mod_name]
 	if include then
 		print("Requiring " .. mod_name)
 		require(mod_name)
@@ -255,7 +255,7 @@ maybe_require("langs.python")
 maybe_require("colors")
 maybe_require("ui")
 
-local include_experimental = true
+local include_experimental = false
 if include_experimental then
 	setup_plugin("fsread", function(fsread)
 		vim.g.flow_strength = 0.7 -- low: 0.3, middle: 0.5, high: 0.7 (default)

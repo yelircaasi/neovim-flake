@@ -178,6 +178,8 @@ https://github.com/atiladefreitas/dooing
 - [ ] https://github.com/fedepujol/move.nvim
 - [ ] https://github.com/ptdewey/pendulum-nvim
 
+https://github.com/akinsho/dotfiles
+
 - [ ] add custom syntax highlighting (later maybe even LSPs) for pictrix and kleidoukhos DSLs: analogous to,
       and using similar setups to, consilium DSLs -> write treesitter parsers someday
 

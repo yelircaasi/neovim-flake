@@ -1,245 +1,713 @@
+-- setup_plugin("plenary")
+-- setup_plugin("nio")
+local selections = {
+	line = "lualine",
+	breadcrumbs = "dropbar",
+}
+local plugins = {
+	["nvim-web-devicons"] = true,
+	["virtcolumn"] = false,
+	["virt-column"] = false,
+	["smartcolumn"] = false,
+	["statuscol"] = false,
+	["symbols"] = true,
+	["aerial"] = false,
+	["navbuddy"] = false,
+	["dropbar"] = selections.breadcrumbs == "dropbar",
+	["lualine"] = selections.line == "lualine",
+	["cokeline"] = selections.line == "cokeline",
+	["heirline"] = selections.line == "heirline",
+	["galaxyline"] = selections.line == "galaxyline",
+	["staline"] = selections.line == "staline",
+	["navic"] = false,
+	["bufferline"] = false,
+	["nougat"] = false,
+	["tabby"] = false,
+	["minibar"] = false,
+	["winbar"] = false,
+	["windline"] = false,
+	["vimade"] = false,
+	["zen-mode"] = true,
+	["modicator"] = true,
+	["modes"] = true,
+	["cmdbuf"] = false,
+	["mini.cmdline"] = false,
+	["menu"] = false,
+	["fidget"] = true,
+	["notify"] = false,
+	["control-panel"] = false,
+	["output-panel"] = false,
+	["cosmic-ui"] = false,
+	["volt"] = false,
+	["noice"] = false,
+	["reactive"] = false,
+}
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── fonts, characters ──────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+local function setup_icons()
+	if vim.g.nerdfont then
+		print("Using nerd icons")
+		setup_plugin("nvim-web-devicons", {
+			-- your personal icons can go here (to override)
+			-- you can specify color or cterm_color instead of specifying both of them
+			-- DevIcon will be appended to `name`
+			override = {
+				zsh = {
+					icon = "",
+					color = "#428850",
+					cterm_color = "65",
+					name = "Zsh",
+				},
+			},
+			-- globally enable different highlight colors per icon (default to true)
+			-- if set to false all icons will have the default icon's color
+			color_icons = true,
+			-- globally enable default icons (default to false)
+			-- will get overriden by `get_icons` option
+			default = true,
+			-- globally enable "strict" selection of icons - icon will be looked up in
+			-- different tables, first by filename, and if not found by extension; this
+			-- prevents cases when file doesn't have any extension but still gets some icon
+			-- because its name happened to match some extension (default to false)
+			strict = true,
+			-- set the light or dark variant manually, instead of relying on `background`
+			-- (default to nil)
+			variant = "light|dark",
+			-- override blend value for all highlight groups :h highlight-blend.
+			-- setting this value to `0` will make all icons opaque. in practice this means
+			-- that icons width will not be affected by pumblend option (see issue #608)
+			-- (default to nil)
+			blend = 0,
+			-- same as `override` but specifically for overrides by filename
+			-- takes effect when `strict` is true
+			override_by_filename = {
+				[".gitignore"] = {
+					icon = "",
+					color = "#f1502f",
+					name = "Gitignore",
+				},
+			},
+			-- same as `override` but specifically for overrides by extension
+			-- takes effect when `strict` is true
+			override_by_extension = {
+				["log"] = {
+					icon = "",
+					color = "#81e043",
+					name = "Log",
+				},
+			},
+			-- same as `override` but specifically for operating system
+			-- takes effect when `strict` is true
+			override_by_operating_system = {
+				["apple"] = {
+					icon = "",
+					color = "#A2AAAD",
+					cterm_color = "248",
+					name = "Apple",
+				},
+			},
+		})
+	else
+		-- TODO: integrate with nvim-tree, bufferline, lualine
+		-- https://github.com/dullmode/bye-nerdfont.nvim
+		-- devicons without nerdfont
+		local bye_nerdfont_defaults = {
+			mode = "emoji", -- alternative: "simple"
+		}
+		setup_plugin("bye-nerdfont", bye_nerdfont_defaults)
+	end
+end
 --─────────────────────────────────────────────────────────────────────────────
 --──── columns ────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- EXPERIMENTAL
--- TODO: compare https://github.com/lukas-reineke/virt-column.nvim (may be better)
--- https://github.com/xiyaowong/virtcolumn.nvim
--- Display a line as the colorcolumn
-local virtcolumn_defaults = nil
-utils.packadd("virtcolumn", function(virtcolumn)
-	vim.g.virtcolumn_char = "▕" -- char to display the line
-	vim.g.virtcolumn_priority = 10 -- priority of extmark
-end)
+local function setup_virtcolumn()
+	-- EXPERIMENTAL
+	-- TODO: compare https://github.com/lukas-reineke/virt-column.nvim (may be better)
+	-- https://github.com/xiyaowong/virtcolumn.nvim
+	-- Display a line as the colorcolumn
+	local virtcolumn_defaults = nil
+	utils.packadd("virtcolumn", function(virtcolumn)
+		vim.g.virtcolumn_char = "▕" -- char to display the line
+		vim.g.virtcolumn_priority = 10 -- priority of extmark
+	end)
+end
 
--- :help virt-column.txt
--- https://github.com/lukas-reineke/virt-column.nvim
--- Display a character as the colorcolumn
-local virt_column_defaults = {} -- TODO: https://github.com/lukas-reineke/virt-column.nvim/blob/master/lua/virt-column/config.lua
-setup_plugin("virt-column", function(virt_column)
-	virt_column.setup(virt_column_defaults)
-end)
+local function setup_virt_column()
+	-- :help virt-column.txt
+	-- https://github.com/lukas-reineke/virt-column.nvim
+	-- Display a character as the colorcolumn
+	local virt_column_defaults = {} -- TODO: https://github.com/lukas-reineke/virt-column.nvim/blob/master/lua/virt-column/config.lua
+	setup_plugin("virt-column", function(virt_column)
+		virt_column.setup(virt_column_defaults)
+	end)
+end
 
--- https://github.com/m4xshen/smartcolumn.nvim
--- A Neovim plugin hiding your colorcolumn when unneeded.
-local smartcolumn_defaults = {
-	colorcolumn = "80",
-	disabled_filetypes = { "help", "text", "markdown" },
-	custom_colorcolumn = {},
-	scope = "file",
-	editorconfig = true,
-}
-setup_plugin("smartcolumn", smartcolumn_defaults)
-
--- https://github.com/luukvbaal/statuscol.nvim
--- Status column plugin that provides a configurable 'statuscolumn' and click handlers.
-setup_plugin("statuscol", function(statuscol)
-	local builtin = require("statuscol.builtin")
-	local statuscol_defaults = {
-		setopt = true, -- Whether to set the 'statuscolumn' option, may be set to false for those who
-		-- want to use the click handlers in their own 'statuscolumn': _G.Sc[SFL]a().
-		-- Although I recommend just using the segments field below to build your
-		-- statuscolumn to benefit from the performance optimizations in this plugin.
-		-- builtin.lnumfunc number string options
-		thousands = false, -- or line number thousands separator string ("." / ",")
-		relculright = false, -- whether to right-align the cursor line number with 'relativenumber' set
-		-- Builtin 'statuscolumn' options
-		ft_ignore = nil, -- Lua table with 'filetype' values for which 'statuscolumn' will be unset
-		bt_ignore = nil, -- Lua table with 'buftype' values for which 'statuscolumn' will be unset
-		-- Default segments (fold -> sign -> line number + separator), explained below
-		segments = {
-			{ text = { "%C" }, click = "v:lua.ScFa" },
-			{ text = { "%s" }, click = "v:lua.ScSa" },
-			{
-				text = { builtin.lnumfunc, " " },
-				condition = { true, builtin.not_empty },
-				click = "v:lua.ScLa",
-			},
-		},
-		clickmod = "c", -- modifier used for certain actions in the builtin clickhandlers:
-		-- "a" for Alt, "c" for Ctrl and "m" for Meta.
-		clickhandlers = { -- builtin click handlers, keys are pattern matched
-			Lnum = builtin.lnum_click,
-			FoldClose = builtin.foldclose_click,
-			FoldOpen = builtin.foldopen_click,
-			FoldOther = builtin.foldother_click,
-			DapBreakpointRejected = builtin.toggle_breakpoint,
-			DapBreakpoint = builtin.toggle_breakpoint,
-			DapBreakpointCondition = builtin.toggle_breakpoint,
-			["diagnostic/signs"] = builtin.diagnostic_click,
-			gitsigns = builtin.gitsigns_click,
-		},
+local function setup_smartcolumn()
+	-- https://github.com/m4xshen/smartcolumn.nvim
+	-- A Neovim plugin hiding your colorcolumn when unneeded.
+	local smartcolumn_defaults = {
+		colorcolumn = "80",
+		disabled_filetypes = { "help", "text", "markdown" },
+		custom_colorcolumn = {},
+		scope = "file",
+		editorconfig = true,
 	}
-	statuscol.setup(statuscol_defaults)
-end)
+	setup_plugin("smartcolumn", smartcolumn_defaults)
+end
 
---─────────────────────────────────────────────────────────────────────────────
---──── menus, selection ───────────────────────────────────────────────────────
---─────────────────────────────────────────────────────────────────────────────
-
--- https://github.com/nvzone/menu
--- Menu plugin for neovim ( supports nested menus ) made using volt
-local menu_defaults = nil
-setup_plugin("menu") -- testing only; usable as a library
+local function setup_statuscol()
+	-- https://github.com/luukvbaal/statuscol.nvim
+	-- Status column plugin that provides a configurable 'statuscolumn' and click handlers.
+	setup_plugin("statuscol", function(statuscol)
+		local builtin = require("statuscol.builtin")
+		local statuscol_defaults = {
+			setopt = true, -- Whether to set the 'statuscolumn' option, may be set to false for those who
+			-- want to use the click handlers in their own 'statuscolumn': _G.Sc[SFL]a().
+			-- Although I recommend just using the segments field below to build your
+			-- statuscolumn to benefit from the performance optimizations in this plugin.
+			-- builtin.lnumfunc number string options
+			thousands = false, -- or line number thousands separator string ("." / ",")
+			relculright = false, -- whether to right-align the cursor line number with 'relativenumber' set
+			-- Builtin 'statuscolumn' options
+			ft_ignore = nil, -- Lua table with 'filetype' values for which 'statuscolumn' will be unset
+			bt_ignore = nil, -- Lua table with 'buftype' values for which 'statuscolumn' will be unset
+			-- Default segments (fold -> sign -> line number + separator), explained below
+			segments = {
+				{ text = { "%C" }, click = "v:lua.ScFa" },
+				{ text = { "%s" }, click = "v:lua.ScSa" },
+				{
+					text = { builtin.lnumfunc, " " },
+					condition = { true, builtin.not_empty },
+					click = "v:lua.ScLa",
+				},
+			},
+			clickmod = "c", -- modifier used for certain actions in the builtin clickhandlers:
+			-- "a" for Alt, "c" for Ctrl and "m" for Meta.
+			clickhandlers = { -- builtin click handlers, keys are pattern matched
+				Lnum = builtin.lnum_click,
+				FoldClose = builtin.foldclose_click,
+				FoldOpen = builtin.foldopen_click,
+				FoldOther = builtin.foldother_click,
+				DapBreakpointRejected = builtin.toggle_breakpoint,
+				DapBreakpoint = builtin.toggle_breakpoint,
+				DapBreakpointCondition = builtin.toggle_breakpoint,
+				["diagnostic/signs"] = builtin.diagnostic_click,
+				gitsigns = builtin.gitsigns_click,
+			},
+		}
+		statuscol.setup(statuscol_defaults)
+	end)
+end
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── outline ────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- TODO: maybe use aerial instead of navbuddy
--- https://github.com/stevearc/aerial.nvim
--- Neovim plugin for a code outline window
-local aerial_config = {
-	layout = {
-		min_width = 30,
-		default_direction = "prefer_right",
-	},
-	attach_mode = "window",
-	close_automatic_events = {
-		"unsupported",
-		"switch_buffer",
-	},
-}
-setup_plugin("aerial", function(aerial)
-	aerial.setup(aerial_config)
+local function setup_symbols()
+	-- https://github.com/oskarrrrrrr/symbols.nvim
+	-- Code navigation sidebar for Neovim.
+	local symbols_defaults = {
+		sidebar = {
+			-- Hide the cursor when in sidebar.
+			hide_cursor = true,
+			-- Side on which the sidebar will open, available options:
+			-- try-left  Opens to the left of the current window if there are no
+			--           windows there. Otherwise opens to the right.
+			-- try-right Opens to the right of the current window if there are no
+			--           windows there. Otherwise opens to the left.
+			-- right     Always opens to the right of the current window.
+			-- left      Always opens to the left of the current window.
+			open_direction = "try-left",
+			-- Whether to run `wincmd =` after opening a sidebar.
+			on_open_make_windows_equal = true,
+			-- Whether the cursor in the sidebar should automatically follow the
+			-- cursor in the source window. Does not unfold the symbols. You can jump
+			-- to symbol with unfolding with "gs" by default.
+			cursor_follow = true,
+			auto_resize = {
+				-- When enabled the sidebar will be resized whenever the view changes.
+				-- For example, after folding/unfolding symbols, after toggling inline details
+				-- or whenever the source file is saved.
+				enabled = true,
+				-- The sidebar will never be auto resized to a smaller width then `min_width`.
+				min_width = 20,
+				-- The sidebar will never be auto resized to a larger width then `max_width`.
+				max_width = 40,
+			},
+			-- Default sidebar width.
+			fixed_width = 30,
+			-- Allows to filter symbols. By default all the symbols are shown.
+			symbol_filter = function(filetype, symbol)
+				return true
+			end,
+			-- Show inline details by default.
+			show_inline_details = false,
+			-- Show details floating window at all times.
+			show_details_pop_up = false,
+			-- When enabled every symbol will be automatically peeked after cursor
+			-- movement.
+			auto_peek = false,
+			-- Whether the sidebar should unfold the target buffer on goto
+			-- This simply sends a zv after the zz
+			unfold_on_goto = false,
+			-- Whether to close the sidebar on goto symbol.
+			close_on_goto = false,
+			-- Whether the sidebar should wrap text.
+			wrap = false,
+			-- Whether to show the guide lines.
+			show_guide_lines = true,
+			chars = {
+				folded = "",
+				unfolded = "",
+				guide_vert = "│",
+				guide_middle_item = "├",
+				guide_last_item = "└",
+				-- use this highlight group for the guide lines
+				hl_guides = "Comment",
+				-- use this highlight group for the collapse/expand markers
+				hl_foldmarker = "String",
+			},
+			-- highlight group for the inline details shown next to the symbol name
+			-- (provider - dependent)
+			hl_details = "Comment",
+			-- Config for the preview window.
+			preview = {
+				-- Whether the preview window is always opened when the sidebar is
+				-- focused.
+				show_always = false,
+				-- Whether the preview window should show line numbers.
+				show_line_number = false,
+				-- Whether to determine the preview window's height automatically.
+				auto_size = true,
+				-- The total number of extra lines shown in the preview window.
+				auto_size_extra_lines = 6,
+				-- Minimum window height when `auto_size` is true.
+				min_window_height = 7,
+				-- Maximum window height when `auto_size` is true.
+				max_window_height = 30,
+				-- Preview window size when `auto_size` is false.
+				fixed_size_height = 12,
+				-- Desired preview window width. Actuall width will be capped at
+				-- the current width of the source window width.
+				window_width = 100,
+				-- Keymaps for actions in the preview window. Available actions:
+				-- close: Closes the preview window.
+				-- goto-code: Changes window to the source code and moves cursor to
+				--            the same position as in the preview window.
+				-- Note: goto-code is not set by default because the most natual
+				-- key would be Enter but some people already have that key mapped.
+				keymaps = {
+					["q"] = "close",
+				},
+			},
+			-- Keymaps for actions in the sidebar. All available actions are used
+			-- in the default keymaps.
+			keymaps = {
+				-- Jumps to symbol in the source window.
+				["<CR>"] = "goto-symbol",
+				-- Jumps to symbol in the source window but the cursor stays in the
+				-- sidebar.
+				["<RightMouse>"] = "peek-symbol",
+				["o"] = "peek-symbol",
 
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>o",
-		action = "<cmd>AerialToggle<cr>",
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "{",
-		action = "<cmd>AerialPrev<cr>",
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "}",
-		action = "<cmd>AerialNext<cr>",
-	})
-end)
+				-- Opens a floating window with symbol preview.
+				["K"] = "open-preview",
+				-- Opens a floating window with symbol details.
+				["d"] = "open-details-window",
 
--- utils.packadd("nui") -- TODO: comment out after next build
--- https://github.com/SmiteshP/nvim-navbuddy
--- A simple popup display that provides breadcrumbs feature using LSP server
-setup_plugin("nvim-navbuddy", function(navbuddy)
-	navbuddy.setup({
-		lsp = {
-			auto_attach = true,
+				-- In the sidebar jumps to symbol under the cursor in the source
+				-- window. Unfolds all the symbols on the way.
+				["gs"] = "show-symbol-under-cursor",
+				-- Jumps to parent symbol. Can be used with a count, e.g. "3gp"
+				-- will go 3 levels up.
+				["gp"] = "goto-parent",
+				-- Jumps to the previous symbol at the same nesting level.
+				["[["] = "prev-symbol-at-level",
+				-- Jumps to the next symbol at the same nesting level.
+				["]]"] = "next-symbol-at-level",
+
+				-- Unfolds the symbol under the cursor.
+				["l"] = "unfold",
+				["zo"] = "unfold",
+				-- Unfolds the symbol under the cursor and all its descendants.
+				["L"] = "unfold-recursively",
+				["zO"] = "unfold-recursively",
+				-- Reduces folding by one level. Can be used with a count,
+				-- e.g. "3zr" will unfold 3 levels.
+				["zr"] = "unfold-one-level",
+				-- Unfolds all symbols in the sidebar.
+				["zR"] = "unfold-all",
+
+				-- Folds the symbol under the cursor.
+				["h"] = "fold",
+				["zc"] = "fold",
+				-- Folds the symbol under the cursor and all its descendants.
+				["H"] = "fold-recursively",
+				["zC"] = "fold-recursively",
+				-- Increases folding by one level. Can be used with a count,
+				-- e.g. "3zm" will fold 3 levels.
+				["zm"] = "fold-one-level",
+				-- Folds all symbols in the sidebar.
+				["zM"] = "fold-all",
+
+				-- Start fuzzy search.
+				["s"] = "search",
+
+				-- Toggles inline details (see sidebar.show_inline_details).
+				["td"] = "toggle-inline-details",
+				-- Toggles auto details floating window (see sidebar.show_details_pop_up).
+				["tD"] = "toggle-auto-details-window",
+				-- Toggles auto preview floating window.
+				["tp"] = "toggle-auto-preview",
+				-- Toggles cursor hiding (see sidebar.auto_resize.
+				["tch"] = "toggle-cursor-hiding",
+				-- Toggles cursor following (see sidebar.cursor_follow).
+				["tcf"] = "toggle-cursor-follow",
+				-- Toggles symbol filters allowing the user to see all the symbols
+				-- given by the provider.
+				["tf"] = "toggle-filters",
+				-- Toggles automatic peeking on cursor movement (see sidebar.auto_peek).
+				["to"] = "toggle-auto-peek",
+				-- Toggles closing on goto symbol (see sidebar.close_on_goto).
+				["tg"] = "toggle-close-on-goto",
+				-- Toggles automatic sidebar resizing (see sidebar.auto_resize).
+				["t="] = "toggle-auto-resize",
+				-- Decrease auto resize max width by 5. Works with a count.
+				["t["] = "decrease-max-width",
+				-- Increase auto resize max width by 5. Works with a count.
+				["t]"] = "increase-max-width",
+
+				-- Toggle fold of the symbol under the cursor.
+				["<2-LeftMouse>"] = "toggle-fold",
+
+				-- Close the sidebar window.
+				["q"] = "close",
+
+				-- Show help.
+				["?"] = "help",
+				["g?"] = "help",
+			},
 		},
-	})
+		providers = {
+			-- Order in which providers will be called to get symbols.
+			priority = {
+				-- Default in case other rules are not defined.
+				["*"] = { "treesitter", "lsp" },
+				-- Treesitter provider for JSON can be slow for large files.
+				json = { "lsp", "treesitter" },
+				python = { "treesitter", "lsp" },
+			},
+			-- Override the priority using extra context.
+			-- Input has the following fields:
+			--  * filetype string
+			--  * path string - absolute path
+			--
+			-- Return `nil` to fall back to `priority` table.
+			priority_fun = function(input)
+				return nil
+			end,
+			lsp = {
+				timeout_ms = 1000,
+				details = {},
+				kinds = { default = {} },
+				highlights = {
+					-- ...
+					default = {},
+				},
+			},
+			treesitter = {
+				details = {},
+				kinds = { default = {} },
+				highlights = {
+					-- ...
+					default = {},
+				},
+			},
+		},
+		dev = {
+			enabled = false,
+			log_level = vim.log.levels.ERROR,
+			keymaps = {},
+		},
+	}
+	setup_plugin("symbols", symbols_defaults)
+end
 
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>nb",
-		action = function()
-			navbuddy.open()
-		end,
-	})
-end)
+local function setup_aerial()
+	-- TODO: maybe use aerial instead of navbuddy
+	-- https://github.com/stevearc/aerial.nvim
+	-- Neovim plugin for a code outline window
+	local aerial_config = {
+		layout = {
+			min_width = 30,
+			default_direction = "prefer_right",
+		},
+		attach_mode = "window",
+		close_automatic_events = {
+			"unsupported",
+			"switch_buffer",
+		},
+	}
+	setup_plugin("aerial", function(aerial)
+		aerial.setup(aerial_config)
+
+		map_explicit({
+			mode = "n",
+			sequence = "<leader>o",
+			action = "<cmd>AerialToggle<cr>",
+		})
+		map_explicit({
+			mode = "n",
+			sequence = "{",
+			action = "<cmd>AerialPrev<cr>",
+		})
+		map_explicit({
+			mode = "n",
+			sequence = "}",
+			action = "<cmd>AerialNext<cr>",
+		})
+	end)
+end
+
+local function setup_navbuddy()
+	-- utils.packadd("nui") -- TODO: comment out after next build
+	-- https://github.com/SmiteshP/nvim-navbuddy
+	-- A simple popup display that provides breadcrumbs feature using LSP server
+	setup_plugin("nvim-navbuddy", function(navbuddy)
+		navbuddy.setup({
+			lsp = {
+				auto_attach = true,
+			},
+		})
+
+		map_explicit({
+			mode = "n",
+			sequence = "<leader>nb",
+			action = function()
+				navbuddy.open()
+			end,
+		})
+	end)
+end
+
+local function setup_dropbar()
+	-- https://github.com/Bekaboo/dropbar.nvim
+	-- IDE-like breadcrumbs, out of the box
+	local dropbar_config = {
+		-- bar = {
+		-- 	padding = {
+		-- 		left = 1,
+		-- 		right = 1,
+		-- 	},
+		-- },
+	}
+	setup_plugin("dropbar", function(dropbar)
+		dropbar.setup(dropbar_config)
+
+		vim.ui.select = require("dropbar.utils.menu").select
+
+		map_explicit({
+			mode = "n",
+			sequence = "<leader>;",
+			action = function()
+				require("dropbar.api").pick()
+			end,
+		})
+
+		map_explicit({
+			mode = "n",
+			sequence = "[;",
+			action = function()
+				require("dropbar.api").goto_context_start()
+			end,
+		})
+
+		map_explicit({
+			mode = "n",
+			sequence = "];",
+			action = function()
+				require("dropbar.api").select_next_context()
+			end,
+		})
+	end)
+end
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── lines, bars ────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- https://github.com/Bekaboo/dropbar.nvim
--- IDE-like breadcrumbs, out of the box
-local dropbar_config = {
-	-- bar = {
-	-- 	padding = {
-	-- 		left = 1,
-	-- 		right = 1,
-	-- 	},
-	-- },
-}
-setup_plugin("dropbar", function(dropbar)
-	dropbar.setup(dropbar_config)
+local function setup_lualine()
+	-- https://github.com/nvim-lualine/lualine.nvim
+	-- A blazing fast and easy to configure neovim statusline plugin written in pure lua.
+	--[[
+    setup_plugin("lualine", ) --, lualine_config)
+    ]]
 
-	vim.ui.select = require("dropbar.utils.menu").select
+	local function lualine_bubbles(lualine)
+		-- don't split bar; use single bar
+		vim.o.laststatus = 3
 
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>;",
-		action = function()
-			require("dropbar.api").pick()
+		local colors = {
+			blue = "#80a0ff",
+			cyan = "#79dac8",
+			black = "#080808",
+			white = "#c6c6c6",
+			red = "#ff5189",
+			violet = "#d183e8",
+			grey = "#303030",
+		}
+
+		local bubbles_theme = {
+			normal = {
+				a = { fg = colors.black, bg = colors.violet },
+				b = { fg = colors.white, bg = colors.grey },
+				c = { fg = colors.white },
+			},
+
+			insert = { a = { fg = colors.black, bg = colors.blue } },
+			visual = { a = { fg = colors.black, bg = colors.cyan } },
+			replace = { a = { fg = colors.black, bg = colors.red } },
+
+			inactive = {
+				a = { fg = colors.white, bg = colors.black },
+				b = { fg = colors.white, bg = colors.black },
+				c = { fg = colors.white },
+			},
+		}
+
+		local cfg = {
+			options = {
+				theme = bubbles_theme,
+				component_separators = "",
+				section_separators = { left = "", right = "" },
+			},
+			sections = {
+				lualine_a = { { "mode", separator = { left = "" }, right_padding = 2 } },
+				lualine_b = { "filename", "branch" },
+				lualine_c = {
+					"%=", --[[ add your center components here in place of this comment ]]
+				},
+				lualine_x = {},
+				lualine_y = { "filetype", "progress" },
+				lualine_z = {
+					{ "location", separator = { right = "" }, left_padding = 2 },
+				},
+			},
+			inactive_sections = {
+				lualine_a = {}, -- "filename" },
+				lualine_b = {},
+				lualine_c = {},
+				lualine_x = {},
+				lualine_y = {},
+				lualine_z = {}, -- "location" },
+			},
+			tabline = {},
+			extensions = {},
+		}
+
+		lualine.setup(cfg)
+	end
+
+	local function lualine_defaultlike(lualine)
+		-- don't split bar; use single bar
+		vim.o.laststatus = 3
+
+		local cfg = {
+			inactive_sections = {
+				lualine_a = {},
+				lualine_b = {},
+				lualine_c = {},
+				lualine_x = {},
+				lualine_y = {},
+				lualine_z = {},
+			},
+		}
+		lualine.setup(cfg)
+	end
+
+	setup_plugin("lualine", lualine_defaultlike) -- lualine_bubbles)
+end
+
+local function setup_cokeline()
+	setup_plugin("cokeline", {}) -- TODO
+end
+
+local function setup_heirline()
+	setup_plugin("heirline", {}) -- TODO
+	setup_plugin("heirline-components", {}) -- TODO
+end
+
+local function setup_galaxyline()
+	setup_plugin("galaxyline", function(_) end) -- TODO
+end
+
+local function setup_staline()
+	setup_plugin("staline", {}) -- TODO
+end
+
+local function setup_navic()
+	-- https://github.com/SmiteshP/nvim-navic
+	-- Simple winbar/statusline plugin that shows your current code context
+	local navic_defaults = {
+		icons = {
+			File = "󰈙 ",
+			Module = " ",
+			Namespace = "󰌗 ",
+			Package = " ",
+			Class = "󰌗 ",
+			Method = "󰆧 ",
+			Property = " ",
+			Field = " ",
+			Constructor = " ",
+			Enum = "󰕘",
+			Interface = "󰕘",
+			Function = "󰊕 ",
+			Variable = "󰆧 ",
+			Constant = "󰏿 ",
+			String = "󰀬 ",
+			Number = "󰎠 ",
+			Boolean = "◩ ",
+			Array = "󰅪 ",
+			Object = "󰅩 ",
+			Key = "󰌋 ",
+			Null = "󰟢 ",
+			EnumMember = " ",
+			Struct = "󰌗 ",
+			Event = " ",
+			Operator = "󰆕 ",
+			TypeParameter = "󰊄 ",
+			enabled = true,
+		},
+		lsp = {
+			auto_attach = false,
+			preference = nil,
+		},
+		highlight = false,
+		separator = " > ",
+		depth_limit = 0,
+		depth_limit_indicator = "..",
+		safe_output = true,
+		lazy_update_context = false,
+		click = false,
+		format_text = function(text)
+			return text
 		end,
-	})
+	}
+	setup_plugin("nvim-navic", navic_defaults)
+end
 
-	map_explicit({
-		mode = "n",
-		sequence = "[;",
-		action = function()
-			require("dropbar.api").goto_context_start()
-		end,
-	})
-
-	map_explicit({
-		mode = "n",
-		sequence = "];",
-		action = function()
-			require("dropbar.api").select_next_context()
-		end,
-	})
-end)
-
--- https://github.com/SmiteshP/nvim-navic
--- Simple winbar/statusline plugin that shows your current code context
-local navic_defaults = {
-	icons = {
-		File = "󰈙 ",
-		Module = " ",
-		Namespace = "󰌗 ",
-		Package = " ",
-		Class = "󰌗 ",
-		Method = "󰆧 ",
-		Property = " ",
-		Field = " ",
-		Constructor = " ",
-		Enum = "󰕘",
-		Interface = "󰕘",
-		Function = "󰊕 ",
-		Variable = "󰆧 ",
-		Constant = "󰏿 ",
-		String = "󰀬 ",
-		Number = "󰎠 ",
-		Boolean = "◩ ",
-		Array = "󰅪 ",
-		Object = "󰅩 ",
-		Key = "󰌋 ",
-		Null = "󰟢 ",
-		EnumMember = " ",
-		Struct = "󰌗 ",
-		Event = " ",
-		Operator = "󰆕 ",
-		TypeParameter = "󰊄 ",
-		enabled = true,
-	},
-	lsp = {
-		auto_attach = false,
-		preference = nil,
-	},
-	highlight = false,
-	separator = " > ",
-	depth_limit = 0,
-	depth_limit_indicator = "..",
-	safe_output = true,
-	lazy_update_context = false,
-	click = false,
-	format_text = function(text)
-		return text
-	end,
-}
-setup_plugin("nvim-navic", navic_defaults)
-
--- https://github.com/akinsho/bufferline.nvim
--- A snazzy bufferline for Neovim
-
-setup_plugin("bufferline", function(bufferline)
+local function setup_bufferline()
+	-- https://github.com/akinsho/bufferline.nvim
+	-- A snazzy bufferline for Neovim
 	local bufferline_defaults = {
 		options = {
 			mode = "buffers", -- set to "tabs" to only show tabpages instead
-			style_preset = bufferline.style_preset.default, -- or bufferline.style_preset.minimal,
+			-- commented out because depends on bufferline
+			-- style_preset = bufferline.style_preset.default, -- or bufferline.style_preset.minimal,
 			themable = true, -- | false, -- allows highlight groups to be overriden i.e. sets highlights as default
 			numbers = "none", -- | "ordinal" | "buffer_id" | "both" | function({ ordinal, id, lower, raise }): string,
 			close_command = "bdelete! %d", -- can be a string | function, | false see "Mouse actions"
@@ -355,169 +823,314 @@ setup_plugin("bufferline", function(bufferline)
 			},
 		},
 	}
-	bufferline.setup(bufferline_defaults)
-end)
+	setup_plugin("bufferline", function(bufferline)
+		bufferline.setup(bufferline_defaults)
+	end)
+end
 
----------------- alternative lines -------------
-if false then
-	setup_plugin("cokeline", {})
-	setup_plugin("galaxyline", function(_) end)
-	setup_plugin("heirline", {})
-	setup_plugin("heirline-components", {})
-	setup_plugin("nougat", function(_) end)
-	setup_plugin("staline", {})
-	setup_plugin("tabby", {})
-	setup_plugin("minibar", {})
-	setup_plugin("winbar", {})
-	setup_plugin("windline", function(_) end)
+local function setup_nougat()
+	setup_plugin("nougat", function(_) end) -- TODO
+end
+
+local function setup_tabby()
+	setup_plugin("tabby", {}) -- TODO
+end
+
+local function setup_minibar()
+	setup_plugin("minibar", {}) -- TODO
+end
+
+local function setup_winbar()
+	setup_plugin("winbar", {}) -- TODO
+end
+
+local function setup_windline()
+	setup_plugin("windline", function(_) end) -- TODO
+end
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── focus ──────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+local function setup_vimade()
+	-- https://github.com/tadaa/vimade
+	-- Vimade let's you dim, fade, tint, animate, and customize colors in your windows and buffers for (Neo)vim
+	setup_plugin("vimade", {
+		recipe = { "default", { animate = true } },
+		fadelevel = 0.4,
+	})
+end
+
+local function setup_zenmode()
+	-- https://github.com/folke/zen-mode.nvim
+	-- Distraction-free coding for Neovim
+	local zenmode_defaults = {
+		wezterm = {
+			enabled = true,
+			-- can be either an absolute font size or the number of incremental steps
+			font = "+4", -- (10% increase per step)
+		},
+	}
+	setup_plugin("zen-mode", function(zenmode)
+		zenmode.setup(zenmode_defaults)
+
+		map_explicit({
+			mode = "n",
+			sequence = "<leader>zm",
+			action = function()
+				-- width will be 85% of the editor width
+				zenmode.toggle({ window = { width = 0.85 } })
+			end,
+			desc = "",
+		})
+		-- print("set map")
+	end)
+end
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── mode-related ───────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+local function setup_modicator()
+	-- https://github.com/mawkler/modicator.nvim
+	-- Cursor line number mode indicator plugin for Neovim
+	local modicator_defaults = {
+		-- Warn if any required option is missing. May emit false positives if some
+		-- other plugin modifies them, which in that case you can just ignore
+		show_warnings = false,
+		highlights = {
+			-- Default options for bold/italic
+			defaults = {
+				bold = false,
+				italic = false,
+			},
+			-- Use `CursorLine`'s background color for `CursorLineNr`'s background
+			use_cursorline_background = false,
+		},
+		integration = {
+			lualine = {
+				enabled = true,
+				-- Letter of lualine section to use (if `nil`, gets detected automatically)
+				mode_section = nil,
+				-- Whether to use lualine's mode highlight's foreground or background
+				highlight = "bg",
+			},
+		},
+	}
+	setup_plugin("modicator", function(modicator)
+		-- already selected in options.lua
+		-- vim.o.termguicolors = true
+		-- vim.o.cursorline = true
+		-- vim.o.number = true
+		modicator.setup(modicator_defaults)
+	end)
+end
+
+local function setup_modes()
+	-- https://github.com/mvllow/modes.nvim
+	-- Prismatic line decorations for the adventurous vim user
+	local modes_defaults = {
+		colors = {
+			bg = "", -- Optional bg param, defaults to Normal hl group
+			copy = "#f5c359",
+			delete = "#c75c6a",
+			change = "#c75c6a", -- Optional param, defaults to delete
+			format = "#c79585",
+			insert = "#78ccc5",
+			replace = "#245361",
+			select = "#9745be", -- Optional param, defaults to visual
+			visual = "#9745be",
+		},
+
+		-- Set opacity for cursorline and number background
+		line_opacity = 0.15,
+
+		-- Enable cursor highlights
+		set_cursor = true,
+
+		-- Enable cursorline initially, and disable cursorline for inactive windows
+		-- or ignored filetypes
+		set_cursorline = true,
+
+		-- Enable line number highlights to match cursorline
+		set_number = true,
+
+		-- Enable sign column highlights to match cursorline
+		set_signcolumn = true,
+
+		-- Disable modes highlights for specified filetypes
+		-- or enable with prefix "!" if otherwise disabled (please PR common patterns)
+		-- Can also be a function fun():boolean that disables modes highlights when true
+		ignore = { "NvimTree", "TelescopePrompt", "!minifiles" },
+	}
+	setup_plugin("modes", function(modes)
+		modes.setup(modes_defaults)
+		vim.o.cmdheight = 0
+	end)
 end
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── command interface ──────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- PROBABLY NOT, BUT WORTH A TRY
--- https://github.com/notomo/cmdbuf.nvim
--- Alternative command-line window plugin for neovim
-local cmdbuf_defaults = nil
-setup_plugin("cmdbuf", function(cmdbuf)
-	map_explicit({
-		mode = "n",
-		sequence = "q:",
-		action = function()
-			cmdbuf.split_open(vim.o.cmdwinheight)
-		end,
-	})
-	map_explicit({
-		mode = "c",
-		sequence = "<C-f>",
-		action = function()
-			cmdbuf.split_open(vim.o.cmdwinheight, { line = vim.fn.getcmdline(), column = vim.fn.getcmdpos() })
-			vim.api.nvim_feedkeys(vim.keycode("<C-c>"), "n", true)
-		end,
-	})
+local function setup_cmdbuf()
+	-- PROBABLY NOT, BUT WORTH A TRY
+	-- https://github.com/notomo/cmdbuf.nvim
+	-- Alternative command-line window plugin for neovim
+	local cmdbuf_defaults = nil
+	setup_plugin("cmdbuf", function(cmdbuf)
+		map_explicit({
+			mode = "n",
+			sequence = "q:",
+			action = function()
+				cmdbuf.split_open(vim.o.cmdwinheight)
+			end,
+		})
+		map_explicit({
+			mode = "c",
+			sequence = "<C-f>",
+			action = function()
+				cmdbuf.split_open(vim.o.cmdwinheight, { line = vim.fn.getcmdline(), column = vim.fn.getcmdpos() })
+				vim.api.nvim_feedkeys(vim.keycode("<C-c>"), "n", true)
+			end,
+		})
 
-	-- Custom buffer mappings
-	vim.api.nvim_create_autocmd({ "User" }, {
-		group = vim.api.nvim_create_augroup("config.cmdbuf", {}),
-		pattern = { "CmdbufNew" },
-		callback = function(args)
-			vim.bo.bufhidden = "wipe" -- if you don't need previous opened buffer state
-			map_explicit({
-				mode = "n",
-				"q",
-				[[<Cmd>quit<CR>]],
-				opts = { nowait = true, buf = 0 },
-			})
-			map_explicit({
-				mode = "n",
-				"dd",
-				[[<Cmd>lua require('cmdbuf').delete()<CR>]],
-				opts = { buf = 0 },
-			})
-			map_explicit({
-				mode = { "n", "i" },
-				"<C-c>",
-				function()
-					return cmdbuf.cmdline_expr()
-				end,
-				opts = { buf = 0, expr = true },
-			})
+		-- Custom buffer mappings
+		vim.api.nvim_create_autocmd({ "User" }, {
+			group = vim.api.nvim_create_augroup("config.cmdbuf", {}),
+			pattern = { "CmdbufNew" },
+			callback = function(args)
+				vim.bo.bufhidden = "wipe" -- if you don't need previous opened buffer state
+				map_explicit({
+					mode = "n",
+					"q",
+					[[<Cmd>quit<CR>]],
+					opts = { nowait = true, buf = 0 },
+				})
+				map_explicit({
+					mode = "n",
+					"dd",
+					[[<Cmd>lua require('cmdbuf').delete()<CR>]],
+					opts = { buf = 0 },
+				})
+				map_explicit({
+					mode = { "n", "i" },
+					"<C-c>",
+					function()
+						return cmdbuf.cmdline_expr()
+					end,
+					opts = { buf = 0, expr = true },
+				})
 
-			local typ = cmdbuf.get_context().type
-			if typ == "vim/cmd" then
-				-- you can filter buffer lines
-				local lines = vim.iter(vim.api.nvim_buf_get_lines(args.buf, 0, -1, false))
-					:filter(function(line)
-						return line ~= "q"
-					end)
-					:totable()
-				vim.api.nvim_buf_set_lines(args.buf, 0, -1, false, lines)
-			end
-		end,
-	})
+				local typ = cmdbuf.get_context().type
+				if typ == "vim/cmd" then
+					-- you can filter buffer lines
+					local lines = vim.iter(vim.api.nvim_buf_get_lines(args.buf, 0, -1, false))
+						:filter(function(line)
+							return line ~= "q"
+						end)
+						:totable()
+					vim.api.nvim_buf_set_lines(args.buf, 0, -1, false, lines)
+				end
+			end,
+		})
 
-	-- open lua command-line window
-	map_explicit({
-		mode = "n",
-		sequence = "ql",
-		action = function()
-			cmdbuf.split_open(vim.o.cmdwinheight, { type = "lua/cmd" })
-		end,
-	})
+		-- open lua command-line window
+		map_explicit({
+			mode = "n",
+			sequence = "ql",
+			action = function()
+				cmdbuf.split_open(vim.o.cmdwinheight, { type = "lua/cmd" })
+			end,
+		})
 
-	-- q/, q? alternative
-	map_explicit({
-		mode = "n",
-		sequence = "q/",
-		action = function()
-			cmdbuf.split_open(vim.o.cmdwinheight, { type = "vim/search/forward" })
-		end,
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "q?",
-		action = function()
-			cmdbuf.split_open(vim.o.cmdwinheight, { type = "vim/search/backward" })
-		end,
-	})
-end)
+		-- q/, q? alternative
+		map_explicit({
+			mode = "n",
+			sequence = "q/",
+			action = function()
+				cmdbuf.split_open(vim.o.cmdwinheight, { type = "vim/search/forward" })
+			end,
+		})
+		map_explicit({
+			mode = "n",
+			sequence = "q?",
+			action = function()
+				cmdbuf.split_open(vim.o.cmdwinheight, { type = "vim/search/backward" })
+			end,
+		})
+	end)
+end
 
--- https://github.com/nvim-mini/mini.cmdline
--- Command line tweaks. Part of 'mini.nvim' library.
-local mini_cmdline_defaults = {
-	-- Autocompletion: show `:h 'wildmenu'` as you type
-	autocomplete = {
-		enable = true,
+local function setup_mini_cmdline()
+	-- https://github.com/nvim-mini/mini.cmdline
+	-- Command line tweaks. Part of 'mini.nvim' library.
+	local mini_cmdline_defaults = {
+		-- Autocompletion: show `:h 'wildmenu'` as you type
+		autocomplete = {
+			enable = true,
 
-		-- Delay (in ms) after which to trigger completion
-		-- Neovim>=0.12 is recommended for positive values
-		delay = 0,
+			-- Delay (in ms) after which to trigger completion
+			-- Neovim>=0.12 is recommended for positive values
+			delay = 0,
 
-		-- Custom rule of when to trigger completion
-		predicate = nil,
+			-- Custom rule of when to trigger completion
+			predicate = nil,
 
-		-- Whether to map arrow keys for more consistent wildmenu behavior
-		map_arrows = true,
-	},
-
-	-- Autocorrection: adjust non-existing words (commands, options, etc.)
-	autocorrect = {
-		enable = true,
-
-		-- Custom autocorrection rule
-		func = nil,
-	},
-
-	-- Autopeek: show command's target range in a floating window
-	autopeek = {
-		enable = true,
-
-		-- Number of lines to show above and below range lines
-		n_context = 1,
-
-		-- Custom rule of when to show peek window
-		predicate = nil,
-
-		-- Window options
-		window = {
-			-- Floating window config
-			config = {},
-
-			-- Function to render statuscolumn
-			statuscolumn = nil,
+			-- Whether to map arrow keys for more consistent wildmenu behavior
+			map_arrows = true,
 		},
-	},
-}
-setup_plugin("mini.cmdline", mini_cmdline_defaults)
+
+		-- Autocorrection: adjust non-existing words (commands, options, etc.)
+		autocorrect = {
+			enable = true,
+
+			-- Custom autocorrection rule
+			func = nil,
+		},
+
+		-- Autopeek: show command's target range in a floating window
+		autopeek = {
+			enable = true,
+
+			-- Number of lines to show above and below range lines
+			n_context = 1,
+
+			-- Custom rule of when to show peek window
+			predicate = nil,
+
+			-- Window options
+			window = {
+				-- Floating window config
+				config = {},
+
+				-- Function to render statuscolumn
+				statuscolumn = nil,
+			},
+		},
+	}
+	setup_plugin("mini.cmdline", mini_cmdline_defaults)
+end
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── menus, selection ───────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+local function setup_menu()
+	-- https://github.com/nvzone/menu
+	-- Menu plugin for neovim ( supports nested menus ) made using volt
+	local menu_defaults = nil
+	setup_plugin("menu") -- testing only; usable as a library
+end
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── output, notification ───────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- https://github.com/j-hui/fidget.nvim
--- Extensible UI for Neovim notifications and LSP progress messages.
-local fidget_defaults = [[{
+local function setup_fidget()
+	-- https://github.com/j-hui/fidget.nvim
+	-- Extensible UI for Neovim notifications and LSP progress messages.
+	local fidget_defaults = [[{
 	-- Options related to LSP progress subsystem
 	progress = {
 		poll_rate = 0, -- How and when to poll for progress messages
@@ -642,151 +1255,255 @@ local fidget_defaults = [[{
 		path = string.format("%s/fidget.nvim.log", vim.fn.stdpath("cache")),
 	},
 }]]
-setup_plugin("fidget", {
-	notification = {
-		window = {
-			winblend = 0,
+	setup_plugin("fidget", {
+		notification = {
+			window = {
+				winblend = 0,
+			},
 		},
-	},
-	progress = {
-		suppress_on_insert = false,
-	},
-})
+		progress = {
+			suppress_on_insert = false,
+		},
+	})
+end
 
--- PROBABLY NOT, BUT WORTH A TRY (== nvim-notify ?)
--- https://github.com/rcarriga/nvim-notify
--- A fancy, configurable, notification manager for NeoVim
-local notify_defaults = {
-	stages = "fade",
-	timeout = 3000,
-	render = "wrapped-default",
-	max_width = function()
-		return math.floor(vim.o.columns * 0.4)
-	end,
-}
-vim.opt.termguicolors = true
--- highlight NotifyERRORBorder guifg=#8A1F1F
--- highlight NotifyWARNBorder guifg=#79491D
--- highlight NotifyINFOBorder guifg=#4F6752
--- highlight NotifyDEBUGBorder guifg=#8B8B8B
--- highlight NotifyTRACEBorder guifg=#4F3552
--- highlight NotifyERRORIcon guifg=#F70067
--- highlight NotifyWARNIcon guifg=#F79000
--- highlight NotifyINFOIcon guifg=#A9FF68
--- highlight NotifyDEBUGIcon guifg=#8B8B8B
--- highlight NotifyTRACEIcon guifg=#D484FF
--- highlight NotifyERRORTitle  guifg=#F70067
--- highlight NotifyWARNTitle guifg=#F79000
--- highlight NotifyINFOTitle guifg=#A9FF68
--- highlight NotifyDEBUGTitle  guifg=#8B8B8B
--- highlight NotifyTRACETitle  guifg=#D484FF
--- highlight link NotifyERRORBody Normal
--- highlight link NotifyWARNBody Normal
--- highlight link NotifyINFOBody Normal
--- highlight link NotifyDEBUGBody Normal
--- highlight link NotifyTRACEBody Normal
-setup_plugin("notify", function(notify)
-	notify.setup(notify_defaults)
+local function setup_notify()
+	-- PROBABLY NOT, BUT WORTH A TRY (== nvim-notify ?)
+	-- https://github.com/rcarriga/nvim-notify
+	-- A fancy, configurable, notification manager for NeoVim
+	local notify_defaults = {
+		stages = "fade",
+		timeout = 3000,
+		render = "wrapped-default",
+		max_width = function()
+			return math.floor(vim.o.columns * 0.4)
+		end,
+	}
+	vim.opt.termguicolors = true
+	-- highlight NotifyERRORBorder guifg=#8A1F1F
+	-- highlight NotifyWARNBorder guifg=#79491D
+	-- highlight NotifyINFOBorder guifg=#4F6752
+	-- highlight NotifyDEBUGBorder guifg=#8B8B8B
+	-- highlight NotifyTRACEBorder guifg=#4F3552
+	-- highlight NotifyERRORIcon guifg=#F70067
+	-- highlight NotifyWARNIcon guifg=#F79000
+	-- highlight NotifyINFOIcon guifg=#A9FF68
+	-- highlight NotifyDEBUGIcon guifg=#8B8B8B
+	-- highlight NotifyTRACEIcon guifg=#D484FF
+	-- highlight NotifyERRORTitle  guifg=#F70067
+	-- highlight NotifyWARNTitle guifg=#F79000
+	-- highlight NotifyINFOTitle guifg=#A9FF68
+	-- highlight NotifyDEBUGTitle  guifg=#8B8B8B
+	-- highlight NotifyTRACETitle  guifg=#D484FF
+	-- highlight link NotifyERRORBody Normal
+	-- highlight link NotifyWARNBody Normal
+	-- highlight link NotifyINFOBody Normal
+	-- highlight link NotifyDEBUGBody Normal
+	-- highlight link NotifyTRACEBody Normal
+	setup_plugin("notify", function(notify)
+		notify.setup(notify_defaults)
 
-	vim.notify = notify
-end)
+		vim.notify = notify
+	end)
+end
 
--- https://github.com/mhanberg/control-panel.nvim
--- experimental plugin, use with caution
-local control_panel_defaults = nil
-setup_plugin("control_panel", control_panel_defaults)
+local function setup_control_panel()
+	-- https://github.com/mhanberg/control-panel.nvim
+	-- experimental plugin, use with caution
+	local control_panel_defaults = nil
+	setup_plugin("control_panel", control_panel_defaults)
+end
 
--- TODO: translate lazy.nvim options from README
--- https://github.com/mhanberg/output-panel.nvim
--- A panel to view the logs from your LSP servers.
-local output_panel_defaults = {
-	max_buffer_size = 5000, -- default
-}
-setup_plugin("output_panel", output_panel_defaults)
+local function setup_output_panel()
+	-- TODO: translate lazy.nvim options from README
+	-- https://github.com/mhanberg/output-panel.nvim
+	-- A panel to view the logs from your LSP servers.
+	local output_panel_defaults = {
+		max_buffer_size = 5000, -- default
+	}
+	setup_plugin("output_panel", output_panel_defaults)
+end
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── UI libraries ───────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- https://github.com/CosmicNvim/cosmic-ui
--- Cosmic-UI is a simple wrapper around specific vim functionality. Built in order to provide a quick and easy way to create a Cosmic UI experience with Neovim!
-local cosmic_ui_defaults = {
-	notify_title = "CosmicUI",
+local function setup_cosmicui()
+	-- https://github.com/CosmicNvim/cosmic-ui
+	-- Cosmic-UI is a simple wrapper around specific vim functionality. Built in order to provide a quick and easy way to create a Cosmic UI experience with Neovim!
+	local cosmic_ui_defaults = {
+		notify_title = "CosmicUI",
 
-	rename = {
-		enabled = true, -- optional (defaults to true when table exists)
-		border = {
-			highlight = "FloatBorder",
-			style = nil, -- falls back to vim.o.winborder
-			title = "Rename",
-			title_align = "left",
-			title_hl = "FloatBorder",
+		rename = {
+			enabled = true, -- optional (defaults to true when table exists)
+			border = {
+				highlight = "FloatBorder",
+				style = nil, -- falls back to vim.o.winborder
+				title = "Rename",
+				title_align = "left",
+				title_hl = "FloatBorder",
+			},
+			prompt = "> ",
+			prompt_hl = "Comment",
 		},
-		prompt = "> ",
-		prompt_hl = "Comment",
-	},
 
-	codeactions = {
-		enabled = true, -- optional (defaults to true when table exists)
-		min_width = nil,
-		border = {
-			bottom_hl = "FloatBorder",
-			highlight = "FloatBorder",
-			style = nil, -- falls back to vim.o.winborder
-			title = "Code Actions",
-			title_align = "center",
-			title_hl = "FloatBorder",
+		codeactions = {
+			enabled = true, -- optional (defaults to true when table exists)
+			min_width = nil,
+			border = {
+				bottom_hl = "FloatBorder",
+				highlight = "FloatBorder",
+				style = nil, -- falls back to vim.o.winborder
+				title = "Code Actions",
+				title_align = "center",
+				title_hl = "FloatBorder",
+			},
 		},
-	},
 
-	formatters = {
-		enabled = true, -- optional (defaults to true when table exists)
-	},
-}
-setup_plugin("cosmic-ui", cosmic_ui_defaults)
-
--- https://github.com/nvzone/volt
--- Create blazing fast & beautiful reactive UI in Neovim
-setup_plugin("volt", function(_) end)
-
--- https://github.com/folke/noice.nvim
--- Highly experimental plugin that completely replaces the UI for messages, cmdline and the popupmenu.
-local noice_config = {
-	lsp = {
-		-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
-		override = {
-			["vim.lsp.util.convert_input_to_markdown_lines"] = true,
-			["vim.lsp.util.stylize_markdown"] = true,
-			["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+		formatters = {
+			enabled = true, -- optional (defaults to true when table exists)
 		},
-	},
-	-- you can enable a preset for easier configuration
-	presets = {
-		bottom_search = true, -- use a classic bottom cmdline for search
-		command_palette = true, -- position the cmdline and popupmenu together
-		long_message_to_split = true, -- long messages will be sent to a split
-		inc_rename = false, -- enables an input dialog for inc-rename.nvim
-		lsp_doc_border = false, -- add a border to hover docs and signature help
-	},
-}
-setup_plugin("noice", noice_config)
+	}
+	setup_plugin("cosmic-ui", cosmic_ui_defaults)
+end
 
+local function setup_volt()
+	-- https://github.com/nvzone/volt
+	-- Create blazing fast & beautiful reactive UI in Neovim
+	setup_plugin("volt", function(_) end)
+end
+
+local function setup_noice()
+	-- https://github.com/folke/noice.nvim
+	-- Highly experimental plugin that completely replaces the UI for messages, cmdline and the popupmenu.
+	local noice_config = {
+		lsp = {
+			-- override markdown rendering so that **cmp** and other plugins use **Treesitter**
+			override = {
+				["vim.lsp.util.convert_input_to_markdown_lines"] = true,
+				["vim.lsp.util.stylize_markdown"] = true,
+				["cmp.entry.get_documentation"] = true, -- requires hrsh7th/nvim-cmp
+			},
+		},
+		-- you can enable a preset for easier configuration
+		presets = {
+			bottom_search = true, -- use a classic bottom cmdline for search
+			command_palette = true, -- position the cmdline and popupmenu together
+			long_message_to_split = true, -- long messages will be sent to a split
+			inc_rename = false, -- enables an input dialog for inc-rename.nvim
+			lsp_doc_border = false, -- add a border to hover docs and signature help
+		},
+	}
+	setup_plugin("noice", noice_config)
+end
 --─────────────────────────────────────────────────────────────────────────────
 --──── other/general ──────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- https://github.com/rasulomaroff/reactive.nvim
--- Reactivity. Right in your neovim.
-local reactive_config = { -- TODO; not currently using this so I can explore
-	builtin = {},
-	configs = {},
-	load = {},
-}
-setup_plugin("reactive")
+local function setup_reactive()
+	-- https://github.com/rasulomaroff/reactive.nvim
+	-- Reactivity. Right in your neovim.
+	local reactive_config = { -- TODO; not currently using this so I can explore
+		builtin = {},
+		configs = {},
+		load = {},
+	}
+	setup_plugin("reactive")
 
-vim.api.nvim_create_autocmd("FileType", {
-	pattern = { "markdown", "norg" },
-	callback = function()
-		vim.opt_local.conceallevel = 2
-	end,
-})
+	vim.api.nvim_create_autocmd("FileType", {
+		pattern = { "markdown", "norg" },
+		callback = function()
+			vim.opt_local.conceallevel = 2
+		end,
+	})
+end
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── SETUP ──────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+local functions = {
+	["nvim-web-devicons"] = setup_icons,
+	["virtcolumn"] = setup_virtcolumn,
+	["virt-column"] = setup_virt_column,
+	["smartcolumn"] = setup_smartcolumn,
+	["statuscol"] = setup_statuscol,
+	["symbols"] = setup_symbols,
+	["aerial"] = setup_aerial,
+	["navbuddy"] = setup_navbuddy,
+	["dropbar"] = setup_dropbar,
+	["lualine"] = setup_lualine,
+	["cokeline"] = setup_cokeline,
+	["heirline"] = setup_heirline,
+	["galaxyline"] = setup_galaxyline,
+	["staline"] = setup_staline,
+	["navic"] = setup_navic,
+	["bufferline"] = setup_bufferline,
+	["nougat"] = setup_nougat,
+	["tabby"] = setup_tabby,
+	["minibar"] = setup_minibar,
+	["winbar"] = setup_winbar,
+	["windline"] = setup_windline,
+	["vimade"] = setup_vimade,
+	["zen-mode"] = setup_zenmode,
+	["modicator"] = setup_modicator,
+	["modes"] = setup_modes,
+	["cmdbuf"] = setup_cmdbuf,
+	["mini.cmdline"] = setup_mini_cmdline,
+	["menu"] = setup_menu,
+	["fidget"] = setup_fidget,
+	["notify"] = setup_notify,
+	["control-panel"] = setup_control_panel,
+	["output-panel"] = setup_output_panel,
+	["cosmic-ui"] = setup_cosmicui,
+	["volt"] = setup_volt,
+	["noice"] = setup_noice,
+	["reactive"] = setup_reactive,
+}
+
+local function maybe_setup(plugin_name)
+	local include = plugins[plugin_name]
+	if include then
+		print("Setting up " .. plugin_name)
+		local func = functions[plugin_name]
+		func()
+	end
+end
+
+maybe_setup("nvim-web-devicons")
+maybe_setup("virtcolumn")
+maybe_setup("virt-column")
+maybe_setup("smartcolumn")
+maybe_setup("statuscol")
+maybe_setup("symbols")
+maybe_setup("aerial")
+maybe_setup("navbuddy")
+maybe_setup("dropbar")
+maybe_setup("lualine")
+maybe_setup("cokeline")
+maybe_setup("heirline")
+maybe_setup("galaxyline")
+maybe_setup("staline")
+maybe_setup("navic")
+maybe_setup("bufferline")
+maybe_setup("nougat")
+maybe_setup("tabby")
+maybe_setup("minibar")
+maybe_setup("winbar")
+maybe_setup("windline")
+
+maybe_setup("vimade")
+maybe_setup("zen-mode")
+maybe_setup("modicator")
+maybe_setup("modes")
+maybe_setup("cmdbuf")
+maybe_setup("mini.cmdline")
+maybe_setup("menu")
+maybe_setup("fidget")
+maybe_setup("notify")
+maybe_setup("control-panel")
+maybe_setup("output-panel")
+maybe_setup("cosmic-ui")
+maybe_setup("volt")
+maybe_setup("noice")
+maybe_setup("reactive")
