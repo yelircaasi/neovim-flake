@@ -14,5 +14,14 @@ setup_plugin("headlines", { -- TODO: move to colors (?)
 	},
 })
 
+--
+--
+-- SEEM TO HANG INDEFINITELY
+setup_plugin("shade", {})
+
+--
+--
+setup_plugin("sunglasses", {})
+
 vim.api.nvim_set_hl(0, "NonText", { fg = "#5b5e5a" })
 vim.api.nvim_set_hl(0, "SpecialKey", { fg = "#5b5e5a" })

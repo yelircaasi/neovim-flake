@@ -15,6 +15,7 @@ local elements = {
 	["lsp-format"] = true,
 	["lspkind"] = true,
 	["lspsaga"] = true,
+	["doc-window"] = true,
 	["trouble"] = true,
 	["quicker"] = true,
 	["bqf"] = true,
@@ -595,6 +596,12 @@ local function setup_lspsaga()
 		action = "K",
 		sequence = "<cmd>Lspsaga hover_doc",
 	})
+end
+
+local function setup_doc_window()
+	-- https://github.com/resonyze/doc-window.nvim
+	-- A plugin to display hover info you get from lsp in a separate buffer.
+	setup_plugin("doc-window", {}) --TODO: DEPENDS ON ts_utils
 end
 
 local function setup_trouble()
@@ -1727,6 +1734,7 @@ local functions = {
 	["lsp-format"] = setup_lsp_format,
 	["lspkind"] = setup_lspkind,
 	["lspsaga"] = setup_lspsaga,
+	["doc-window"] = setup_doc_window,
 	["trouble"] = setup_trouble,
 	["quicker"] = setup_quicker,
 	["bqf"] = setup_bqf,
@@ -1765,6 +1773,7 @@ maybe_call("conform")
 maybe_call("lsp-format")
 maybe_call("lspkind")
 maybe_call("lspsaga")
+maybe_call("doc-window")
 maybe_call("trouble")
 maybe_call("quicker")
 maybe_call("bqf")

@@ -70,3 +70,26 @@ setup_plugin("equals", equals_defaults)
 -- Option 2: Use conform for on-save mypy checks (slower but thorough)
 
 -- pip install "python-lsp-server[all]" pylsp-mypy
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── testing ────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+local function get_neotest_python_adapter()
+	utils.packadd("neotest-python")
+	local python_adapter = require("neotest-python")({
+		dap = { justMyCode = false },
+		python = function(_)
+			return utils.get_executable("python")
+		end,
+		runner = "pytest",
+	})
+end
+
+require("testing").setup_testing_for_lang({
+	language = "python",
+	neotest_adapter = get_neotest_python_adapter(),
+	-- coverage_langspec = ...,
+	-- neotest_overrides = ...,
+	-- coverage_overrides = ...,
+})

@@ -2,23 +2,19 @@ vim.opt.shell = utils.get_executable("sh") -- TODO: move to global opts file?
 
 -- https://github.com/nvim-neotest/neotest
 -- An extensible framework for interacting with tests within NeoVim.
-setup_plugin("neotest", function(neotest)
-	neotest.setup({
-		adapters = {
-			require("neotest-python")({
-				dap = { justMyCode = false },
-				python = function(_)
-					return utils.get_executable("python")
-				end,
-				runner = "pytest",
-			}),
+local neotest_defaults = {
+	adapters = {},
+	strategies = {
+		integrated = {
+			width = 120,
 		},
-		strategies = {
-			integrated = {
-				width = 120,
-			},
-		},
-	})
+	},
+}
+
+local function setup_neotest_for_lang(language, adapter, overrides)
+	cfg = vim.tbl_deep_extend("force", neotest_defaults, overrides or {})
+	cfg.adapters[language] = adapter
+	neotest = setup_plugin("neotest", cfg)
 
 	local function nmap(spec)
 		spec.mode = "n"
@@ -54,11 +50,11 @@ setup_plugin("neotest", function(neotest)
 		action = neotest.summary.toggle,
 		desc = "Toggle test summary",
 	})
-end)
+end
 
 -- https://github.com/andythigpen/nvim-coverage
 -- Displays test coverage data in the sign column
-local coverage_sample_config = {
+local coverage_defaults = { -- just sample config; not exchaustive
 	commands = true, -- create commands
 	highlights = {
 		-- customize highlight groups created by the plugin
@@ -78,9 +74,22 @@ local coverage_sample_config = {
 		-- customize language specific settings
 	},
 }
-setup_plugin("coverage", coverage_sample_config)
+local function setup_coverage_for_lang(language, lang_specs, overrides)
+	cfg = vim.tbl_deep_extend("force", cfg, overrides or {})
+	cfg.lang[language] = lang_specs
+	setup_plugin("coverage", cfg)
+end
 
--- TODO: add to neotest setup
--- https://github.com/nvim-neotest/neotest-plenary
--- for lua testing
-setup_plugin("neotest-plenary") -- just to test installation & requiring
+---@class LanguageTestingConfig
+---@field language string
+---@field coverage_langspec LanguageCoverageConfig
+---@field neotest_adapter LanguageNeotestAdapterConfig
+---@field neotest_overrides NeotestConfig
+---@field coverage_overrides CoverageConfig
+
+local function setup_testing_for_lang(lang_cfg)
+	setup_neotest_for_lang(lang_cfg.language, lang_cfg.neotest_adapter, lang_cfg.neotest_overrides)
+	setup_coverage_for_lang(lang_cfg.language, lang_cfg.coverage_langspec, lang_cfg.coverage_overrides)
+end
+
+return { setup_testing_for_lang = setup_testing_for_lang }

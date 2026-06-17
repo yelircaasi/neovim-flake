@@ -298,6 +298,13 @@ local function setup_yarepl()
 	})
 end
 
+local function setup_neomux()
+	-- TODO: debug nvr-go
+	-- https://github.com/nikvdp/neomux
+	-- Control Neovim from shells running inside Neovim.
+	utils.packadd("neomux")
+end
+
 --─────────────────────────────────────────────────────────────────────────────
 --──── CALL SETUPS ────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
@@ -308,3 +315,4 @@ setup_toggleterm()
 setup_neaterm()
 setup_termim()
 setup_yarepl()
+setup_neomux()

@@ -10,6 +10,7 @@ local plugins = {
 	["virt-column"] = false,
 	["smartcolumn"] = false,
 	["statuscol"] = false,
+	["TreePin"] = false,
 	["symbols"] = true,
 	["aerial"] = false,
 	["navbuddy"] = false,
@@ -38,6 +39,7 @@ local plugins = {
 	["control-panel"] = false,
 	["output-panel"] = false,
 	["cosmic-ui"] = false,
+	["lvim-ui-config"] = false,
 	["volt"] = false,
 	["noice"] = false,
 	["reactive"] = false,
@@ -206,6 +208,12 @@ end
 --─────────────────────────────────────────────────────────────────────────────
 --──── outline ────────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
+
+local function setup_treepin()
+	-- https://github.com/KaityyUwU/TreePin
+	-- A lightweight neovim plugin for pinning fragments of code to the screen.
+	setup_plugin("TreePin", {}) -- TODO: REQUIRES UPDATE FROM nvim-treesitter
+end
 
 local function setup_symbols()
 	-- https://github.com/oskarrrrrrr/symbols.nvim
@@ -1367,6 +1375,12 @@ local function setup_cosmicui()
 	setup_plugin("cosmic-ui", cosmic_ui_defaults)
 end
 
+local function setup_lvim_ui_config()
+	--
+	--
+	setup_plugin("lvim-ui-config", {}) -- TODO: not requirable
+end
+
 local function setup_volt()
 	-- https://github.com/nvzone/volt
 	-- Create blazing fast & beautiful reactive UI in Neovim
@@ -1428,6 +1442,7 @@ local functions = {
 	["virt-column"] = setup_virt_column,
 	["smartcolumn"] = setup_smartcolumn,
 	["statuscol"] = setup_statuscol,
+	["TreePin"] = setup_treepin,
 	["symbols"] = setup_symbols,
 	["aerial"] = setup_aerial,
 	["navbuddy"] = setup_navbuddy,
@@ -1456,6 +1471,7 @@ local functions = {
 	["control-panel"] = setup_control_panel,
 	["output-panel"] = setup_output_panel,
 	["cosmic-ui"] = setup_cosmicui,
+	["lvim-ui-config"] = setup_lvim_ui_config,
 	["volt"] = setup_volt,
 	["noice"] = setup_noice,
 	["reactive"] = setup_reactive,
@@ -1475,6 +1491,7 @@ maybe_setup("virtcolumn")
 maybe_setup("virt-column")
 maybe_setup("smartcolumn")
 maybe_setup("statuscol")
+maybe_setup("TreePin")
 maybe_setup("symbols")
 maybe_setup("aerial")
 maybe_setup("navbuddy")
@@ -1491,7 +1508,6 @@ maybe_setup("tabby")
 maybe_setup("minibar")
 maybe_setup("winbar")
 maybe_setup("windline")
-
 maybe_setup("vimade")
 maybe_setup("zen-mode")
 maybe_setup("modicator")
@@ -1504,6 +1520,7 @@ maybe_setup("notify")
 maybe_setup("control-panel")
 maybe_setup("output-panel")
 maybe_setup("cosmic-ui")
+maybe_setup("lvim-ui-config")
 maybe_setup("volt")
 maybe_setup("noice")
 maybe_setup("reactive")

@@ -655,9 +655,16 @@ local function setup_vim_ai()
 	utils.packadd("vim-ai", vim_ai_setup)
 end
 
+local function setup_sg()
+	-- https://github.com/sourcegraph/sg.nvim
+	-- Experimental Sourcegraph + Cody plugin for Neovim
+	setup_plugin("sg", {}) -- requires interactive input
+end
+
 setup_copilot()
 setup_opencode()
 setup_avante()
 setup_codecompanion()
 setup_llm()
 setup_vim_ai()
+setup_sg()

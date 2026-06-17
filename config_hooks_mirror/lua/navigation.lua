@@ -4,6 +4,8 @@ local elements = {
 	["spear"] = true,
 	["smart-splits"] = true,
 	["swm"] = true,
+	["nvim_winpick"] = true,
+	["windows"] = true,
 	["pragma"] = true,
 	["windex-nvim"] = true,
 	["bafa"] = true,
@@ -184,6 +186,18 @@ local function setup_swm()
 			desc = "Window right",
 		})
 	end)
+end
+
+local function setup_nvim_winpick()
+	-- https://github.com/MarcusGrass/nvim_winpick
+	-- A neovim window picker and mover
+	setup_plugin("nvim_winpick", {}) -- TODO: RUST
+end
+
+local function setup_windows()
+	-- https://github.com/anuvyklack/windows.nvim
+	-- Automatically expand width of the current window. Maximizes and restore it. And all this with nice animations!
+	setup_plugin("windows", {}) -- ERRORRED
 end
 
 local function setup_pragma()
@@ -1892,6 +1906,8 @@ local functions = {
 	["spear"] = setup_spear,
 	["smart-splits"] = setup_smart_splits,
 	["swm"] = setup_swm,
+	["nvim_winpick"] = setup_nvim_winpick,
+	["windows"] = setup_windows,
 	["pragma"] = setup_pragma,
 	["windex-nvim"] = setup_windex_nvim,
 	["bafa"] = setup_bafa,
@@ -1934,6 +1950,8 @@ maybe_call("general-setup")
 maybe_call("spear")
 maybe_call("smart-splits")
 maybe_call("swm")
+maybe_call("nvim_winpick")
+maybe_call("windows")
 maybe_call("pragma")
 maybe_call("windex-nvim")
 maybe_call("bafa")

@@ -68,6 +68,7 @@ local elements = {
 	["nvim-anydent"] = true,
 	["mini.align"] = true,
 	["vim-mundo"] = true,
+	["edit-list"] = true,
 	["various-textobjs"] = true,
 	["autocommands"] = true,
 }
@@ -2197,6 +2198,12 @@ local function setup_vim_mundo()
 	end)
 end
 
+local function setup_edit_list()
+	--
+	--
+	setup_plugin("edit-list", {}) -- TODO: expects /home/isaac/.cache/nvim/edit-list.json
+end
+
 local function setup_nvim_various_textobjs()
 	utils.packadd("nvim-various-textobjs", function()
 		require("various-textobjs").setup({
@@ -2272,6 +2279,7 @@ local functions = {
 	["nvim-anydent"] = setup_nvim_anydent,
 	["mini.align"] = setup_mini_align,
 	["vim-mundo"] = setup_vim_mundo,
+	["edit-list"] = setup_edit_list,
 	["various-textobjs"] = setup_nvim_various_textobjs,
 	["autocommands"] = create_miscellaneous_autocommands,
 }
@@ -2332,5 +2340,6 @@ maybe_call("anydent")
 maybe_call("nvim-anydent")
 maybe_call("mini.align")
 maybe_call("vim-mundo")
+maybe_call("edit-list")
 maybe_call("various-textobjs")
 maybe_call("autocommands")

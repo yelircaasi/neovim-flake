@@ -95,8 +95,15 @@ local function setup_k8vim()
 	setup_plugin("k8vim", k8vim_defaults)
 end
 
+local function setup_kubernetes()
+	-- https://github.com/diogo464/kubernetes.nvim
+	-- Kubernetes CRD support for yaml-language-server and neovim
+	-- setup_plugin("kubernetes", {})  TODO: install kubectl
+end
+
 setup_kubectl()
 setup_kpops()
 setup_kubels()
 setup_vim_helm()
 setup_k8vim()
+setup_kubernetes()

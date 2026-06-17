@@ -414,6 +414,12 @@ local function setup_asyncrun()
 	utils.packadd("asyncrun")
 end
 
+local function setup_xmake()
+	-- https://github.com/Mythos-404/xmake.nvim
+	-- The xmake plugin for neovim provides a ui interface that allows you to configure xmake more efficiently.
+	setup_plugin("xmake", {}) -- TODO: install xmake
+end
+
 --─────────────────────────────────────────────────────────────────────────────
 --──── CALL SETUPS ────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
@@ -431,3 +437,4 @@ setup_compiler()
 setup_jupytext()
 setup_quarto()
 setup_asyncrun()
+setup_xmake()

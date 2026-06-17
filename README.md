@@ -2,7 +2,11 @@
 
 ## Roadmap
 
+https://neovim.io/doc/user/lsp/#vim.lsp.buf.typehierarchy()
+
 https://github.com/mistweaverco/juu.nvim
+
+https://github.com/AlexandrosAlexiou/kotlin.nvim *********
 
 https://github.com/va9iff/lil
 https://github.com/uga-rosa/ccc.nvim
@@ -26,6 +30,11 @@ https://github.com/eero-lehtinen/oklch-color-picker.nvim
 	-- setup_plugin("nvim-alt-substitute", {})-- archived; superseded by nvim-rip-substitute
 	-- setup_plugin("pylsp-rope", {})
   -- utils.packadd("vim-multiple-cursors") -- PROBABLY NOT, BUT WORTH A TRY
+  -- 
+	-- https://github.com/Slyces/hierarchy.nvim
+	--     Neovim plugin providing an attempt to « hack around » the lack of support
+  --     (in clients & servers) for the type hierarchy LSP protocol.
+	--     setup_plugin("hierarchy", {}) -- null global error
 ```
 
 https://docs.rockylinux.org/10/books/nvchad/ *********

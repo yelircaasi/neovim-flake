@@ -62,8 +62,10 @@ local elements = {
 	["metrics"] = false,
 	["keylab"] = false,
 	["nvim-apm"] = false,
+	["daily-focus"] = false,
 	["interlaced"] = false,
 	["nvmm"] = false,
+	["feed"] = false,
 	["firenvim"] = false,
 	["qalc"] = false,
 	["flashcards"] = false,
@@ -1562,12 +1564,12 @@ local function setup_nvim_apm()
 	-- calculate your APM, also show your key strokes in a buffer.
 	local nvim_apm_defaults = nil
 	setup_plugin("nvim-apm", nvim_apm_defaults)
+end
 
-	--─────────────────────────────────────────────────────────────────────────────
-	--──── other ──────────────────────────────────────────────────────────────────
-	--─────────────────────────────────────────────────────────────────────────────
-
-	-- Neovim plugin for aligning bilingual parallel texts
+local function setup_daily_focus()
+	-- https://github.com/steveclarke/daily-focus.nvim
+	-- A Neovim plugin to show a daily Vim tip to focus on for the day.
+	setup_plugin("daily-focus", {}) -- TODO config error
 end
 
 local function setup_interlaced()
@@ -1657,6 +1659,12 @@ local function setup_nvmm()
 		},
 	}
 	setup_plugin("nvmm", nvmm_defaults)
+end
+
+local function setup_feed()
+	-- https://github.com/neo451/feed.nvim
+	-- Neovim feed reader, rss, atom and jsonfeed, all in lua
+	setup_plugin("feed", {}) -- TODO: FIX OPTIONS
 end
 
 local function setup_firenvim()
@@ -1842,8 +1850,10 @@ local functions = {
 	["metrics"] = setup_metrics,
 	["keylab"] = setup_keylab,
 	["nvim-apm"] = setup_nvim_apm,
+	["daily-focus"] = setup_daily_focus,
 	["interlaced"] = setup_interlaced,
 	["nvmm"] = setup_nvmm,
+	["feed"] = setup_feed,
 	["firenvim"] = setup_firenvim,
 	["qalc"] = setup_qalc,
 	["flashcards"] = setup_flashcards,
@@ -1921,8 +1931,10 @@ maybe_call("api-browser")
 maybe_call("metrics")
 maybe_call("keylab")
 maybe_call("nvim-apm")
+maybe_call("daily-focus")
 maybe_call("interlaced")
 maybe_call("nvmm")
+maybe_call("feed")
 maybe_call("firenvim")
 maybe_call("qalc")
 maybe_call("flashcards")

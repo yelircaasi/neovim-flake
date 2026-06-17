@@ -66,3 +66,8 @@ vim.lsp.config["lua_ls"] = { -- TODO (?)
 --TODO: pick one
 vim.lsp.enable("lua_ls")
 vim.lsp.enable("luals")
+
+-- TODO: add to neotest setup
+-- https://github.com/nvim-neotest/neotest-plenary
+-- for lua testing
+setup_plugin("neotest-plenary") -- just to test installation & requiring

@@ -1250,7 +1250,14 @@ local function setup_nvimtree()
 	setup_plugin("nvim-tree", nvimtree_defaults)
 end
 
+local function setup_chadtree()
+	-- https://github.com/ms-jpq/chadtree
+	-- File manager for Neovim. Better than NERDTree.
+	setup_plugin("chadtree", {}) -- annoying messages & non-nix install habits
+end
+
 setup_nvimtree()
 setup_oil()
 setup_neotree()
 setup_nvimtree()
+setup_chadtree()
