@@ -1,5 +1,4 @@
-local autocmd = vim.api.nvim_create_autocmd
-local api = vim.api
+local vim_api = vim.api
 
 local M = {}
 
@@ -26,7 +25,7 @@ local function delete_empty_folder(file)
 end
 
 local function cleanup(bufnr)
-	api.nvim_buf_delete(bufnr, { force = true })
+	vim_api.nvim_buf_delete(bufnr, { force = true })
 	-- cleanup qf list
 	vim.fn.setqflist({}, "r")
 	-- reload current file
@@ -43,7 +42,7 @@ function M.save(opts)
 
 	vim.bo[qf_bufnr].modified = false
 
-	local changed_items = api.nvim_buf_get_lines(qf_bufnr, 0, vim.tbl_count(qf_items), false)
+	local changed_items = vim_api.nvim_buf_get_lines(qf_bufnr, 0, vim.tbl_count(qf_items), false)
 	local unique_files = {}
 
 	-- get every unique file
@@ -102,7 +101,7 @@ function M.save(opts)
 	if rename_files then
 		for index, item in pairs(qf_items) do
 			local source_win_id = vim.fn.bufwinid(item.bufnr)
-			local source_is_loaded = api.nvim_buf_is_loaded(item.bufnr)
+			local source_is_loaded = vim_api.nvim_buf_is_loaded(item.bufnr)
 			local source_file = vim.fn.bufname(item.bufnr)
 
 			-- already renamed this file
@@ -132,7 +131,7 @@ function M.save(opts)
 			end
 
 			-- reload source buffer
-			api.nvim_buf_call(item.bufnr, function()
+			vim_api.nvim_buf_call(item.bufnr, function()
 				vim.cmd("edit!")
 			end)
 
@@ -141,7 +140,7 @@ function M.save(opts)
 
 				-- delete open buffer that's not visible
 				if source_is_loaded and source_win_id == -1 then
-					api.nvim_buf_delete(item.bufnr, {})
+					vim_api.nvim_buf_delete(item.bufnr, {})
 				end
 
 				-- ensure destination directory exists
@@ -157,9 +156,9 @@ function M.save(opts)
 
 				-- update visible buffer to point to the new file
 				if source_win_id ~= -1 then
-					api.nvim_set_current_win(source_win_id)
-					api.nvim_command("edit! " .. dest_file)
-					api.nvim_buf_delete(item.bufnr, {})
+					vim_api.nvim_set_current_win(source_win_id)
+					vim_api.nvim_command("edit! " .. dest_file)
+					vim_api.nvim_buf_delete(item.bufnr, {})
 				end
 
 				delete_empty_folder(source_file)
@@ -193,24 +192,24 @@ function M.run(opts)
 
 	vim.bo.modifiable = true
 
-	api.nvim_buf_set_lines(0, 0, -1, false, {})
+	vim_api.nvim_buf_set_lines(0, 0, -1, false, {})
 
 	for i, item in pairs(qf_items) do
-		if not api.nvim_buf_is_loaded(item.bufnr) then
+		if not vim_api.nvim_buf_is_loaded(item.bufnr) then
 			vim.fn.bufload(item.bufnr)
 		end
 
-		local text = api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
+		local text = vim_api.nvim_buf_get_lines(item.bufnr, item.lnum - 1, item.lnum, false)[1]
 
 		local line = vim.fn.bufname(item.bufnr) .. ":" .. text
 
-		api.nvim_buf_set_lines(0, i - 1, i - 1, false, { line })
+		vim_api.nvim_buf_set_lines(0, i - 1, i - 1, false, { line })
 	end
 
 	if opts.save_on_write then
 		local qf_bufnr = vim.fn.bufnr()
 
-		autocmd("BufWriteCmd", {
+		vim_api.nvim_create_autocmd("BufWriteCmd", {
 			buffer = qf_bufnr,
 			once = true,
 			callback = function()
@@ -223,8 +222,8 @@ function M.run(opts)
 		vim.bo.buftype = "nofile"
 	end
 
-	api.nvim_buf_set_name(0, "replacer://replacer")
-	api.nvim_win_set_cursor(0, { 1, 0 })
+	vim_api.nvim_buf_set_name(0, "replacer://replacer")
+	vim_api.nvim_win_set_cursor(0, { 1, 0 })
 
 	vim.opt_local.cursorcolumn = false
 	vim.opt_local.number = false

@@ -66,3 +66,9 @@ map_explicit({
 	end,
 	desc = "Preview fold",
 })
+
+vim.cmd("packadd promise-async")
+require("promise")
+require("async")
+utils.packadd("ufo")
+require("ufo").setup()

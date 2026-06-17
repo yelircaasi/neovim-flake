@@ -2,107 +2,112 @@
 --──── snippet sources ────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-utils.packadd("friendly-snippets")
+local function setup_friendly_snippets()
+	utils.packadd("friendly-snippets")
 
-vim.api.nvim_create_autocmd("InsertEnter", {
-	callback = function()
-		utils.packadd("friendly-snippets") -- Optional: for pre-made snippets
+	vim.api.nvim_create_autocmd("InsertEnter", {
+		callback = function()
+			utils.packadd("friendly-snippets") -- Optional: for pre-made snippets
 
-		-- utils.packadd("jsregexp")
-		-- require("jsregexp")
-		require("luasnip.loaders.from_vscode").lazy_load()
-		require("luasnip.loaders.from_snipmate").lazy_load()
-	end,
-})
+			-- utils.packadd("jsregexp")
+			-- require("jsregexp")
+			require("luasnip.loaders.from_vscode").lazy_load()
+			require("luasnip.loaders.from_snipmate").lazy_load()
+		end,
+	})
+end
 
-utils.packadd("ultisnips")
+local function setup_ultisnips()
+	utils.packadd("ultisnips")
+end
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── snippet engines ────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
 local function setup_luasnip()
-	vim.cmd(":packadd luasnip")
-	local ls = require("luasnip")
+	local function setup_luasnip()
+		vim.cmd(":packadd luasnip")
+		local ls = require("luasnip")
 
-	ls.setup()
-	-- print(require("luasnip.util.jsregexp"))
+		ls.setup()
+		-- print(require("luasnip.util.jsregexp"))
 
-	-- utils.packadd("jsregexp")
-	require("jsregexp")
+		-- utils.packadd("jsregexp")
+		require("jsregexp")
 
-	local s = ls.snippet
-	local t = ls.text_node
+		local s = ls.snippet
+		local t = ls.text_node
 
-	ls.add_snippets("all", {
-		s({ trig = "a.*b", regTrig = true }, {
-			t("REGEX OK"),
-		}),
-	})
+		ls.add_snippets("all", {
+			s({ trig = "a.*b", regTrig = true }, {
+				t("REGEX OK"),
+			}),
+		})
 
-	-- loaders
-	-- TODO: https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#lua
+		-- loaders
+		-- TODO: https://github.com/L3MON4D3/LuaSnip/blob/master/DOC.md#lua
 
-	require("luasnip.loaders.from_vscode").lazy_load()
-	-- NOTE:
-	-- It's mandatory to have a `package.json` file in the snippet directory. For examples, see [friendly-snippets](https://github.com/rafamadriz/friendly-snippets/blob/main/package.json).
-	-- require("luasnip.loaders.from_vscode").lazy_load({ paths = { "./my-cool-snippets" } })
+		require("luasnip.loaders.from_vscode").lazy_load()
+		-- NOTE:
+		-- It's mandatory to have a `package.json` file in the snippet directory. For examples, see [friendly-snippets](https://github.com/rafamadriz/friendly-snippets/blob/main/package.json).
+		-- require("luasnip.loaders.from_vscode").lazy_load({ paths = { "./my-cool-snippets" } })
 
-	require("luasnip.loaders.from_snipmate").lazy_load()
+		require("luasnip.loaders.from_snipmate").lazy_load()
 
-	map_explicit({
-		mode = { "i" },
-		sequence = "<C-K>",
-		action = function()
-			ls.expand()
-		end,
-		opts = { silent = true },
-	})
-	map_explicit({
-		mode = { "i", "s" },
-		sequence = "<C-L>",
-		action = function()
-			ls.jump(1)
-		end,
-		opts = { silent = true },
-	})
-	map_explicit({
-		mode = { "i", "s" },
-		sequence = "<C-J>",
-		action = function()
-			ls.jump(-1)
-		end,
-		opts = { silent = true },
-	})
+		map_explicit({
+			mode = { "i" },
+			sequence = "<C-K>",
+			action = function()
+				ls.expand()
+			end,
+			opts = { silent = true },
+		})
+		map_explicit({
+			mode = { "i", "s" },
+			sequence = "<C-L>",
+			action = function()
+				ls.jump(1)
+			end,
+			opts = { silent = true },
+		})
+		map_explicit({
+			mode = { "i", "s" },
+			sequence = "<C-J>",
+			action = function()
+				ls.jump(-1)
+			end,
+			opts = { silent = true },
+		})
 
-	map_explicit({
-		mode = { "i", "s" },
-		sequence = "<C-E>",
-		action = function()
-			if ls.choice_active() then
-				ls.change_choice(1)
-			end
-		end,
-		opts = { silent = true },
-	})
+		map_explicit({
+			mode = { "i", "s" },
+			sequence = "<C-E>",
+			action = function()
+				if ls.choice_active() then
+					ls.change_choice(1)
+				end
+			end,
+			opts = { silent = true },
+		})
+	end
+	setup_luasnip()
 end
-setup_luasnip()
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── completion engines ─────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
--- TODO: clean up, check whether name is "cmp" or "nvim-cmp"
-
--- should work (optional dependency): require("jsregexp")
-
--- used as sources:
--- setup_plugin("cmp-nvim-lsp")
--- setup_plugin("cmp-buffer")
--- setup_plugin("cmp-path")
--- setup_plugin("cmp-cmdline")
-
 local function setup_nvim_cmp()
+	-- TODO: clean up, check whether name is "cmp" or "nvim-cmp"
+
+	-- should work (optional dependency): require("jsregexp")
+
+	-- used as sources:
+	-- setup_plugin("cmp-nvim-lsp")
+	-- setup_plugin("cmp-buffer")
+	-- setup_plugin("cmp-path")
+	-- setup_plugin("cmp-cmdline")
 	utils.packadd("cmp-nvim-lsp")
 	utils.packadd("cmp-buffer")
 	utils.packadd("cmp-path")
@@ -115,7 +120,7 @@ local function setup_nvim_cmp()
 	local cmp = require("cmp")
 	local defaults = require("cmp.config.default")()
 	local auto_select = true
-	return {
+	cmp.setup({
 		snippet = {
 			-- REQUIRED for luasnip
 			expand = function(args)
@@ -206,95 +211,104 @@ local function setup_nvim_cmp()
 			} or false,
 		},
 		sorting = defaults.sorting,
-	}
+	})
 end
-setup_nvim_cmp()
 
-local bink_cmp_defaults = {
-	-- Enables keymaps, completions and signature help when true (doesn't apply to cmdline or term)
-	--
-	-- If the function returns 'force', the default conditions for disabling the plugin will be ignored
-	-- Default conditions: (vim.bo.buftype ~= 'prompt' and vim.b.completion ~= false)
-	-- Note that the default conditions are ignored when `vim.b.completion` is explicitly set to `true`
-	--
-	-- Exceptions: vim.bo.filetype == 'dap-repl'
-	enabled = function()
-		return not vim.tbl_contains({ "lua", "markdown" }, vim.bo.filetype)
-	end,
+local function setup_blink_cmp()
+	local bink_cmp_defaults = {
+		-- Enables keymaps, completions and signature help when true (doesn't apply to cmdline or term)
+		--
+		-- If the function returns 'force', the default conditions for disabling the plugin will be ignored
+		-- Default conditions: (vim.bo.buftype ~= 'prompt' and vim.b.completion ~= false)
+		-- Note that the default conditions are ignored when `vim.b.completion` is explicitly set to `true`
+		--
+		-- Exceptions: vim.bo.filetype == 'dap-repl'
+		enabled = function()
+			return not vim.tbl_contains({ "lua", "markdown" }, vim.bo.filetype)
+		end,
 
-	-- Disable cmdline
-	cmdline = { enabled = false },
+		-- Disable cmdline
+		cmdline = { enabled = false },
 
-	completion = {
-		-- 'prefix' will fuzzy match on the text before the cursor
-		-- 'full' will fuzzy match on the text before _and_ after the cursor
-		-- example: 'foo_|_bar' will match 'foo_' for 'prefix' and 'foo__bar' for 'full'
-		keyword = { range = "full" },
+		completion = {
+			-- 'prefix' will fuzzy match on the text before the cursor
+			-- 'full' will fuzzy match on the text before _and_ after the cursor
+			-- example: 'foo_|_bar' will match 'foo_' for 'prefix' and 'foo__bar' for 'full'
+			keyword = { range = "full" },
 
-		-- Disable auto brackets
-		-- NOTE: some LSPs may add auto brackets themselves anyway
-		accept = { auto_brackets = { enabled = false } },
+			-- Disable auto brackets
+			-- NOTE: some LSPs may add auto brackets themselves anyway
+			accept = { auto_brackets = { enabled = false } },
 
-		-- Don't select by default, auto insert on selection
-		list = { selection = { preselect = false, auto_insert = true } },
-		-- or set via a function
-		list = { selection = {
-			preselect = function(ctx)
-				return vim.bo.filetype ~= "markdown"
-			end,
-		} },
-
-		menu = {
-			-- Don't automatically show the completion menu
-			auto_show = false,
-
-			-- nvim-cmp style menu
-			draw = {
-				columns = {
-					{ "label", "label_description", gap = 1 },
-					{ "kind_icon", "kind" },
+			-- Don't select by default, auto insert on selection
+			list = { selection = { preselect = false, auto_insert = true } },
+			-- or set via a function
+			list = {
+				selection = {
+					preselect = function(ctx)
+						return vim.bo.filetype ~= "markdown"
+					end,
 				},
 			},
+
+			menu = {
+				-- Don't automatically show the completion menu
+				auto_show = false,
+
+				-- nvim-cmp style menu
+				draw = {
+					columns = {
+						{ "label", "label_description", gap = 1 },
+						{ "kind_icon", "kind" },
+					},
+				},
+			},
+
+			-- Show documentation when selecting a completion item
+			documentation = { auto_show = true, auto_show_delay_ms = 500 },
+
+			-- Display a preview of the selected item on the current line
+			ghost_text = { enabled = true },
 		},
 
-		-- Show documentation when selecting a completion item
-		documentation = { auto_show = true, auto_show_delay_ms = 500 },
+		sources = {
+			-- Remove 'buffer' if you don't want text completions, by default it's only enabled when LSP returns no items
+			default = { "lsp", "path", "snippets", "buffer" },
+		},
 
-		-- Display a preview of the selected item on the current line
-		ghost_text = { enabled = true },
-	},
+		-- Use a preset for snippets, check the snippets documentation for more information
+		snippets = { preset = "default" | "luasnip" | "mini_snippets" | "vsnip" },
 
-	sources = {
-		-- Remove 'buffer' if you don't want text completions, by default it's only enabled when LSP returns no items
-		default = { "lsp", "path", "snippets", "buffer" },
-	},
+		-- Experimental signature help support
+		signature = { enabled = true },
+	}
+	local blink_cmp_opts = { ------------------------------------------------------------------------------------- blink
+		fuzzy = { implementation = "lua" }, -- TODO: change to Rust
+		keymap = {
+			-- 'default' for vim-like (C-y to accept)
+			-- 'super-tab' for vscode-like (Tab to accept/jump)
+			-- 'enter' for enter to accept
+			preset = "super-tab",
 
-	-- Use a preset for snippets, check the snippets documentation for more information
-	snippets = { preset = "default" | "luasnip" | "mini_snippets" | "vsnip" },
+			["<C-k>"] = { "select_prev", "fallback" },
+			["<C-j>"] = { "select_next", "fallback" },
 
-	-- Experimental signature help support
-	signature = { enabled = true },
-}
-local blink_cmp_opts = { ------------------------------------------------------------------------------------- blink
-	fuzzy = { implementation = "lua" }, -- TODO: change to Rust
-	keymap = {
-		-- 'default' for vim-like (C-y to accept)
-		-- 'super-tab' for vscode-like (Tab to accept/jump)
-		-- 'enter' for enter to accept
-		preset = "super-tab",
+			["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+			["<C-e>"] = { "hide", "fallback" },
+			["<CR>"] = { "accept", "fallback" },
 
-		["<C-k>"] = { "select_prev", "fallback" },
-		["<C-j>"] = { "select_next", "fallback" },
+			["<Tab>"] = { "snippet_forward", "fallback" },
+			["<S-Tab>"] = { "snippet_backward", "fallback" },
 
-		["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
-		["<C-e>"] = { "hide", "fallback" },
-		["<CR>"] = { "accept", "fallback" },
+			["<C-b>"] = { "scroll_documentation_up", "fallback" },
+			["<C-f>"] = { "scroll_documentation_down", "fallback" },
+		},
+	}
+	setup_plugin("blink.cmp", blink_cmp_opts)
+end
 
-		["<Tab>"] = { "snippet_forward", "fallback" },
-		["<S-Tab>"] = { "snippet_backward", "fallback" },
-
-		["<C-b>"] = { "scroll_documentation_up", "fallback" },
-		["<C-f>"] = { "scroll_documentation_down", "fallback" },
-	},
-}
-setup_plugin("blink.cmp", blink_cmp_opts)
+setup_friendly_snippets()
+setup_ultisnips()
+setup_luasnip()
+setup_nvim_cmp()
+setup_blink_cmp()

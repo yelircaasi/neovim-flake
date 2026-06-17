@@ -1,8 +1,3 @@
-vim.cmd("packadd promise-async")
-require("promise")
-require("async")
-utils.packadd("ufo")
-require("ufo").setup()
 
 -- if false then
 -- setup_plugin("ufo", {})

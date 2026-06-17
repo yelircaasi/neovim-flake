@@ -2,6 +2,8 @@
 
 ## Roadmap
 
+https://github.com/mistweaverco/juu.nvim
+
 https://github.com/va9iff/lil
 https://github.com/uga-rosa/ccc.nvim
 https://github.com/eero-lehtinen/oklch-color-picker.nvim
@@ -177,6 +179,8 @@ https://github.com/atiladefreitas/dooing
 - [ ] https://github.com/tpope/vim-unimpaired/
 - [ ] https://github.com/fedepujol/move.nvim
 - [ ] https://github.com/ptdewey/pendulum-nvim
+
+https://github.com/mistweaverco/floaterm.nvim
 
 https://github.com/akinsho/dotfiles
 

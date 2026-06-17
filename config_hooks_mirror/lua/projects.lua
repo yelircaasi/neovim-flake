@@ -1,6 +1,7 @@
 setup_plugin("auto-session", {
 	suppressed_dirs = { "~/", "~/Projects", "~/Downloads", "/" },
 })
+
 setup_plugin("persistence", {
 	{
 		dir = vim.fn.stdpath("state") .. "/sessions/", -- directory where session files are saved
@@ -10,6 +11,7 @@ setup_plugin("persistence", {
 		branch = true, -- use git branch to save session
 	},
 })
+
 setup_plugin("project_nvim", {
 	-- Manual mode doesn't automatically change your root directory, so you have
 	-- the option to manually do so using `:ProjectRoot` command.
