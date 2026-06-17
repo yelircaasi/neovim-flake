@@ -44,12 +44,6 @@ vim.lsp.config["basedpyright"] = {
 		},
 	},
 }
-vim.lsp.config["nixd"] = {
-	cmd = { "nixd" },
-	filetypes = { "nix" },
-	root_markers = { "flake.nix", ".git" },
-	settings = {},
-}
 
 vim.lsp.enable("pylsp")
 vim.lsp.enable("basedpyright")

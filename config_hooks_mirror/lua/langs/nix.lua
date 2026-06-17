@@ -27,6 +27,11 @@ end)
 :DevenvShell --profile foo
 --]]
 
-vim.lsp.config["nixd"] = {} -- TODO (?)
+vim.lsp.config["nixd"] = {
+	cmd = { "nixd" },
+	filetypes = { "nix" },
+	root_markers = { "flake.nix", ".git" },
+	settings = {},
+}
 
 vim.lsp.enable("nixd")
