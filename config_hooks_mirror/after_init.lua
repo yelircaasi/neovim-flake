@@ -232,8 +232,10 @@ local ALL_config_modules = {
 -- TMP
 config_modules = {
 	["options"] = true,
-	["ui"] = false,
 	["lsp_etc"] = true,
+	["editing"] = true,
+	["navigation"] = true,
+	["ui"] = false,
 	["treesitter"] = false,
 	["core"] = false,
 	["langs.python"] = true,
@@ -249,6 +251,8 @@ end
 
 maybe_require("options")
 maybe_require("lsp_etc")
+maybe_require("editing")
+maybe_require("navigation")
 maybe_require("treesitter")
 maybe_require("core")
 maybe_require("langs.python")

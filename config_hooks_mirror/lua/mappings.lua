@@ -610,3 +610,12 @@ setup_plugin("nvim-keymapper", function(keymapper)
 	keymapper.set("n", "<leader>k", ":Keymaps<CR>", {}, "Telescope: Show keymaps")
 	keymapper.set("n", "<leader>T", "<ESC>:vsplit | term<CR>", {}, "Open a terminal in a vertical split")
 end)
+
+local function setup_mini_keymap()
+	setup_plugin("mini.keymap", function(km)
+		km.setup()
+
+		km.map_combo({ "n", "i" }, { "j", "k" }, "<Esc>")
+		km.map_combo({ "n", "i" }, { "k", "j" }, "<Esc>")
+	end)
+end

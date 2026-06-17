@@ -291,7 +291,7 @@ in rec {
       };
       meta.homepage = "https://github.com/Vigemus/iron.nvim";
     };
-    sibling-swap-nvim = pkgs.vimUtils.buildVimPlugin {
+    sibling-swap = pkgs.vimUtils.buildVimPlugin {
       pname = "sibling-swap.nvim";
       version = "2023-12-13";
       src = pkgs.fetchFromGitHub {
@@ -380,7 +380,7 @@ in rec {
       };
       meta.homepage = "https://github.com/altermo/ultimate-autopair.nvim";
     };
-    sentiment-nvim = pkgs.vimUtils.buildVimPlugin {
+    sentiment = pkgs.vimUtils.buildVimPlugin {
       pname = "sentiment.nvim";
       version = "2023-04-21";
       src = pkgs.fetchFromGitHub {

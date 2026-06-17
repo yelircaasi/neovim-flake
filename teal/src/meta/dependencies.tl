@@ -37,5 +37,6 @@ local M: {string: {string}} = {
 	["indent-tools"]   = { "plenary", "nui", "arshlib" },
 	["structlog"]      = { "ts_context_commentstring" },
 	["bye-nerdfont"]   = { "nvim-web-devicons" },
+	["multicursors"]   = { "hydra" },
 }
 return M
