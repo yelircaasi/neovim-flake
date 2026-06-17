@@ -69,6 +69,7 @@ local elements = {
 	["mini.align"] = true,
 	["vim-mundo"] = true,
 	["various-textobjs"] = true,
+	["autocommands"] = true,
 }
 
 local function general_setup() end
@@ -2208,7 +2209,7 @@ end
 --──── autocommands ───────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
-local function create_miscennaleous_autocommands()
+local function create_miscellaneous_autocommands()
 	vim.api.nvim_create_autocmd("FileType", {
 		pattern = { "help", "qf", "man", "lspinfo" },
 		callback = function(ev)
@@ -2272,6 +2273,7 @@ local functions = {
 	["mini.align"] = setup_mini_align,
 	["vim-mundo"] = setup_vim_mundo,
 	["various-textobjs"] = setup_nvim_various_textobjs,
+	["autocommands"] = create_miscellaneous_autocommands,
 }
 local function maybe_call(element_name)
 	local include = elements[element_name]
@@ -2331,3 +2333,4 @@ maybe_call("nvim-anydent")
 maybe_call("mini.align")
 maybe_call("vim-mundo")
 maybe_call("various-textobjs")
+maybe_call("autocommands")
