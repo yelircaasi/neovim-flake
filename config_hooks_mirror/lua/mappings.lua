@@ -12,6 +12,11 @@ local function general_keymaps()
 	-- })
 	map_explicit({
 		mode = "n",
+		sequence = "<leader>ii",
+		action = "<cmd>Inspect<cr>",
+	})
+	map_explicit({
+		mode = "n",
 		sequence = "<leader>o",
 		action = ":update<CR> :source<CR>",
 	})

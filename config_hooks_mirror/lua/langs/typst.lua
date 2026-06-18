@@ -1,3 +1,3 @@
-vim.lsp.config["tinymist"] = {} -- TODO (?)
+vim.lsp.config["tinymist"] = {}
 
 vim.lsp.enable("tinymist")

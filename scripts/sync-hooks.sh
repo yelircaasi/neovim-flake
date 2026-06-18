@@ -44,6 +44,7 @@ sync_hooks lua/debugging.lua
 sync_hooks lua/diff.lua
 sync_hooks lua/editing.lua
 sync_hooks lua/execution.lua
+sync_hooks lua/experimental.lua
 sync_hooks lua/explorers.lua
 sync_hooks lua/fsread.lua
 sync_hooks lua/folding.lua

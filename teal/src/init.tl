@@ -23,6 +23,7 @@ global NVIM_HOME: string = vim.fn.expand("~/.config/nvim") as string
 global VERBOSE: boolean = false
 global SAFE: boolean = true
 global LAYERS: {number}|nil = nil
+vim.opt.runtimepath:prepend(NVIM_HOME)
 dofile(NVIM_HOME .. "/before_init.lua")
 
 -- GLOBAL OPTIONS ======================================================================================================

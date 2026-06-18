@@ -51,7 +51,7 @@ local plugins = {
 
 local function setup_icons()
 	if vim.g.nerdfont then
-		print("Using nerd icons")
+		utils.printv("Using nerd icons")
 		setup_plugin("nvim-web-devicons", {
 			-- your personal icons can go here (to override)
 			-- you can specify color or cterm_color instead of specifying both of them
@@ -1480,7 +1480,7 @@ local functions = {
 local function maybe_setup(plugin_name)
 	local include = plugins[plugin_name]
 	if include then
-		print("Setting up " .. plugin_name)
+		-- print("Setting up " .. plugin_name)
 		local func = functions[plugin_name]
 		func()
 	end

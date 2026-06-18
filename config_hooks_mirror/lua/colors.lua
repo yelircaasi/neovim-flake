@@ -1,3 +1,14 @@
+local function setup_odenwald_colorscheme()
+	vim.opt.runtimepath:prepend("/home/isaac/repos/nvim-colors/odenwald.nvim")
+	local odenwald = require("odenwald")
+	odenwald.setup()
+	odenwald.load()
+	vim.api.nvim_set_hl(0, "pythonConstant", { link = "Constant" })
+	vim.api.nvim_set_hl(0, "pythonBoolean", { link = "Constant" })
+	vim.api.nvim_set_hl(0, "pythonAttribute", { link = "Constant" })
+	vim.api.nvim_set_hl(0, "@variable", { link = "Identifier" })
+end
+
 local function setup_headlines()
 	-- https://github.com/lukas-reineke/headlines.nvim
 	-- adds horizontal highlights for text filetypes, like markdown, orgmode, and neorg
@@ -101,6 +112,7 @@ local function configure()
 	})
 end
 
+setup_odenwald_colorscheme()
 setup_headlines()
 map_explicit({ mode = "n", sequence = "<leader>su", action = setup_sunglasses })
 configure()

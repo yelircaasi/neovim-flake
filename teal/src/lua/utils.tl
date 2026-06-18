@@ -159,8 +159,35 @@ local function setup(config: UtilsConfig): Utils
 	    M.packadd = M.packadd_default
 	end
 
-	M.map = function(mode: string | {string}, lhs: string, rhs: string | function(), opts?: vim.keymap.SetOpts): nil
-		vim.keymap.set(mode, lhs, rhs, (opts or {}) as vim.keymap.SetOpts)
+	-- M.map = function(mode: string | {string}, lhs: string, rhs: string | function(), opts?: vim.keymap.SetOpts): nil
+	-- 	vim.keymap.set(mode, lhs, rhs, (opts or {}) as vim.keymap.SetOpts)
+	-- end
+
+	M.map = function(spec: KeymapSpec): nil
+		local opts: vim.keymap.SetOpts = spec.opts or {}
+		if spec.desc then
+			opts.desc = spec.desc
+		end
+		vim.keymap.set(spec.mode, spec.sequence, spec.action, opts)
+	end
+
+	M.setup_plugin_special = function(dir_name: string, mod_name: string, config_or_function: PluginConfig | function(Plugin)): Plugin
+		M.packadd(dir_name)
+		local mod = require(mod_name) as PluginWithSetup
+		if type(config_or_function) == "function" then
+			local func = config_or_function as function(PluginWithSetup)
+        	func(mod)
+		else
+			mod.setup(config_or_function as PluginConfig)
+		end
+		return mod as Plugin
+	end
+
+	M.mkprint = function(msg: string): Printer
+		local function inner()
+			print(msg)
+		end
+		return inner
 	end
 
 	M.get_executable = function(name: string): string
