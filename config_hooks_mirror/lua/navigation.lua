@@ -635,6 +635,21 @@ end
 local function setup_stickybuf()
 	-- https://github.com/stevearc/stickybuf.nvim
 	-- Neovim plugin for locking a buffer to a window
+	local function is_real_buffer(bufnr)
+		bufnr = bufnr or 0
+		local bt = vim.bo[bufnr].buftype
+		if bt ~= "" then
+			return false
+		end
+
+		local ft = vim.bo[bufnr].filetype
+		if ft == "" then
+			return false
+		end
+
+		return true
+	end
+
 	setup_plugin("stickybuf", function(stickybuf)
 		-- Automatically pin special buffers so they can't be replaced
 		local cfg = {
@@ -650,6 +665,9 @@ local function setup_stickybuf()
 					"toggleterm",
 					"trouble",
 				}
+				if (vim.bo[bufnr].buftype ~= "") or not vim.bo[bufnr].buflisted then
+					return
+				end
 				if vim.tbl_contains(buftypes, buftype) then
 					return stickybuf.strategy.buf
 				end

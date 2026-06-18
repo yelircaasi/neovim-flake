@@ -19,6 +19,7 @@ local function set_options()
 		incsearch = true,
 		timeout = true,
 		timeoutlen = 300,
+		laststatus = 3,
 	}
 
 	for name, value in pairs(global_options) do

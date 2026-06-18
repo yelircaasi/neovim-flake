@@ -6,12 +6,12 @@ local function setup_dap_python()
 		map_explicit({
 			mode = "n",
 			sequence = "<leader>tt",
-			action = mkprint("Leader is working!"),
+			action = utils.mkprint("Leader is working!"),
 		})
 		map_explicit({
 			mode = "n",
 			sequence = "<leader>pp",
-			action = mkprint("This works"),
+			action = utils.mkprint("This works"),
 		})
 		map_explicit({
 			mode = "n",
@@ -29,10 +29,6 @@ local function setup_dap_python()
 			action = dap_python.debug_selection,
 		})
 		-- OTHER
-		dap_python.setup("debugpy-adapter")
-		dap_python.test_runner = "pytest"
-		map("n", "<leader>tt", mkprint("Leader is working!"))
-		map("n", "<leader>pp", mkprint("This works"))
 		map_explicit({
 			mode = "n",
 			sequence = "<leader>dn",

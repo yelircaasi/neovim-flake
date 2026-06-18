@@ -49,7 +49,7 @@ vim.filetype.add({
 map_explicit({
 	mode = { "n", "v" },
 	sequence = "<leader>pp",
-	action = mkprint("This is working!"),
+	action = utils.mkprint("This is working!"),
 })
 
 vim.fn.expand("%:p") -- full path

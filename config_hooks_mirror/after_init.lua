@@ -36,18 +36,19 @@ config_modules = {
 	["editing"] = true,
 	["navigation"] = true,
 	["langs.python"] = true,
+	["mappings"] = true,
 
 	["ai"] = false,
-	["clipboard"] = false,
+	["clipboard"] = true,
 	["cloud"] = false,
 	["completion"] = false,
 	["core"] = false, -- empty
-	["debugging"] = false,
+	["debugging"] = true,
 	["diff"] = false,
 	["execution"] = false,
 	["experimental"] = false,
-	["explorers"] = false,
-	["folding"] = false,
+	["explorers"] = true,
+	["folding"] = true,
 	["git"] = false,
 	["langs.go"] = false,
 	["langs.haskell"] = false,
@@ -62,7 +63,6 @@ config_modules = {
 	["langs.xit"] = false,
 	["lsp_etc"] = false,
 	["macros"] = false,
-	["mappings"] = false,
 	["miscellaneous"] = false,
 	["projects"] = false,
 	["replacer"] = false,
@@ -122,4 +122,7 @@ maybe_require("miscellaneous")
 maybe_require("tmp")
 maybe_require("experimental")
 
+--─────────────────────────────────────────────────────────────────────────────
+--──── DEBUG INFO ─────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 utils.printv("Reached end of after_init.lua.")

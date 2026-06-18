@@ -187,32 +187,23 @@ end
 
 local function setup_pasta()
 	setup_plugin("pasta", function(pasta)
+		local mapping = require("pasta.mapping")
 		map_explicit({
 			mode = { "n", "x" },
-			"p",
-			require("pasta.mapping").p,
+			sequence = "p",
+			action = mapping.p,
 		})
 		map_explicit({
 			mode = { "n", "x" },
-			"P",
-			require("pasta.mapping").P,
+			sequence = "P",
+			action = mapping.P,
 		})
 
-		-- This is the default. You can omit `setup` call if you don't want to change this.
 		local pasta_config = pasta.config
-		pasta_config.next_key = vim.keycode("<C-n>")
-		pasta_config.prev_key = vim.keycode("<C-p>")
+		pasta_config.next_key = vim.api.nvim_replace_termcodes("<C-n>", true, true, true) -- vim.keycode("<C-n>")
+		pasta_config.prev_key = vim.api.nvim_replace_termcodes("<C-p>", true, true, true) -- vim.keycode("<C-p>")
 		pasta_config.indent_key = vim.keycode(",")
 		pasta_config.indent_fix = true
-	end)
-
-	-- TODO: resolve and remove duplicate (?)
-	setup_plugin("nvim-pasta", function(pasta)
-		pasta.setup({
-			-- Reindent pasted text to match surrounding context
-			next_key = vim.api.nvim_replace_termcodes("<C-n>", true, true, true),
-			prev_key = vim.api.nvim_replace_termcodes("<C-p>", true, true, true),
-		})
 		-- p/P are remapped by pasta automatically; C-n/C-p cycle through paste history
 	end)
 end

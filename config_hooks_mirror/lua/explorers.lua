@@ -1227,11 +1227,6 @@ local function setup_nvimtree()
 	-- optionally enable 24-bit colour
 	vim.opt.termguicolors = true
 
-	-- empty setup using defaults
-	require("nvim-tree").setup()
-
-	-- OR setup with a config
-
 	---@type nvim_tree.config
 	local nvimtree_defaults = {
 		sort = {
@@ -1256,8 +1251,8 @@ local function setup_chadtree()
 	setup_plugin("chadtree", {}) -- annoying messages & non-nix install habits
 end
 
-setup_nvimtree()
+setup_yazi()
 setup_oil()
 setup_neotree()
 setup_nvimtree()
-setup_chadtree()
+-- setup_chadtree()

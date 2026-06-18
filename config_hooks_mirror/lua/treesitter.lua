@@ -177,6 +177,18 @@ local function setup_treesitter_context()
 end
 
 local function wrap_treesitter_start()
+	local ts_disabled = {
+		"yazi",
+		"oil",
+		-- snacks_notif,
+		-- ["blink-cmp-menu"] = true,
+
+		-- telescope = true,
+		-- TelescopePrompt = true,
+		-- TelescopeResults = true,
+		-- TelescopePreview = true,
+		-- dmap = true,
+	}
 	local orig_ts_start = vim.treesitter.start
 	vim.treesitter.start = function(bufnr, lang)
 		bufnr = bufnr or 0
@@ -184,6 +196,9 @@ local function wrap_treesitter_start()
 		-- only code buffers have butype ""; 'special' buffers have a specific type
 		local bt = vim.bo[bufnr].buftype
 		if bt ~= "" then
+			return
+		end
+		if vim.tbl_contains(ts_disabled, lang) then
 			return
 		end
 

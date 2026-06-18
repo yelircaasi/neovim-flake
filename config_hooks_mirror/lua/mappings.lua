@@ -68,41 +68,64 @@ local function general_keymaps()
 		action = "+d<CR>",
 		desc = "Paste from system clipboard",
 	})
+	-- map_explicit({
+	-- 	mode = "n",
+	-- 	sequence = "<leader>lu",
+	-- 	action = function()
+	-- 		-- Create a new empty floating window or split
+	-- 		vim.cmd("vsplit | enew")
+	-- 		vim.bo.filetype = "lua"
+	-- 		vim.bo.bufhidden = "hide"
+
+	-- 		map_explicit({
+	-- 			mode = "n",
+	-- 			sequence = "<CR>",
+	-- 			action = ":.lua<CR>",
+	-- 			opts = { buffer = true },
+	-- 		})
+	-- 		map_explicit({
+	-- 			mode = "v",
+	-- 			sequence = "<CR>",
+	-- 			action = ":lua<CR>",
+	-- 			opts = { buffer = true },
+	-- 		})
+	-- 	end,
+	-- 	desc = "Open Lua Scratchpad",
+	-- })
+
+	function move_selection_to_new_file()
+		local bufnr = 0
+		local s_line, e_line = vim.fn.line("'<"), vim.fn.line("'>")
+
+		if s_line == 0 or e_line == 0 then
+			vim.notify("No visual selection found", vim.log.levels.ERROR)
+			return
+		end
+
+		local lines = vim.api.nvim_buf_get_lines(bufnr, s_line - 1, e_line, false)
+
+		-- steps; prompt; delete original text via Ex (simplest & safest); open split; insert text
+		local default_path = vim.fn.expand("%:p:h") .. "/"
+		local target = vim.fn.input("Move selection to: ", default_path, "file")
+		if target == "" then
+			return
+		end
+		vim.cmd(string.format("%d,%dd", s_line, e_line))
+		vim.cmd("vsplit " .. vim.fn.fnameescape(target))
+		vim.api.nvim_buf_set_lines(0, 0, -1, false, lines)
+		vim.bo.modified = true
+	end
+	map_explicit({
+		mode = "v",
+		sequence = "<leader>ms",
+		action = move_selection_to_new_file,
+	})
+
 	map_explicit({
 		mode = "x",
 		sequence = "<leader>mf",
 		action = ":'<,'>lua move_selection_to_new_file()<CR>",
 		desc = "Move selection to new file (split)",
-	})
-	map_explicit({
-		mode = "n",
-		sequence = "<leader>lu",
-		action = function()
-			-- Create a new empty floating window or split
-			vim.cmd("vsplit | enew")
-			vim.bo.filetype = "lua"
-			vim.bo.bufhidden = "hide"
-
-			-- Map <CR> to execute the current line or selection
-			map_explicit({
-				mode = "n",
-				sequence = "<CR>",
-				action = ":.lua<CR>",
-				opts = { buffer = true },
-			})
-			map_explicit({
-				mode = "v",
-				sequence = "<CR>",
-				action = ":lua<CR>",
-				opts = { buffer = true },
-			})
-		end,
-		desc = "Open Lua Scratchpad",
-	})
-	map_explicit({
-		mode = "v",
-		sequence = "<leader>ms",
-		action = move_selection_to_new_file,
 	})
 end
 
@@ -663,7 +686,7 @@ setup_hydra()
 setup_hydra()
 setup_hydra()
 setup_unimpaired_which_key()
-setup_wf()
-setup_keytex()
+-- setup_wf() TODO
+-- setup_keytex() TODO
 setup_nvim_keymapper()
 setup_mini_keymap()
