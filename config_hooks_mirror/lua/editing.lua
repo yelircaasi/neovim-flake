@@ -68,7 +68,7 @@ local elements = {
 	["nvim-anydent"] = true,
 	["mini.align"] = true,
 	["vim-mundo"] = true,
-	["edit-list"] = true,
+	["edit-list"] = false, -- TODO: fix import error
 	["various-textobjs"] = true,
 	["autocommands"] = true,
 }
@@ -2286,7 +2286,7 @@ local functions = {
 local function maybe_call(element_name)
 	local include = elements[element_name]
 	if include then
-		print("Calling '" .. element_name .. "'")
+		-- print("Calling '" .. element_name .. "'")
 		local func = functions[element_name]
 		func()
 	end

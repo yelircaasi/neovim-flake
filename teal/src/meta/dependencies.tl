@@ -38,5 +38,6 @@ local M: {string: {string}} = {
 	["structlog"]      = { "ts_context_commentstring" },
 	["bye-nerdfont"]   = { "nvim-web-devicons" },
 	["multicursors"]   = { "hydra" },
+	["neotest-python"]   = { "neotest" },
 }
 return M

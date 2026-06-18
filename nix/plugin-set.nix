@@ -3,9 +3,68 @@
   blink-lib,
 }: let
   custom = import ./self-packaged-plugins.nix;
+
+  nvim_winpick_src = pkgs.fetchFromGitHub {
+    owner = "MarcusGrass";
+    repo = "nvim_winpick";
+    rev = "18037e9f5ce417bd75d16ebbf70787bcc478c249";
+    hash = "sha256-YXwM0hzqyIob6wMumkqqsPp2nRMuPxYnrHW4ihU6htw=";
+  };
+
+  nvim_winpick_native = pkgs.rustPlatform.buildRustPackage {
+    pname = "nvim_winpick-native";
+    version = "2025-06-30";
+
+    src = nvim_winpick_src;
+
+    cargoHash = "sha256-qwOvEcwpw8PkzZOyUaJGFIR5z1RlC9tLCsoo4E2eNgs=";
+
+    # buildAndTestSubdir = "integration-tests";
+
+    doCheck = false;
+
+    installPhase = ''
+      mkdir -p $out/lua
+
+      so=$(find target -type f -name "libnvim_winpick.so" | head -n 1)
+
+      echo "Found: $so"
+
+      cp "$so" $out/lua/nvim_winpick.so
+    '';
+  };
+  # nvim_winpick = pkgs.vimUtils.buildVimPlugin {
+  #   pname = "nvim_winpick";
+  #   version = "2025-06-30";
+  #   src = nvim_winpick_src;
+  #   nativeBuildInputs = with pkgs; [
+  #     cargo
+  #     rustc
+  #   ];
+  #   buildPhase = ''
+  #     runHook preBuild
+  #     cargo build --release -p nvim-winpick-core
+  #     runHook postBuild
+  #   '';
+  #   installPhase = ''
+  #     mkdir -p $out/lua
+  #     cp target/release/libnvim_winpick.so $out/lua/nvim_winpick.so
+  #   '';
+  #   doCheck = false;
+  # };
 in rec {
   # CURRENTLY NOT USED - TO REVIEW
   customPlugins = {
+    nvim_winpick = pkgs.vimUtils.buildVimPlugin {
+      pname = "nvim_winpick";
+      version = "2025-06-30";
+      src = nvim_winpick_src;
+      doCheck = false;
+
+      postInstall = ''
+        cp ${nvim_winpick_native}/lua/nvim_winpick.so $out/lua/
+      '';
+    };
     # hawtkeys-nvim = pkgs.vimUtils.buildVimPlugin {
     #   pname = "hawtkeys.nvim";
     #   version = "2024-01-15";
@@ -892,21 +951,73 @@ in rec {
         description = "";
       };
     };
-    nvim_winpick = pkgs.vimUtils.buildVimPlugin {
-      pname = "nvim_winpick";
-      version = "2025-01-30";
-      src = pkgs.fetchFromGitHub {
-        owner = "MarcusGrass";
-        repo = "nvim_winpick";
-        rev = "18037e9f5ce417bd75d16ebbf70787bcc478c249";
-        hash = "sha256-YXwM0hzqyIob6wMumkqqsPp2nRMuPxYnrHW4ihU6htw=";
-      };
-      doCheck = false;
-      meta = {
-        homepage = "https://github.com/MarcusGrass/nvim_winpick";
-        description = "";
-      };
-    };
+    # nvim_winpick = pkgs.vimUtils.buildVimPlugin {
+    #   pname = "nvim_winpick";
+    #   version = "2025-06-30";
+    #   src = pkgs.fetchFromGitHub {
+    #     owner = "MarcusGrass";
+    #     repo = "nvim_winpick";
+    #     rev = "18037e9f5ce417bd75d16ebbf70787bcc478c249";
+    #     hash = "";
+    #   };
+    #   doCheck = false;
+    #   meta = {
+    #     homepage = "https://github.com/MarcusGrass/nvim_winpick";
+    #     description = "A neovim window picker and mover";
+    #   };
+    # };
+    # nvim_winpick = pkgs.vimUtils.buildVimPlugin rec {
+    #   pname = "nvim_winpick";
+    #   version = "2025-06-30";
+
+    #   src = pkgs.fetchFromGitHub {
+    #     owner = "MarcusGrass";
+    #     repo = "nvim_winpick";
+    #     rev = "18037e9f5ce417bd75d16ebbf70787bcc478c249";
+    #     hash = "sha256-YXwM0hzqyIob6wMumkqqsPp2nRMuPxYnrHW4ihU6htw=";
+    #   };
+
+    #   nativeBuildInputs = with pkgs; [
+    #     cargo
+    #     rustc
+    #   ];
+
+    #   cargoDeps = pkgs.rustPlatform.fetchCargoVendor {
+    #     inherit src;
+    #     hash = "sha256-qwOvEcwpw8PkzZOyUaJGFIR5z1RlC9tLCsoo4E2eNgs=";
+    #   };
+
+    #   buildPhase = ''
+    #     runHook preBuild
+
+    #     cargo build --release
+
+    #     runHook postBuild
+    #   '';
+
+    #   installPhase = ''
+    #     runHook preInstall
+
+    #     mkdir -p $out
+
+    #     # Install the plugin files
+    #     cp -r lua plugin doc $out/ 2>/dev/null || true
+
+    #     # Install the compiled module
+    #     mkdir -p $out/lua
+    #     cp target/release/nvim_winpick.so $out/lua/
+
+    #     runHook postInstall
+    #   '';
+
+    #   doCheck = false;
+
+    #   meta = with pkgs.lib; {
+    #     homepage = "https://github.com/MarcusGrass/nvim_winpick";
+    #     description = "A Neovim window picker and mover";
+    #     license = licenses.mit;
+    #   };
+    # };
     flybuf = pkgs.vimUtils.buildVimPlugin {
       pname = "flybuf";
       version = "2023-03-25";

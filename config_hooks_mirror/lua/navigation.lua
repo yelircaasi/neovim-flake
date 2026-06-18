@@ -4,8 +4,8 @@ local elements = {
 	["spear"] = true,
 	["smart-splits"] = true,
 	["swm"] = true,
-	["nvim_winpick"] = true,
-	["windows"] = true,
+	["nvim_winpick"] = false, -- TODO: write nix expression to build rust
+	["windows"] = false, -- TODO: fix config error
 	["pragma"] = true,
 	["windex-nvim"] = true,
 	["bafa"] = true,
@@ -191,7 +191,56 @@ end
 local function setup_nvim_winpick()
 	-- https://github.com/MarcusGrass/nvim_winpick
 	-- A neovim window picker and mover
-	setup_plugin("nvim_winpick", {}) -- TODO: RUST
+	local default_nvim_winpick_config = {
+		-- Which chars should be used as visual prompts, no repetitions allowed.
+		-- Some chars are not rendered for the hint 'floating-big-letter', those will
+		-- cause an if used (same with repetitions).
+		selection_chars = "FJDKSLA;CMRUEIWOQP",
+		filter_rules = {
+			-- If there's only one window to choose after filtering, immediately pick it
+			autoselect_one = true,
+			-- Include the currently focused window
+			include_current_win = true,
+			-- Include windows that cannot be focused
+			include_unfocusable_windows = false,
+			-- Bufferoptions that should be filtered on
+			bo = {
+				filetype = {
+					-- filetype exactly matches
+					"NvimTree",
+					"neo-tree",
+					"notify",
+					"snacks_notif",
+				},
+				buftype = {
+					-- buftype exactly matches
+					"terminal",
+					"nofile",
+					"prompt",
+				},
+			},
+			file_path_contains = {
+				-- This is an array of excluding sub-strings of a file-path
+				-- Ex: /home/me/docs/my-file.md would be matched by 'docs/my'
+			},
+			file_name_contains = {
+				-- This is an array of excluding sub-strings of a filename
+				-- Ex: /home/me/docs/my-file.md would be matched by 'my-file' but not 'docs'
+			},
+		},
+		-- "floating-big-letter" or "floating-letter" is valid here
+		hint = "floating-big-letter",
+
+		-- characters that control multiselect
+		-- both or none must be present
+		multiselect = {
+			-- Not set by default, character that triggers a multiselect (if available on the action)
+			-- trigger_char = "m",
+			-- Not set by default, character that triggers a commit of the selected windows (if available on the action)
+			-- commit_char = "c",
+		},
+	}
+	setup_plugin("nvim_winpick", default_nvim_winpick_config) -- TODO: RUST
 end
 
 local function setup_windows()
@@ -1940,7 +1989,7 @@ local functions = {
 local function maybe_call(element_name)
 	local include = elements[element_name]
 	if include then
-		print("Calling '" .. element_name .. "'")
+		-- print("Calling '" .. element_name .. "'")
 		local func = functions[element_name]
 		func()
 	end

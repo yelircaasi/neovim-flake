@@ -70,6 +70,7 @@ setup_plugin("equals", equals_defaults)
 --─────────────────────────────────────────────────────────────────────────────
 
 local function get_neotest_python_adapter()
+	utils.packadd("neotest")
 	utils.packadd("neotest-python")
 	local python_adapter = require("neotest-python")({
 		dap = { justMyCode = false },

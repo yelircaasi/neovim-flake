@@ -1392,7 +1392,7 @@ local functions = {
 local function maybe_call(element_name)
 	local include = elements[element_name]
 	if include then
-		print("Calling '" .. element_name .. "'")
+		-- print("Calling '" .. element_name .. "'")
 		local func = functions[element_name]
 		func()
 	end

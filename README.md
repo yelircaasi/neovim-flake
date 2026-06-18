@@ -7,8 +7,9 @@
 - [ ] plugins from last good working config
 
 - [ ] [USE] trouble.nvim
-- [ ] [VENDOR] wezterm.nvim https://github.com/willothy/wezterm.nvim
-- [ ] [VENDOR] wezterm-move.nvim https://github.com/letieu/wezterm-move.nvim
+- [ ] [VENDOR] [wezterm.nvim](https://github.com/willothy/wezterm.nvim)
+- [ ] [VENDOR] [wezterm-move.nvim](https://github.com/letieu/wezterm-move.nvim)
+- [ ] [VENDOR] [shade.nvim](https://github.com/sunjon/shade.nvim)
 - [ ] [USE] conform.nvim
 - [ ] [USE] lazydev.nvim
 - [ ] [USE] fidget.nvim
@@ -118,9 +119,9 @@
     - [ ] [] debug        Pretty inspect & backtraces for debugging    
     - [ ] [] dim          Focus on the active scope by dimming the rest    
     - [ ] [] explorer     A file explorer (picker in disguise) (extra config required!)
-    - [ ] [TRY] gh           GitHub CLI integration    
-    - [ ] [TRY] git          Git utilities    
-    - [ ] [TRY] gitbrowse    Open the current file, branch, commit, or repo in a browser (e.g. GitHub, GitLab, Bitbucket)    
+    - [ ] [TRY] gh        GitHub CLI integration    
+    - [ ] [TRY] git       Git utilities    
+    - [ ] [TRY] gitbrowse Open the current file, branch, commit, or repo in a browser (e.g. GitHub, GitLab, Bitbucket)    
     - [ ] [] image        Image viewer using Kitty Graphics Protocol, supported by kitty, wezterm and ghostty (extra config required!)
     - [ ] [] indent       Indent guides and scopes    
     - [ ] [] input        Better vim.ui.input (extra config required!)
@@ -131,8 +132,8 @@
     - [ ] [] notify       Utility functions to work with Neovim's vim.notify    
     - [ ] [] picker       Picker for selecting items (extra config required!)
     - [ ] [] profiler     Neovim lua profiler    
-    - [ ] [TRY] quickfile    When doing nvim somefile.txt, it will render the file as quickly as possible, before loading your plugins. (extra config required!)
-    - [ ] [TRY] rename       LSP-integrated file renaming with support for plugins like neo-tree.nvim and mini.files.    
+    - [ ] [TRY] quickfile When doing nvim somefile.txt, it will render the file as quickly as possible, before loading your plugins. (extra config required!)
+    - [ ] [TRY] rename    LSP-integrated file renaming with support for plugins like neo-tree.nvim and mini.files.    
     - [ ] [] scope        Scope detection, text objects and jumping based on treesitter or indent (extra config required!)
     - [ ] [] scratch      Scratch buffers with a persistent file    
     - [ ] [] scroll       Smooth scrolling (extra config required!)

@@ -127,20 +127,6 @@ vim.g.mapleader = " "
 
 -- MODULES
 
-vim.api.nvim_create_autocmd("ColorScheme", {
-	-- immediate = true,
-	callback = function()
-		local win_sep = vim.api.nvim_get_hl(0, { name = "WinSeparator", link = false })
-		local statusnc = vim.api.nvim_get_hl(0, { name = "StatusLineNC", link = false })
-
-		-- Make the inactive bar background match so it blends with WinSeparator
-		vim.api.nvim_set_hl(0, "StatusLineNC", {
-			fg = win_sep.fg,
-			bg = statusnc.bg,
-		})
-	end,
-})
-
 -------------------------------------------------------------------------------
 -- MODULES: ---------------------------------------------------------------------
 -------------------------------------------------------------------------------
@@ -235,9 +221,9 @@ config_modules = {
 	["lsp_etc"] = true,
 	["editing"] = true,
 	["navigation"] = true,
-	["ui"] = false,
-	["treesitter"] = false,
-	["core"] = false,
+	["ui"] = true,
+	["treesitter"] = true,
+	["core"] = true,
 	["langs.python"] = true,
 	["colors"] = true,
 }

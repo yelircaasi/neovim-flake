@@ -19,7 +19,7 @@ local function setup_neotest_for_lang(language, adapter, overrides)
 	local function nmap(spec)
 		spec.mode = "n"
 		spec.opts = { silent = true }
-		map_explicit(specs)
+		map_explicit(spec)
 	end
 
 	nmap({
@@ -75,7 +75,7 @@ local coverage_defaults = { -- just sample config; not exchaustive
 	},
 }
 local function setup_coverage_for_lang(language, lang_specs, overrides)
-	cfg = vim.tbl_deep_extend("force", cfg, overrides or {})
+	cfg = vim.tbl_deep_extend("force", coverage_defaults, overrides or {})
 	cfg.lang[language] = lang_specs
 	setup_plugin("coverage", cfg)
 end
