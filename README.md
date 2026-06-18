@@ -367,6 +367,10 @@ neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
 
 ### Reading / Theory
 
+- [ ] [Neovim Registers: Work Smarter, Not Harder](https://www.youtube.com/watch?v=jSy8WjSyMAE)
+
+- [ ] [Registers Explained - Vim Tips & Tricks - Stop Losing Text in Vim](https://www.youtube.com/watch?v=bBU7gVNqVFw)
+
 - [ ] https://samuellawrentz.com/hacks/neovim/demystifying-buffers-windows-tabs-neovim/
 
 - [ ] https://samuellawrentz.com/hacks/neovim/boost-your-coding-efficiency/
