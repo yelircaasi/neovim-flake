@@ -1,4 +1,8 @@
 utils.printv("Entering after_init.lua.")
+
+--─────────────────────────────────────────────────────────────────────────────
+--──── OPTIONS ────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
 require("options")
 
 --─────────────────────────────────────────────────────────────────────────────
@@ -9,7 +13,7 @@ setup_plugin = utils.setup_plugin
 packadd = utils.packadd
 
 --─────────────────────────────────────────────────────────────────────────────
---──── MODULES ────────────────────────────────────────────────────────────────
+--──── DEPENDENCY MODULES ─────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 -- require("commons.fio")
 -- require("nio")
@@ -18,96 +22,104 @@ packadd = utils.packadd
 -- require("pathlib")
 
 --─────────────────────────────────────────────────────────────────────────────
---──── colorscheme ────────────────────────────────────────────────────────────
+--──── COLORSCHEME ────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 require("colors")
 
 --─────────────────────────────────────────────────────────────────────────────
---──── modules ────────────────────────────────────────────────────────────────
+--──── CONFIG MODULES ─────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
-
-local ALL_config_modules = {
-	["options"] = true,
-	["core"] = true, -- empty
+config_modules = {
 	["ui"] = true,
-
-	["clipboard"] = true,
-	["cloud"] = true,
-	["colors"] = true,
-	["execution"] = true,
-
-	["completion"] = true,
-	["explorers"] = true,
-	["testing"] = true,
+	["treesitter"] = true,
 	["lsp_etc"] = true,
-
 	["editing"] = true,
-	["folding"] = true,
-	["search"] = true,
 	["navigation"] = true,
+	["langs.python"] = true,
 
-	["telescope_etc"] = true,
-	["diff"] = true,
-	["terminal"] = true,
-	["debugging"] = true,
-	["projects"] = true,
-	["macros"] = true,
-
-	["task_runner"] = true,
-	["replacer"] = true,
-
-	["git"] = true,
-	["ai"] = true,
-
-	["mappings"] = true, -- TODO: move out to respective files
-
-	["tmp"] = true,
-
-	["langs.multilang"] = false,
+	["ai"] = false,
+	["clipboard"] = false,
+	["cloud"] = false,
+	["completion"] = false,
+	["core"] = false, -- empty
+	["debugging"] = false,
+	["diff"] = false,
+	["execution"] = false,
+	["experimental"] = false,
+	["explorers"] = false,
+	["folding"] = false,
+	["git"] = false,
 	["langs.go"] = false,
-	["langs.haskell"] = true,
-	["langs.json_yaml"] = true,
+	["langs.haskell"] = false,
+	["langs.json_yaml"] = false,
 	["langs.lua_language"] = false,
 	["langs.markdown"] = false,
-	["langs.nix"] = true,
-	["langs.rust"] = true,
+	["langs.multilang"] = false,
+	["langs.nix"] = false,
+	["langs.rust"] = false,
 	["langs.tex"] = false,
 	["langs.typst"] = false,
 	["langs.xit"] = false,
-
-	["miscellaneous"] = false, -- TODO
-	["experimental"] = true,
-}
--- TMP
-config_modules = {
-	["options"] = true,
-	["lsp_etc"] = true,
-	["editing"] = true,
-	["navigation"] = true,
-	["ui"] = true,
-	["treesitter"] = true,
-	["core"] = true,
-	["langs.python"] = true,
-	["colors"] = true,
-	["experimental"] = false,
+	["lsp_etc"] = false,
+	["macros"] = false,
+	["mappings"] = false,
+	["miscellaneous"] = false,
+	["projects"] = false,
+	["replacer"] = false,
+	["search"] = false,
+	["task_runner"] = false,
+	["telescope_etc"] = false,
+	["terminal"] = false,
+	["testing"] = false,
+	["tmp"] = false,
 }
 local function maybe_require(mod_name)
 	local include = config_modules[mod_name]
 	if include then
-		-- print("Requiring " .. mod_name)
 		require(mod_name)
 	end
 end
 
-maybe_require("options")
 maybe_require("lsp_etc")
 maybe_require("editing")
 maybe_require("navigation")
 maybe_require("treesitter")
 maybe_require("core")
 maybe_require("langs.python")
-maybe_require("colors")
 maybe_require("ui")
+maybe_require("experimental")
+maybe_require("clipboard")
+maybe_require("cloud")
+maybe_require("execution")
+maybe_require("completion")
+maybe_require("explorers")
+maybe_require("testing")
+maybe_require("folding")
+maybe_require("search")
+maybe_require("telescope_etc")
+maybe_require("diff")
+maybe_require("terminal")
+maybe_require("debugging")
+maybe_require("projects")
+maybe_require("macros")
+maybe_require("task_runner")
+maybe_require("replacer")
+maybe_require("git")
+maybe_require("ai")
+maybe_require("mappings")
+maybe_require("langs.multilang")
+maybe_require("langs.go")
+maybe_require("langs.haskell")
+maybe_require("langs.json_yaml")
+maybe_require("langs.lua_language")
+maybe_require("langs.markdown")
+maybe_require("langs.nix")
+maybe_require("langs.rust")
+maybe_require("langs.tex")
+maybe_require("langs.typst")
+maybe_require("langs.xit")
+maybe_require("miscellaneous")
+maybe_require("tmp")
 maybe_require("experimental")
 
 utils.printv("Reached end of after_init.lua.")
