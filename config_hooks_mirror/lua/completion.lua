@@ -83,7 +83,6 @@ end)
 --]]
 -- cmp-sources -> blink.cmp equivalence table:
 --[[
-
   - `cmp-nvim-lsp  -->  built in (`lsp`)
   - `cmp-path  -->  built in (`path`)
   - `cmp-buffer  -->  built in (`buffer`)
@@ -92,10 +91,17 @@ end)
   - `cmp-nvim-lua  -->  built in (`lsp` covers this)
   - `cmp-git  -->  `blink-cmp-git`
   - `copilot-cmp  -->  `blink-copilot`
-
 --]]
 
 --> most of the cmp source plugins will be superseded (TODO)
+-- TODO: https://search.nixos.org/packages?channel=26.05&query=blink-cmp (added to nix, not yet to lua)
+--     env
+--     spell
+--     dictionary
+--     yanky
+--     conventional-commits
+--     avante
+--     copilot
 
 --─────────────────────────────────────────────────────────────────────────────
 --──── snippet sources ────────────────────────────────────────────────────────
