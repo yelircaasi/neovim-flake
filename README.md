@@ -15,6 +15,47 @@ flexibility.
 
 ## Roadmap
 
+### Mappings (key knowledge)
+
+Use localleader as a different key from leader (conventionally for local mappings,
+but not required to be). Other conventions:
+
+- `]` as a namespace (already conventional for "next" operations)
+- `[` for "prev"
+- `g` for "go to"
+- `z` for fold/view operations
+- use `<leader>t` for test, `<leader>g` for git, etc.
+
+Use `{ buffer = true }` for buffer-local mappings.
+
+Set `vim.opt.timeoutlen = 300`  -- ms to wait for a key sequence to complete
+
+The built-in prefix keys (wait for another key by default):
+
+- `g`: extended motion/operation namespace
+- `z`: fold/view/spell namespace
+- `[` / `]`: prev/next pairs
+- `"`: register selection
+- `'` / `` ` ``: mark jumping
+- `<C-w>`: window operations
+- `c` / `d` / `y`: operator (wait for motion)
+- `>` / `<` / `=`: indent operators
+
+Self-contained keys (act immediately in normal mode):
+
+- `h`/`j`/`k`/`l`: motion
+- `x`: delete char
+- `p` / `P`: put
+- `u` / `<C-r>`: undo/redo
+- `i`/`a`/`o`/`O`: enter insert
+- `v`/`V`/`<C-v>`: enter visual
+- `r`: replace char (technically waits for one key)
+- `~`: toggle case
+- `J`: join lines
+- `n`/`N`: search next/prev
+
+`->` Explore these with `:Telescope keymaps` (or `fzf-lua`'s equivalent `fzf.keymaps()`) to fuzzy-search all active mappings and see exactly what each key does.
+
 ### Desired Mappings / Features
 
 #### --- NAVIGATION ---
