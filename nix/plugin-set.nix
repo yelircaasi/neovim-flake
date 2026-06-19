@@ -3653,6 +3653,10 @@ in rec {
       path = yanky-nvim;
     }
     {
+      name = "neoclip";
+      path = nvim-neoclip-lua;
+    }
+    {
       name = "moveline";
       path = moveline-nvim;
     }
