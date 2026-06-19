@@ -51,7 +51,6 @@ local elements = {
 	["wildfire"] = true,
 	["vim-sandwich"] = true,
 	["mini.surround"] = true,
-	["sentiment"] = false, -- TODO: rebuild
 	["ultimate-autopair"] = true,
 	["blink.pairs"] = true,
 	["rainbow-delimiters"] = true,
@@ -1592,59 +1591,6 @@ local function setup_mini_surround()
 	setup_plugin("mini.surround", mini_surround_defaults)
 end
 
-local function setup_sentiment()
-	-- https://github.com/utilyre/sentiment.nvim
-	-- Enhanced matchparen.vim plugin for Neovim to highlight the outer pair.
-	-- TODO: deprecated -> vendor? fork?
-	local sentiment_defaults = {
-		---Dictionary to check whether a buftype should be included.
-		---
-		---@type table<string, boolean>
-		included_buftypes = {
-			[""] = true,
-		},
-
-		---Dictionary to check whether a filetype should be excluded.
-		---
-		---@type table<string, boolean>
-		excluded_filetypes = {},
-
-		---Dictionary to check whether a mode should be included.
-		---
-		---@type table<string, boolean>
-		included_modes = {
-			n = true,
-			i = true,
-		},
-
-		---How much (in milliseconds) should the cursor stay still to calculate and
-		---render a pair.
-		---
-		---NOTE: It's recommended to set this somewhere above and close to your key
-		---repeat speed in order to keep the calculations at minimum.
-		---
-		---@type integer
-		delay = 50,
-
-		---How many lines to look backwards/forwards to find a pair.
-		---
-		---@type integer
-		limit = 100,
-
-		---List of `(left, right)` pairs.
-		---
-		---NOTE: Both sides of a pair can't have the same character.
-		---
-		---@type tuple<string, string>[]
-		pairs = {
-			{ "(", ")" },
-			{ "{", "}" },
-			{ "[", "]" },
-		},
-	}
-	setup_plugin("sentiment", sentiment_defaults) -- archived
-end
-
 local function setup_ultimate_autopair()
 	-- https://github.com/altermo/ultimate-autopair.nvim
 	-- treesitter supported autopairing plugin with extensions, and much more
@@ -2262,7 +2208,6 @@ local functions = {
 	["wildfire"] = setup_wildfire,
 	["vim-sandwich"] = setup_vim_sandwich,
 	["mini.surround"] = setup_mini_surround,
-	["sentiment"] = setup_sentiment_nvim,
 	["ultimate-autopair"] = setup_ultimate_autopair,
 	["blink.pairs"] = setup_blink_pairs,
 	["rainbow-delimiters"] = setup_rainbow_delimiters,
@@ -2323,7 +2268,6 @@ maybe_call("move")
 maybe_call("wildfire")
 maybe_call("vim-sandwich")
 maybe_call("mini.surround")
-maybe_call("sentiment")
 maybe_call("ultimate-autopair")
 maybe_call("blink.pairs")
 maybe_call("rainbow-delimiters")

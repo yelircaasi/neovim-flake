@@ -56,6 +56,7 @@
 - [ ] [VENDOR] [wezterm.nvim](https://github.com/willothy/wezterm.nvim)
 - [ ] [VENDOR] [wezterm-move.nvim](https://github.com/letieu/wezterm-move.nvim)
 - [ ] [VENDOR] [shade.nvim](https://github.com/sunjon/shade.nvim)
+- [ ] [VENDOR] [jvim](https://github.com/ThePrimeagen/jvim.nvim) JSON navigation
 - [ ] [USE] conform.nvim
 - [ ] [USE] lazydev.nvim
 - [ ] [USE] fidget.nvim
@@ -367,6 +368,8 @@ neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
 
 ### Reading / Theory
 
+- [ ] Learning the vi and Vim Editors
+
 - [ ] [Neovim Registers: Work Smarter, Not Harder](https://www.youtube.com/watch?v=jSy8WjSyMAE)
 
 - [ ] [Registers Explained - Vim Tips & Tricks - Stop Losing Text in Vim](https://www.youtube.com/watch?v=bBU7gVNqVFw)
@@ -399,16 +402,17 @@ neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
 
 ### Remove from Nix plugins
 
-- [ ] "vim-twig"
-- [ ] "tree-sitter-just"
-- [ ] "guard"
-- [ ] "nvim-treesitter"
-- [ ] "splitjoin.vim (kept lua version)
+- [x] zellij.nvim
+- [x] "vim-twig"
+- [x] "tree-sitter-just"
+- [x] "guard"
+- [x] "nvim-treesitter"
+- [x] "splitjoin.vim (kept lua version)
 - [ ] "none-ls"
-- [ ] "nvim-alt-substitute" (archived; superseded by nvim-rip-substitute)
+- [x] "nvim-alt-substitute" (archived; superseded by nvim-rip-substitute)
 - [ ] "pylsp-rope"
-- [ ] "vim-multiple-cursors"
-- [ ] https://github.com/Slyces/hierarchy.nvim
+- [x] "vim-multiple-cursors"
+- [x] https://github.com/Slyces/hierarchy.nvim
       Neovim plugin providing an attempt to « hack around » the lack of support
       (in clients & servers) for the type hierarchy LSP protocol.
 
