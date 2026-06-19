@@ -1,4 +1,103 @@
 --─────────────────────────────────────────────────────────────────────────────
+--──── notes ──────────────────────────────────────────────────────────────────
+--─────────────────────────────────────────────────────────────────────────────
+
+-- drop nvim-cmp in favor of blink.cmp
+-- drop ultisnips in favor of luasnip
+-- keep friendly-snippets; loaded via luasnip.loaders
+-- TODO: proposed setup:
+--[[
+setup_plugin("luasnip", function(ls)
+    ls.config.set_opts({
+        history = true,
+        updateevents = "TextChanged,TextChangedI",
+        enable_autosnippets = true,
+    })
+
+    -- Load friendly-snippets
+    require("luasnip.loaders.from_vscode").lazy_load()
+
+    -- Jump between snippet nodes
+    local map = vim.keymap.set
+    map({"i","s"}, "<C-l>", function() ls.jump(1) end,  { desc = "Snippet: next node" })
+    map({"i","s"}, "<C-h>", function() ls.jump(-1) end, { desc = "Snippet: prev node" })
+    map({"i","s"}, "<C-e>", function()
+        if ls.choice_active() then ls.change_choice(1) end
+    end, { desc = "Snippet: cycle choice" })
+end)
+
+
+setup_plugin("blink-cmp", function(blink)
+    blink.setup({
+        keymap = {
+            preset = "default",
+            ["<C-space>"] = { "show", "show_documentation", "hide_documentation" },
+            ["<C-e>"]     = { "hide" },
+            ["<CR>"]      = { "accept", "fallback" },
+            ["<Tab>"]     = { "snippet_forward", "select_next", "fallback" },
+            ["<S-Tab>"]   = { "snippet_backward", "select_prev", "fallback" },
+            ["<C-j>"]     = { "select_next", "fallback" },
+            ["<C-k>"]     = { "select_prev", "fallback" },
+            ["<C-d>"]     = { "scroll_documentation_down" },
+            ["<C-u>"]     = { "scroll_documentation_up" },
+        },
+        appearance = {
+            use_nvim_cmp_as_default = false,
+            nerd_font_variant = "mono",
+        },
+        sources = {
+            default = { "lsp", "path", "snippets", "buffer" },
+            providers = {
+                snippets = {
+                    name   = "Snippets",
+                    module = "blink.cmp.sources.snippets",
+                    opts   = {
+                        friendly_snippets = true,
+                        search_paths = { vim.fn.stdpath("data") .. "/lazy/friendly-snippets" },
+                    },
+                },
+            },
+        },
+        completion = {
+            documentation = {
+                auto_show       = true,
+                auto_show_delay_ms = 200,
+            },
+            ghost_text = { enabled = true },
+            menu = {
+                draw = {
+                    treesitter = { "lsp" },
+                    columns = {
+                        { "label", "label_description", gap = 1 },
+                        { "kind_icon", "kind" },
+                    },
+                },
+            },
+        },
+        signature = { enabled = true },
+        snippets = {
+            preset = "luasnip",  -- tell blink to use luasnip
+        },
+    })
+end)
+--]]
+-- cmp-sources -> blink.cmp equivalence table:
+--[[
+
+  - `cmp-nvim-lsp  -->  built in (`lsp`)
+  - `cmp-path  -->  built in (`path`)
+  - `cmp-buffer  -->  built in (`buffer`)
+  - `cmp_luasnip  -->  built in via `snippets.preset = "luasnip"`
+  - `cmp-cmdline  -->  built in (`cmdline`)
+  - `cmp-nvim-lua  -->  built in (`lsp` covers this)
+  - `cmp-git  -->  `blink-cmp-git`
+  - `copilot-cmp  -->  `blink-copilot`
+
+--]]
+
+--> most of the cmp source plugins will be superseded (TODO)
+
+--─────────────────────────────────────────────────────────────────────────────
 --──── snippet sources ────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 

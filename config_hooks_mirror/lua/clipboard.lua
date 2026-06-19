@@ -1,3 +1,42 @@
+local function general_config()
+	-- unnamed register syncs with system clipboard
+	vim.opt.clipboard = "unnamedplus"
+
+	-- alternate (default, keep separate)
+	-- vim.opt.clipboard = ""
+	--> then use "+y / "+p explicitly
+
+	-- yank to system clipboard
+	vim.keymap.set({ "n", "v" }, "<leader>y", '"+y', { desc = "Yank to clipboard" })
+	vim.keymap.set("n", "<leader>Y", '"+Y', { desc = "Yank line to clipboard" })
+	-- put from system clipboard
+	vim.keymap.set({ "n", "v" }, "<leader>p", '"+p', { desc = "Put from clipboard" })
+	vim.keymap.set({ "n", "v" }, "<leader>P", '"+P', { desc = "Put from clipboard (before)" })
+	-- delete without affecting clipboard
+	vim.keymap.set({ "n", "v" }, "<leader>d", '"_d', { desc = "Delete to blackhole" })
+
+	-- for SSH
+	if vim.env.SSH_TTY or vim.env.SSH_CLIENT then
+		vim.g.clipboard = {
+			name = "OSC 52",
+			copy = {
+				["+"] = require("vim.ui.clipboard.osc52").copy("+"),
+				["*"] = require("vim.ui.clipboard.osc52").copy("*"),
+			},
+			paste = {
+				["+"] = require("vim.ui.clipboard.osc52").paste("+"),
+				["*"] = require("vim.ui.clipboard.osc52").paste("*"),
+			},
+		}
+	else
+		vim.opt.clipboard = "unnamedplus"
+	end
+
+	-- TODO: use a yank history plugin like yanky.nvim or snacks' yank history,
+	-- which lets me cycle through previous yanks after pasting.
+	-- That way you never lose a yank regardless of what `d` does
+end
+
 local function create_autocommands()
 	vim.api.nvim_create_autocmd("TextYankPost", {
 		callback = function()
@@ -232,6 +271,7 @@ end
 --──── CALL SETUPS ────────────────────────────────────────────────────────────
 --─────────────────────────────────────────────────────────────────────────────
 
+general_config()
 create_autocommands()
 setup_yanky()
 setup_lazyclip()

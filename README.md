@@ -1,5 +1,18 @@
 # neovim-flake
 
+This flake is designed to handle installation (nvim, plugins, lua modules,
+treesitter, etc.) and provide a default configuration with a global `utils`
+module and my current preferred plugins and settings. It also provides two
+hooks that allow me to iterate quickly and add features ad hoc:
+
+- `$HOME/.config/nvim/after_init.lua`
+
+- `$HOME/.config/nvim/after_init.lua`
+
+The key design choice here is to cleanly separate installation from
+configuration, while striking a comfortable balance between declarativity and
+flexibility.
+
 ## Roadmap
 
 ### Desired Mappings / Features
@@ -300,6 +313,7 @@
 ```
 
 #### Fix dependency: ts-context-commentstring
+
 ```lua
 	setup_plugin("structlog", {})
 ```
@@ -355,6 +369,8 @@ neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
   - [ ] vim keybindings for line editing (provided by wezterm or shell?
         or simply open minimal vim editor to edit command)
   - [ ] comfortable switching between different shells (bash, nushell, xonsh, elvish, etc)
+
+- TODO: `enable_osc52 = true` ?
 
 #### wezterm-integration.nvim
 
