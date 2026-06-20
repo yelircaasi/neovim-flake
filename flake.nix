@@ -66,7 +66,7 @@
     };
 
     blink-lib = {
-      url = "github:saghen/blink.lib/b127d48bf8e9ac9cf41f6e0fbead317503f76558";
+      url = "github:saghen/blink.lib/5876dd95deeb70aadbe9f1c0b7117a135061cdac";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
