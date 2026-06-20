@@ -1,0 +1,353 @@
+"<leader>"..i   function() list:select(i) end desc = "Harpoon: jump to " .. i,  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+=======================
+=========  -  =========
+=======================
+"<leader>-"     Open yazi at the current file                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/explorers.lua
+=======================
+=========  ;  =========
+=======================
+"<leader>;"     function() require("dropbar.api").pick() end        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/ui.lua
+=======================
+========  <cr>  =======
+=======================
+"<leader><cr>"                                                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+======================
+=====  <leader>  =====
+======================
+"<leader><leader>h"  Swap buffer left,                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+"<leader><leader>j"  Swap buffer down,                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+"<leader><leader>k"  Swap buffer up,                                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+"<leader><leader>l"  Swap buffer right,                             |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+=======================
+=========  P  =========
+=======================
+"<leader>P"     Put from system (unnamedplus) clipboard (before),   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/clipboard.lua
+=======================
+=========  Q  =========
+=======================
+"<leader>Q"     "<cmd>cclose<cr>"                                   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+=======================
+=========  R  =========
+=======================
+"<leader>R"     replace all                                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>R"     move_up = "U", move_down = "D", move_to = "i",      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+=======================
+=========  T  =========
+=======================
+"<leader>T"     "<ESC>:vsplit | term<CR>", {                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+=======================
+=========    =========
+=======================
+"<leader>Y"     Yank line to clipboard,                             |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/clipboard.lua
+=======================
+=========    =========
+=======================
+"<leader>\\"    -- Keybinding to save session (default: <leader>\) <> load_key = "<leader><BS>", -- Keybinding to load session (default: <leader><BS>) <> autosave = false, -- Autosave session on every file write (default: false) <>  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+=======================
+=========    =========
+=======================
+"<leader>a"     function() vim.cmd.RustLsp("codeAction") -- supports rust-analyzer's grouping <> -- or vim.lsp.buf.codeAction() if you don't want grouping. end opts = { silent = true, buffer = bufnr  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>a"     config = "<leader>c", preview = "<leader>p", send_text = "<leader>st", send_html = "<leader>sh",  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>a"     My custom issue action                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/git.lua
+"<leader>a="    ":Tabularize /=<cr>",                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/editing.lua
+"<leader>a="    ":Tabularize /=<cr>",                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/editing.lua
+=======================
+=========    =========
+=======================
+"<leader>b"     Toggle the file panel                               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>b"     Toggle the file panel                               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>b"     Toggle the file panel.                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>b"     My custom PR action                                 |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/git.lua
+"<leader>bd"    Delete buffer,                                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>bf"    FlyBuf: buffer list,                                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+=======================
+=========  c  =========
+=======================
+"<leader>c"     input replace command,                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>cA"    action = crates.upgrade_all_crates                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cA"    Choose all the versions of a conflict for the whole file   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cA"    Choose all the versions of a conflict for the whole file   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cB"    Choose the BASE version of a conflict for the whole file   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cB"    Choose the BASE version of a conflict for the whole file   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cC"    action = crates.open_crates_io                             |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cD"    action = crates.open_documentation                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cH"    action = crates.open_homepage                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cL"    action = crates.open_lib_rs                                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cO"    Choose the OURS version of a conflict for the whole file   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cO"    Choose the OURS version of a conflict for the whole file   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cR"    action = crates.open_repository                            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cT"    Choose the THEIRS version of a conflict for the whole file |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cT"    Choose the THEIRS version of a conflict for the whole file |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cU"    action = crates.upgrade_crate                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cU"    action = crates.upgrade_crates                             |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cX"    action = crates.extract_crate_into_table                   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>ca"    action = crates.update_all_crates                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>ca"    action = vim.lsp.buf.code_action                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>ca"    Choose all the versions of a conflict                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>ca"    vim.lsp.buf.code_action, "Code Action") <> lsp_map("<leader>rn", vim.lsp.buf.rename, "Rename") <> -- Diagnostics <> lsp_map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic") <> lsp_map("]d", vim.diagnostic.goto_next, "Next Diagnostic") <> lsp_map("<leader>dl", vim.diagnostic.open_float, "Show Line Diagnostics") <> -- format on save (to use LSP formatter instead of conform) <> -- vim.api.nvim_buf_create_autocmd("BufWritePre", { <> --   buffer = ev.buf, --   callback = function() vim.lsp.buf.format { async = false  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>ca"    vim.lsp.buf.code_action, "Code Action") <> lsp_map("<leader>rn", vim.lsp.buf.rename, "Rename") <> -- Diagnostics <> lsp_map("[d", vim.diagnostic.goto_prev, "Previous Diagnostic") <> lsp_map("]d", vim.diagnostic.goto_next, "Next Diagnostic") <> lsp_map("<leader>dl", vim.diagnostic.open_float, "Show Line Diagnostics") <> -- format on save (to use LSP formatter instead of conform) <> -- vim.api.nvim_buf_create_autocmd("BufWritePre", { <> --   buffer = ev.buf, --   callback = function() vim.lsp.buf.format { async = false  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>cb"    Choose the BASE version of a conflict                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cd"    action = crates.show_dependencies_popup                    |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cf"    action = crates.show_features_popup                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cf"    function() require("conform").format({ bufnr = ev.buf      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>cl"    action = vim.lsp.codelens.run                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>cn"    ":CarbonNow<CR>" opts = { silent = true                    |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>co"    Choose the OURS version of a conflict                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cr"    action = crates.reload                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>ct"    action = crates.toggle                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>ct"    Choose the THEIRS version of a conflict                    |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>cu"    action = crates.update_crate                               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cu"    action = crates.update_crates                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cv"    action = crates.show_versions_popup                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+"<leader>cw"    Open the file manager in nvim's working directory          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/explorers.lua
+"<leader>cx"    action = crates.expand_plain_crate_to_inline_table         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/langs/rust.lua
+=======================
+=========  d  =========
+=======================
+"<leader>d"     Paste from system clipboard,                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>d"     Delete to blackhole,                                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/clipboard.lua
+"<leader>dB"    function() dap.set_breakpoint(vim.fn.input("Breakpoint condition: ")) end  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>da"    [D]oing: [A]dd                                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>db"    dap.toggle_breakpoint                               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>dc"    dap.continue                                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>de"    [D]oing: [E]dit                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>df"    dap_python.test_class                               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>df"    dap_python.test_class                               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>df"    dap_python.test_class                               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>dl"    dap.run_last                                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>dm"    Cycle LSP Diagnostic Modes,                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>dn"    dap_python.test_method                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>dn"    dap_python.test_method                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>dn"    dap_python.test_method                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>dn"    [D]oing: Do[n]e                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>dr"    dap.repl.open                                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>ds"    dap_python.debug_selection                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>ds"    dap_python.debug_selection                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>ds"    function() dap_python.debug_selection() end         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>ds"    function() vim.notify(doing.status(true), vim.log.levels.INFO, { title = "Doing:", icon = ""  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>dt"    "<cmd>InsertDate<CR>" opts = { noremap = true, silent = true  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/editing.lua
+"<leader>dt"    action = ':r! date "+\\%d-\\%m-\\%Y" <CR>',         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/editing.lua
+"<leader>dt"    [D]oing: [T]oggle                                   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>dt"    Toggle LSP Diagnostics                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>dtt"   "<cmd>InsertDateTime<CR>"                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/editing.lua
+"<leader>du"    dapui.toggle                                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>dx"    dap.terminate                                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+=======================
+=========  e  ========= EXPLORING
+=======================
+"<leader>e"     ":Oil<CR>"                                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>e"     vim.diagnostic.open_float                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>e"     Bring focus to the file panel                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>e"     Bring focus to the file panel                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>e"     Bring focus to the file panel                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/diff.lua
+"<leader>eN"    [E]rror [N]previous,                                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>ec"    [E]rror [C]ompile,                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>en"    [E]rror [N]ext,                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>es"    [E]rror [S]ource,                                   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+=======================
+=========  f  ========= FINDING
+=======================
+"<leader>f"     ":Pick files<CR>",                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>f."    Resume last picker,                                 |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>f/"    Grep current buffer,                                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>fD"    Workspace diagnostics,                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>fS"    Workspace symbols,                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>fb"    Find Buffers,                                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/telescope_etc.lua
+"<leader>fb"    Find Buffers,                                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/telescope_etc.lua
+"<leader>fb"    Buffers,                                            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>fc"    Commands,                                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>fd"    Buffer diagnostics,                                 |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>ff"    Find Files,                                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/telescope_etc.lua
+"<leader>ff"    Find files,                                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>ff"    Find Files,                                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/telescope_etc.lua
+"<leader>fg"    Live Grep,                                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/telescope_etc.lua
+"<leader>fg"    Live Grep,                                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/telescope_etc.lua
+"<leader>fg"    Live grep,                                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>fh"    Find Help Tags,                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/telescope_etc.lua
+"<leader>fh"    Find Help Tags,                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/telescope_etc.lua
+"<leader>fh"    Help tags,                                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>fq"    Quickfix list,                                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>fr"    Recent files,                                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>fs"    Document symbols,                                   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>ft"    Toggle floaterm,                                    |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/terminal.lua
+"<leader>ft"    Toggle floaterm,                                    |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/terminal.lua
+"<leader>fw"    Grep word under cursor,                             |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>fw"    Grep selection,                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+=======================
+=========  g  ========= GIT
+=======================
+"<leader>gB"    Git browse (open in browser),                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>gf"    Find Git Files,                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/telescope_etc.lua
+"<leader>gf"    Find Git Files,                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/telescope_etc.lua
+"<leader>gg"    Open Neogit UI                                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/git.lua
+"<leader>gl"    Lazygit log,                                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>gp"    -- 	action = ido.projects("~/repos")                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+=======================
+=========  h  ========= HELP / HARPOON
+=======================
+"<leader>h"     ":Pick help",                                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>ha"    Harpoon: add file,                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+"<leader>hh"    Harpoon: menu,                                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+"<leader>hn"    Harpoon: next,                                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+"<leader>hp"    Harpoon: prev,                                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+=======================
+=========  i  ========= ???
+=======================
+"<leader>iN"    Browse recent nerd icons,                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>id"    test_ido                                            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>ii"    "<cmd>Inspect<cr>"                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>in"    Browse nerd icons,                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+=======================
+=========  k  ========= 
+=======================
+"<leader>k"     ":Keymaps<CR>", {                                   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+=======================
+=========  l  =========
+=======================
+"<leader>l"     repeat last search,                                 |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>l"]    actions.enter_win("list"), -- Focus list window <>  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>l"]    actions.enter_win("preview"), -- Focus preview window <> ["q"] = actions.close, -- Closes Glance window <> ["Q"] = actions.close, ["<Esc>"] = actions.close, ["<C-q>"] = actions.quickfix, -- Send all locations to quickfix list <> -- ['<Esc>'] = false -- Disable a mapping <>  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>lf"    vim.lsp.buf.format desc = "",                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>lu"    -- 	function() -- 		-- Create a new empty floating window or split <> -- 		vim.cmd("vsplit | enew") <> -- 		vim.bo.filetype = "lua" <> -- 		vim.bo.bufhidden = "hide" <> -- 		map_explicit({ <> -- 			mode = "n", -- 			sequence = "<CR>", -- 			":.lua<CR>" -- 			opts = { buffer = true  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+=======================
+=========  m  =========
+=======================
+"<leader>md"    Marks: delete all buffer marks                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+"<leader>mf"    Move selection to new file (split),                 |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>mlb"   Marks: list buffer marks,                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+"<leader>mqb"   Marks: list buffer marks in quickfix,               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/navigation.lua
+"<leader>ms"    move_selection_to_new_file                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+=======================
+=========  n  =========
+=======================
+"<leader>n"     Notification history,                               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>nb"    function() navbuddy.open() end                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/ui.lua
+=======================
+=========  o  =========
+=======================
+"<leader>o"     ":update<CR> :source<CR>",                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>o"     "<cmd>AerialToggle<cr>"                             |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/ui.lua
+"<leader>o"     show options,                                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>oa"    Ask opencode…,                                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/ai.lua
+"<leader>os"    Select opencode…,                                   |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/ai.lua
+=======================
+=========  p  =========
+=======================
+"<leader>p"     "<cmd>:lua require('quicknote').NewNoteAtCurrentLine()<cr>", { |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>p"     Put from system (unnamedplus) clipboard,                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/clipboard.lua
+"<leader>pE"    function() return debug.print_exp({ output_location = "above"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>pEE"   function() return debug.print_exp({ output_location = "above"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>pP"    function() return debug.print_loc({ output_location = "above"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>pV"    function() return debug.print_var({ output_location = "above"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>pV"    function() return debug.print_var({ output_location = "above"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>pc"    TODO                                                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>pe"    function() return debug.print_exp({ output_location = "below"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>pee"   function() return debug.print_exp({ output_location = "below"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>pp"    action = utils.mkprint("This is working!"),                    |    /home/isaac/repos/neovim-flake/config_hooks_mirror/scratch/scratch.lua
+"<leader>pp"    action = utils.mkprint("This works"),                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>pp"    function() return debug.print_loc({ output_location = "below"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>pv"    function() return debug.print_var({ output_location = "below"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>pv"    function() return debug.print_var({ output_location = "below"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+=======================
+=========  q  =========
+=======================
+"<leader>q"     "<cmd>copen<cr>"                                    |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>q"     function() vim.diagnostic.setqflist({ bufnr = 0     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>q"     send all items to quickfix,                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>qa"    approve PR                                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/git.lua
+"<leader>qq"    ":quit<CR>"                                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+=======================
+=========  r  =========
+=======================
+"<leader>rE"    Extract Function To File, expr = true               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>rI"    Inline function, expr = true                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>rW"    "<CMD>SearchReplaceSingleBufferCWORD<CR>"           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rbW"   "<CMD>SearchReplaceMultiBufferCWORD<CR>"            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rbe"   "<CMD>SearchReplaceMultiBufferCExpr<CR>"            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rbf"   "<CMD>SearchReplaceMultiBufferCFile<CR>"            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rbo"   "<CMD>SearchReplaceMultiBufferOpen<CR>"             |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rbs"   "<CMD>SearchReplaceMultiBufferSelections<CR>"       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rbw"   "<CMD>SearchReplaceMultiBufferCWord<CR>"            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rc"    replace current line,                               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rd"    delete line,                                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>re"    "<CMD>SearchReplaceSingleBufferCExpr<CR>"           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>re"    Extract Function, expr = true                       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>ree"   Extract Function (line), expr = true                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>rf"    "<CMD>SearchReplaceSingleBufferCFile<CR> "          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>ri"    Inline Variable, expr = true                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>rn"    action = vim.lsp.buf.rename                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>ro"    "<CMD>SearchReplaceSingleBufferOpen<CR>"            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rp"    pick template,                                      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rq"    Macro history (neoclip)                             |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/clipboard.lua
+"<leader>rs"    "<CMD>SearchReplaceSingleBufferSelections<CR>"      |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>rs"    Select refactor                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>rt"    repl_send_line = "<leader>rl", repl_send_selection = "<leader>rs", repl_send_buffer = "<leader>rb", repl_clear = "<leader>rc", repl_history = "<leader>rh", repl_variables = "<leader>rv", repl_restart = "<leader>rR",  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/terminal.lua
+"<leader>rv"    Extract Variable                                    |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>rvv"   Extract Variable (line), expr = true                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>rw"    "<CMD>SearchReplaceSingleBufferCWord<CR>"           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>ry"    Yank history (neoclip)                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/clipboard.lua
+=======================
+=========  s  =========
+=======================
+"<leader>sR"    Spectre selection,                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>sR"    Spectre toggle,                                     |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>sW"    function() spectre.open_visual({ select_word = true |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>sf"    Spectre current file,                               |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>sr"    function() grug.open({ prefills = { search = grug.get_visual_selection()  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>sr"    Search and replace                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+"<leader>ss"    spread.out, default_options) <> vim.keymap.add("n", "<leader>ssc", spread.combine, default_options) <> end)
+"<leader>su"    action = setup_sunglasses                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/colors.lua
+"<leader>sw"    function() grug.open({ prefills = { search = vim.fn.expand("<cword>")  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+=======================
+=========  t  =========
+=======================
+"<leader>tC"    "<Cmd>Timew cancel<CR>",                            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>tO"    Toggle output panel,                                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/testing.lua
+"<leader>tO"    "Toggle output panel"
+"<leader>tS"    "Toggle test summary" "[t", function() neotest.jump.prev({ status = "failed"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/testing_old.lua
+"<leader>tS"    "<Cmd>Timew summary<CR>"                            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>tS"    Toggle test summary,                                |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/testing.lua
+"<leader>tc"    "<Cmd>Timew continue<CR>",                          |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>td"    "<Cmd>Timew delete<CR>",                            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>tf"    function() neotest.run.run(vim.fn.expand("%")) end "Run tests in file") <> nmap("<leader>ta", function() neotest.run.run(vim.fn.getcwd()) end "Run all tests") <> nmap("<leader>tl", function() neotest.run.run_last() end "Re-run last test") <> -- Debug <> nmap("<leader>td", function() neotest.run.run({ strategy = "dap"  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/testing_old.lua
+"<leader>tk"    Pick Taskfile task                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/task_runner.lua
+"<leader>tn"    "<Cmd>Timew start<CR>",                             |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>to"    function() neotest.output.open({ enter = false, short = false  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/testing.lua
+"<leader>ts"    "<Cmd>Timew stop<CR>",                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/miscellaneous.lua
+"<leader>ts"    function() neotest.run.stop() end "Stop running tests") <> -- UI <> nmap("<leader>to", function() neotest.output.open({ enter = false, short = false  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/testing_old.lua
+"<leader>tt"    "<cmd>InsertTime<CR>" opts = { noremap = true, silent = true  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/editing.lua
+"<leader>tt"    action = ':r! date "+\\%H:\\%M:\\%S" <CR>',         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/editing.lua
+"<leader>tt"    function() neotest.run.run({ <> strategy = "integrated", enter = false,  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/testing.lua
+"<leader>tt"    action = utils.mkprint("Leader is working!"),       |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>tt"    function() neotest.run.run({ <> strategy = function(spec) <> -- spec.strategy is the default table. We override it to be 'headless' <> spec.strategy = { <> type = "integrated", -- This ensures it doesn't try to open a TTY that hijacks focus <> detach = true,  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/testing_old.lua
+=======================
+=========  u  =========
+=======================
+"<leader>u"     "<cmd>MundoToggle<cr>"                              |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/editing.lua
+=======================
+=========  v  =========
+=======================
+"<leader>v"     change result view mode,                            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/search.lua
+=======================
+=========  w  =========
+=======================
+"<leader>wb"    ":MoveWord(-1)<CR>"                                 |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/editing.lua
+"<leader>wf"    ":MoveWord(1)<CR>"                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/editing.lua
+"<leader>wq"    ":wq<CR>"                                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>wq"    function() vim.cmd("wq") end                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+"<leader>ww"    ":write<CR>"                                        |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>ww"    function() vim.cmd("w") end                         |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/lsp_etc.lua
+=======================
+=========  x  =========
+=======================
+"<leader>xX"    vim.diagnostic.setqflist                            |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+"<leader>xx"    vim.diagnostic.setloclist                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/debugging.lua
+=======================
+=========    =========
+=======================
+"<leader>y"     Yank to system clipboard,                           |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/mappings.lua
+"<leader>y"     Yank to clipboard,                                  |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/clipboard.lua
+=======================
+=========  z  =========
+=======================
+"<leader>zm"    zenmode.toggle(...)                                 |    /home/isaac/repos/neovim-flake/config_hooks_mirror/lua/ui.lua

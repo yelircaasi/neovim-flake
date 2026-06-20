@@ -15,6 +15,14 @@ flexibility.
 
 ## Roadmap
 
+1. [ ] 
+
+2. [ ] set up efm-langserver with LSP
+3. [ ] 
+4. [ ] 
+5. [ ] 
+6. [ ] 
+
 ### Mappings (key knowledge)
 
 Use localleader as a different key from leader (conventionally for local mappings,
@@ -60,7 +68,18 @@ Self-contained keys (act immediately in normal mode):
 
 #### --- NAVIGATION ---
 
-- [ ] windows: up down left right, fzf menu, menu navigation (up down), move/rearrange
+- [ ] windows:
+  - navigate up: `<Ctrl-w>k`
+  - navigate down: `<Ctrl-w>j`
+  - navigate left: `<Ctrl-w>h`
+  - navigate right: `<Ctrl-w>l`
+  - move up: ``fzf menu
+  - move down: ``
+  - move left: ``
+  - move right: ``
+- [ ] rg menu
+- [ ] file picker
+- [ ] menu navigation (up down)
 - [ ] tabs: up down left right, fzf menu, menu navigation (up down), move/rearrange
 - [ ] buffers: up down left right, fzf menu, menu navigation (up down), move/rearrange
 
@@ -106,58 +125,10 @@ Self-contained keys (act immediately in normal mode):
 - [x] add <leader>wq, <leader>qq, etc
 - [ ] plugins from last good working config
 
-- [ ] [USE] trouble.nvim
-- [ ] [VENDOR] [wezterm.nvim](https://github.com/willothy/wezterm.nvim)
-- [ ] [VENDOR] [wezterm-move.nvim](https://github.com/letieu/wezterm-move.nvim)
-- [ ] [VENDOR] [shade.nvim](https://github.com/sunjon/shade.nvim)
-- [ ] [VENDOR] [jvim](https://github.com/ThePrimeagen/jvim.nvim) JSON navigation
-- [ ] [USE] conform.nvim
-- [ ] [USE] lazydev.nvim
-- [ ] [USE] fidget.nvim
-- [ ] [USE] https://github.com/mrjones2014/smart-splits.nvim
-  - [ ] FixCursorHold.nvim
-  - [ ] LuaSnip
-  - [ ] bamboo.nvim
-  - [ ] blink.cmp
-  - [ ] cmp-buffer
-  - [ ] cmp-nvim-lsp
-  - [ ] cmp-path
-  - [ ] cmp_luasnip
-  - [ ] conform.nvim
-  - [ ] copilot.lua
-  - [ ] dial.nvim
-  - [ ] diffview.nvim
-  - [ ] friendly-snippets
-  - [ ] gitsigns.nvim
-  - [ ] lazy.nvim
-  - [ ] lualine.nvim
-  - [ ] markit.nvim
-  - [ ] mini.nvim
-  - [ ] neotest
-  - [ ] neotest-python
-  - [ ] nvim-bqf
-  - [ ] nvim-cmp
-  - [ ] nvim-nio
-  - [ ] nvim-treesitter-textobjects
-  - [ ] pickme.nvim
-  - [x] plenary.nvim
-  - [ ] snacks.nvim
-  - [ ] telescope-fzf-native.nvim
-  - [ ] telescope.nvim
-  - [ ] todo-comments.nvim
-  - [ ] toggleterm.nvim
-  - [ ] vim-floaterm
-  - [ ] vim-visual-multi
-  - [ ] wezterm.nvim
-  - [ ] which-key.nvim
-  - [ ] yazi.nvim
-  - [ ] zen-mode.nvim
-
-- [ ] Add cloud.lua
+- [X] Add cloud.lua
 - [ ] add factory functions and `make_setup_function` and `make_packadd` in utils to simplify 
       toggling plugin setup and passing around (wrapped) setup calls, adding them to keymaps and commands, etc
 - [ ] Add basedpyright to nix-config, along with other language servers I want available from anywhere. 
-
 - [ ] gather all nvim configs I have written, glean what
       is still usable, combine them here
 - [x] fork dial, fix structure, write nix expression
@@ -168,146 +139,190 @@ Self-contained keys (act immediately in normal mode):
 - [ ] go through, clean up and pare down notes
 - [ ] get Python LSP running properly
 
-- set up with at least minimal config: ------------------------------------------
-  - [x] mypy
-  - [x] lsp-format
-  - [x] lspkind
-  - [x] lspsaga
-  - [x] trouble.nvim
-  - [x] quicker
-  - [x] null-ls
-  - [x] nvim-lint
-  - [x] refactoring
-  - [x] NeoComposer
-  - [x] recorder
-  - [x] auto-session
-  - [x] persistence
-  - [x] project_nvim
-  - [x] deck
-  - [x] neotest-python
-  - [x] rustaceanvim
-  - [x] haskell-tools
-  - [x] lazydev
-  - [x] crates
-  - [x] cargo
-  - [x] neorepl
+- [x] [USING] [lazygit](https://github.com/kdheepak/lazygit.nvim) / [neogit](https://github.com/NeogitOrg/neogit)
+- [x] [USING] auto-session
+- [x] [USING] blink.cmp
+- [x] [USING] cargo
+- [x] [USING] conform.nvim
+- [x] [USING] copilot.lua
+- [x] [USING] crates
+- [x] [USING] deck
+- [x] [USING] dial.nvim
+- [x] [USING] diffview.nvim
+- [x] [USING] fidget.nvim
+- [x] [USING] flash.nvim
+- [x] [USING] friendly-snippets
+- [x] [USING] gitsigns.nvim
+- [x] [USING] grug-far.nvim https://github.com/MagicDuck/grug-far.nvim
+- [x] [USING] haskell-tools
+- [x] [USING] hlsearch.nvim
+- [x] [USING] https://github.com/b0o/schemastore.nvim
+- [x] [USING] https://github.com/hrsh7th/nvim-deck
+- [x] [USING] https://github.com/mrjones2014/smart-splits.nvim
+- [x] [USING] https://github.com/Tastyep/structlog.nvim
+- [x] [USING] lazydev
+- [x] [USING] lazydev.nvim
+- [x] [USING] lsp-format
+- [x] [USING] lspkind
+- [x] [USING] lspsaga
+- [x] [USING] lualine.nvim
+- [x] [USING] luasnip
+- [x] [USING] LuaSnip
+- [x] [USING] markit.nvim
+- [x] [USING] mfussenegger/nvim-dap and rcarriga/nvim-dap-ui
+- [x] [USING] mini.nvim
+- [x] [USING] modes.nvim
+- [x] [USING] mypy
+- [x] [USING] neo-tree.nvim
+- [x] [USING] NeoComposer 
+- [x] [USING] neorepl
+- [x] [USING] neotest
+- [x] [USING] neotest-python
+- [x] [USING] null-ls
+- [x] [USING] nvim-bqf
+- [x] [USING] nvim-lint
+- [x] [USING] nvim-nio
+- [x] [USING] nvim-treesitter-textobjects
+- [x] [USING] oil
+- [x] [USING] persistence
+- [x] [USING] pickme.nvim
+- [x] [USING] plenary.nvim
+- [x] [USING] project_nvim
+- [x] [USING] quicker
+- [x] [USING] rainbow-delimiters.nvim
+- [x] [USING] recorder
+- [x] [USING] refactoring
+- [x] [USING] render-markdown.nvim
+- [x] [USING] rustaceanvim
+- [x] [USING] SmiteshP/nvim-navic
+- [x] [USING] snacks.nvim
+- [x] [USING] telescope-fzf-native.nvim
+- [x] [USING] telescope.nvim
+- [x] [USING] todo-comments.nvim
+- [x] [USING] toggleterm.nvim
+- [x] [USING] trouble.nvim
+- [x] [USING] vim-floaterm
+- [x] [USING] vim-visual-multi
+- [x] [USING] which-key.nvim
+- [x] [USING] yazi.nvim
+- [x] [USING] zen-mode.nvim
 
-#### Longer Plugin List
+#### Plugin Suites
 
-- [ ] [TRY] luasnip
-- [ ] [TRY] oil
-- [ ] [TRY] blink.cmp
-- [ ] [TRY] flash.nvim
-- [ ] [TRY] SmiteshP/nvim-navic
-- [ ] [TRY] grug-far.nvim https://github.com/MagicDuck/grug-far.nvim
-- [ ] [TRY] mfussenegger/nvim-dap and rcarriga/nvim-dap-ui
-- [ ] [TRY] [lazygit](https://github.com/kdheepak/lazygit.nvim) / [neogit](https://github.com/NeogitOrg/neogit)
-- [ ] [TRY] https://github.com/hrsh7th/nvim-deck
-- [ ] [TRY] neo-tree.nvim
-- [ ] [TRY] rainbow-delimiters.nvim
-- [ ] [TRY] modes.nvim
-- [ ] [TRY] render-markdown.nvim
-- [ ] [TRY] telescope.nvim
-- [ ] [TRY] hlsearch.nvim
-- [ ] [TRY] https://github.com/nvimtools/none-ls.nvim/
-- [ ] [TRY] https://github.com/b0o/schemastore.nvim
-- [ ] [LATER] https://github.com/Tastyep/structlog.nvim
-- [ ] [TRY] snacks.nvim
-    - [ ] [] animate      Efficient animations including over 45 easing functions (library)    
-    - [ ] [] bigfile      Deal with big files (extra config required!)
-    - [ ] [] bufdelete    Delete buffers without disrupting window layout    
-    - [ ] [] dashboard    Beautiful declarative dashboards (extra config required!)
-    - [ ] [] debug        Pretty inspect & backtraces for debugging    
-    - [ ] [] dim          Focus on the active scope by dimming the rest    
-    - [ ] [] explorer     A file explorer (picker in disguise) (extra config required!)
-    - [ ] [TRY] gh        GitHub CLI integration    
-    - [ ] [TRY] git       Git utilities    
-    - [ ] [TRY] gitbrowse Open the current file, branch, commit, or repo in a browser (e.g. GitHub, GitLab, Bitbucket)    
-    - [ ] [] image        Image viewer using Kitty Graphics Protocol, supported by kitty, wezterm and ghostty (extra config required!)
-    - [ ] [] indent       Indent guides and scopes    
-    - [ ] [] input        Better vim.ui.input (extra config required!)
-    - [ ] [] keymap       Better vim.keymap with support for filetypes and LSP clients    
-    - [ ] [] layout       Window layouts    
-    - [ ] [] lazygit      Open LazyGit in a float, auto-configure colorscheme and integration with Neovim    
-    - [ ] [] notifier     Pretty vim.notify (extra config required!)
-    - [ ] [] notify       Utility functions to work with Neovim's vim.notify    
-    - [ ] [] picker       Picker for selecting items (extra config required!)
-    - [ ] [] profiler     Neovim lua profiler    
-    - [ ] [TRY] quickfile When doing nvim somefile.txt, it will render the file as quickly as possible, before loading your plugins. (extra config required!)
-    - [ ] [TRY] rename    LSP-integrated file renaming with support for plugins like neo-tree.nvim and mini.files.    
-    - [ ] [] scope        Scope detection, text objects and jumping based on treesitter or indent (extra config required!)
-    - [ ] [] scratch      Scratch buffers with a persistent file    
-    - [ ] [] scroll       Smooth scrolling (extra config required!)
-    - [ ] [] statuscolumn Pretty status column (extra config required!)
-    - [ ] [] terminal     Create and toggle floating/split terminals    
-    - [ ] [] toggle       Toggle keymaps integrated with which-key icons / colors    
-    - [ ] [] util         Utility functions for Snacks (library)    
-    - [ ] [] win          Create and manage floating windows or splits    
-    - [ ] [] words        Auto-show LSP references and quickly navigate between them (extra config required!)
-    - [ ] [] zen          Zen mode • distraction-free coding
+- [ ] [LATER] https://github.com/nvimtools/none-ls.nvim/
+- [ ] [USING] snacks.nvim
+    - [ ] [LATER] animate      Efficient animations including over 45 easing functions (library)    
+    - [ ] [LATER] bigfile      Deal with big files (extra config required!)
+    - [ ] [LATER] bufdelete    Delete buffers without disrupting window layout    
+    - [x] [USING] dashboard    Beautiful declarative dashboards (extra config required!)
+    - [ ] [LATER] debug        Pretty inspect & backtraces for debugging    
+    - [ ] [LATER] dim          Focus on the active scope by dimming the rest    
+    - [ ] [LATER] explorer     A file explorer (picker in disguise) (extra config required!)
+    - [ ] [LATER] gh           GitHub CLI integration    
+    - [ ] [LATER] git          Git utilities
+    - [ ] [LATER] gitbrowse    Open the current file, branch, commit, or repo in a browser 
+                               (e.g. GitHub, GitLab, Bitbucket)
+    - [ ] [LATER] image        Image viewer using Kitty Graphics Protocol, supported by kitty,
+                               wezterm and ghostty (extra config required!)
+    - [ ] [LATER] indent       Indent guides and scopes
+    - [ ] [LATER] input        Better vim.ui.input (extra config required!)
+    - [ ] [LATER] keymap       Better vim.keymap with support for filetypes and LSP clients
+    - [ ] [LATER] layout       Window layouts
+    - [ ] [LATER] lazygit      Open LazyGit in a float, auto-configure colorscheme and integration
+                               with Neovim
+    - [ ] [LATER] notifier     Pretty vim.notify (extra config required!)
+    - [ ] [LATER] notify       Utility functions to work with Neovim's vim.notify
+    - [x] [USING] picker       Picker for selecting items (extra config required!)
+    - [ ] [LATER] profiler     Neovim lua profiler
+    - [ ] [LATER] quickfile    When doing nvim somefile.txt, it will render the file as quickly as
+                               possible, before loading your plugins. (extra config required!)
+    - [ ] [LATER] rename       LSP-integrated file renaming with support for plugins like
+                               neo-tree.nvim and mini.files.
+    - [ ] [LATER] scope        Scope detection, text objects and jumping based on treesitter or
+                               indent (extra config required!)
+    - [ ] [LATER] scratch      Scratch buffers with a persistent file
+    - [ ] [LATER] scroll       Smooth scrolling (extra config required!)
+    - [ ] [LATER] statuscolumn Pretty status column (extra config required!)
+    - [ ] [LATER] terminal     Create and toggle floating/split terminals
+    - [ ] [LATER] toggle       Toggle keymaps integrated with which-key icons / colors
+    - [ ] [LATER] util         Utility functions for Snacks (library)
+    - [ ] [LATER] win          Create and manage floating windows or splits
+    - [ ] [LATER] words        Auto-show LSP references and quickly navigate between them 
+                               (extra config required!)
+    - [ ] [LATER] zen          Zen mode • distraction-free coding
 - [ ] go through [nvimdev](https://nvimdev.github.io)
-    - [ ] [] [TRY] flybuf.nvim: Show buffers list in float window and quickly navigate between
-    - [ ] [] [TRY] guard.nvim: Async format and linting utility for Neovim
-    - [ ] [] [TRY] indentmini.nvim: A minimalist indent plugin https://github.com/nvimdev/indentmini.nvim
-    - [ ] [] [TRY] mdashboard-nvim: Fancy Neovim start screen
-    - [ ] [] [USE] lspsaga.nvim: Neovim LSP enhancement plugin
-    - [ ] [] dbsession.nvim: A simple session management plugin
-    - [ ] [] dyninput.nvim: Dynamically change input character
-    - [ ] [] nerdicons.nvim: Search, copy, and paste Nerd Fonts icons
-    - [ ] [] template.nvim: Template for Neovim
+    - [x] [USING] flybuf.nvim: Show buffers list in float window and quickly navigate between
+    - [x] [USING] indentmini.nvim: A minimalist indent plugin https://github.com/nvimdev/indentmini.nvim
+    - [x] [USING] lspsaga.nvim: Neovim LSP enhancement plugin
+    - [ ] [LATER] dashboard-nvim: Fancy Neovim start screen
+    - [ ] [LATER] dbsession.nvim: A simple session management plugin
+    - [ ] [LATER] dyninput.nvim: Dynamically change input character
+    - [ ] [LATER] nerdicons.nvim: Search, copy, and paste Nerd Fonts icons
+    - [ ] [LATER] template.nvim: Template for Neovim
+    - [ ] [REJECTED] guard.nvim: Async format and linting utility for Neovim
 - [ ] go through [mini suite](https://nvim-mini.org/mini.nvim/)
     - [ ] [] editing
-        - [ ] [] mini.ai           Extend and create a/i textobjects
-        - [ ] [TRY] mini.align     Align text interactively
-        - [ ] [] mini.comment      Comment lines
-        - [ ] [] mini.completion   Completion and signature help
-        - [ ] [TRY] mini.keymap    Special key mappings
-        - [ ] [TRY] mini.move      Move any selection in any direction
-        - [ ] [TRY] mini.operators Text edit operators
-        - [ ] [TRY] mini.pairs     Autopairs
-        - [ ] [] mini.snippets     Manage and expand snippets
-        - [ ] [] mini.splitjoin    Split and join arguments
-        - [ ] [TRY] mini.surround  Surround actions
+        - [x] [USING] mini.align        Align text interactively
+        - [ ] [LATER] mini.ai           Extend and create a/i textobjects
+        - [ ] [LATER] mini.comment      Comment lines
+        - [ ] [LATER] mini.completion   Completion and signature help
+        - [ ] [LATER] mini.keymap       Special key mappings
+        - [ ] [LATER] mini.move         Move any selection in any direction
+        - [ ] [LATER] mini.operators    Text edit operators
+        - [ ] [LATER] mini.pairs        Autopairs
+        - [ ] [LATER] mini.snippets     Manage and expand snippets
+        - [ ] [LATER] mini.splitjoin    Split and join arguments
+        - [ ] [LATER] mini.surround     Surround actions
     - [ ] [] workflow
-        - [ ] [] mini.basics       Common configuration presets
-        - [ ] [] mini.bracketed    Go forward/backward with square brackets
-        - [ ] [] mini.bufremove    Remove buffers
-        - [ ] [] mini.clue         Show next key clues
-        - [ ] [] mini.cmdline      Command line tweaks
-        - [ ] [] mini.deps         Plugin manager
-        - [ ] [TRY] mini.diff      Work with diff hunks
-        - [ ] [] mini.extra        Extra ‘mini.nvim’ functionality
-        - [ ] [TRY] mini.files     Navigate and manipulate file system
-        - [ ] [] mini.git          Git integration
-        - [ ] [] mini.jump         Jump to next/previous single character
-        - [ ] [] mini.jump2d       Jump within visible lines
-        - [ ] [] mini.misc         Miscellaneous functions
-        - [ ] [TRY] mini.pick      Pick anything
-        - [ ] [TRY] mini.sessions  Session management
-        - [ ] [TRY] mini.visits    Track and reuse file system visits
-    - [ ] [] appearance
-        - [ ] [] mini.animate      Animate common Neovim actions
-        - [ ] [] mini.base16       Base16 colorscheme creation
-        - [ ] [] mini.colors       Tweak and save any color scheme
-        - [ ] [] mini.cursorword   Autohighlight word under cursor
-        - [ ] [] mini.hipatterns   Highlight patterns in text
-        - [ ] [] mini.hues         Generate configurable color scheme
-        - [ ] [] mini.icons        Icon provider
-        - [ ] [] mini.indentscope  Visualize and work with indent scope
-        - [ ] [] mini.map          Window with buffer text overview
-        - [ ] [] mini.notify       Show notifications
-        - [ ] [] mini.starter      Start screen
-        - [ ] [] mini.statusline   Statusline
-        - [ ] [] mini.tabline      Tabline
-        - [ ] [USE] mini.trailspace Trailspace (highlight and remove)
-    - [ ] [] other
-        - [ ] [] mini.doc          Generate Neovim help files
-        - [ ] [TRY] mini.fuzzy     Fuzzy matching
-        - [ ] [] mini.test         Test Neovim plugins
+        - [ ] [LATER] mini.basics       Common configuration presets
+        - [ ] [LATER] mini.bracketed    Go forward/backward with square brackets
+        - [ ] [LATER] mini.bufremove    Remove buffers
+        - [ ] [LATER] mini.clue         Show next key clues
+        - [ ] [LATER] mini.cmdline      Command line tweaks
+        - [ ] [LATER] mini.deps         Plugin manager
+        - [ ] [LATER] mini.diff         Work with diff hunks
+        - [ ] [LATER] mini.extra        Extra ‘mini.nvim’ functionality
+        - [ ] [LATER] mini.files        Navigate and manipulate file system
+        - [ ] [LATER] mini.git          Git integration
+        - [ ] [LATER] mini.jump         Jump to next/previous single character
+        - [ ] [LATER] mini.jump2d       Jump within visible lines
+        - [ ] [LATER] mini.misc         Miscellaneous functions
+        - [ ] [LATER] mini.pick         Pick anything
+        - [ ] [LATER] mini.sessions     Session management
+        - [ ] [LATER] mini.visits       Track and reuse file system visits
+    - [ ] [LATER] appearance
+        - [ ] [LATER] mini.animate      Animate common Neovim actions
+        - [ ] [LATER] mini.base16       Base16 colorscheme creation
+        - [ ] [LATER] mini.colors       Tweak and save any color scheme
+        - [ ] [LATER] mini.cursorword   Autohighlight word under cursor
+        - [ ] [LATER] mini.hipatterns   Highlight patterns in text
+        - [ ] [LATER] mini.hues         Generate configurable color scheme
+        - [ ] [LATER] mini.icons        Icon provider
+        - [ ] [LATER] mini.indentscope  Visualize and work with indent scope
+        - [ ] [LATER] mini.map          Window with buffer text overview
+        - [ ] [LATER] mini.notify       Show notifications
+        - [ ] [LATER] mini.starter      Start screen
+        - [ ] [LATER] mini.statusline   Statusline
+        - [ ] [LATER] mini.tabline      Tabline
+        - [ ] [USE] mini.trailspace     Trailspace (highlight and remove)
+    - [ ] [LATER] other
+        - [ ] [LATER] mini.doc          Generate Neovim help files
+        - [ ] [LATER] mini.fuzzy        Fuzzy matching
+        - [ ] [LATER] mini.test         Test Neovim plugins
 
 #### === TO HACK ON ===
 
-- [ ] oxi
+- [ ] [LATER] oxi
+
+#### === REJECTED ===
+
+- [ ] [REJECTED] FixCursorHold.nvim
+- [ ] [REJECTED] cmp_luasnip
+- [ ] [REJECTED] cmp-buffer
+- [ ] [REJECTED] cmp-nvim-lsp
+- [ ] [REJECTED] cmp-path
+- [ ] [REJECTED] lazy.nvim
+- [ ] [REJECTED] nvim-cmp
 
 #### === SOMEDAY ===
 
@@ -317,7 +332,6 @@ Self-contained keys (act immediately in normal mode):
 - [ ] quarto
 - [ ] render
 - [ ] telescope-file-history
-- [ ] trouble.nvim
 - [ ] typescript-tools
 - [ ] typst
 - [ ] vague
@@ -329,11 +343,18 @@ Self-contained keys (act immediately in normal mode):
 - [ ] gruvbox-material
 - [ ] hologram
 - [ ] image_preview
-- [ ] jupytext
+- [x] jupytext
 - [ ] cloak
+- [ ] [ivy](https://github.com/AdeAttwood/ivy.nvim)
 
 #### === TO VENDOR ===
 
+- [ ] [VENDOR] [jvim](https://github.com/ThePrimeagen/jvim.nvim) JSON navigation
+- [ ] [VENDOR] [shade.nvim](https://github.com/sunjon/shade.nvim)
+- [ ] [VENDOR] [wezterm-move.nvim](https://github.com/letieu/wezterm-move.nvim)
+- [ ] [VENDOR] [wezterm.nvim](https://github.com/willothy/wezterm.nvim)
+- [ ] [VENDOR] bamboo.nvim
+- [ ] [VENDOR] wezterm.nvim
 - [ ] vim-capslock
 - [ ] vim-numbertoggle
 - [ ] vim-repeat
@@ -346,18 +367,9 @@ Self-contained keys (act immediately in normal mode):
 - [ ] checkupdate
 - [ ] editorconfig
 
-#### More complicated installations:
-
-```lua
-  setup_plugin("ido", {}) -- 'fzy.lua' not found
-  setup_plugin("ivy", {}) -- libivyrs.so not found
-```
-
 #### Fix dependency: ts-context-commentstring
 
-```lua
-	setup_plugin("structlog", {})
-```
+- structlog
 
 #### Set up telescope extensions:
 
@@ -375,7 +387,7 @@ Self-contained keys (act immediately in normal mode):
 	setup_plugin("telescope-xc", {})
 ```
 
-#### Set up completion sources:
+#### Remove old completion sources (when blink.cmp is working):
 
 ```lua
 	setup_plugin("cmp_bulma", {})
@@ -587,6 +599,7 @@ neorg-taskwarrior behaves as a neorg plugin, not a top-level plugin
 - [ ] https://github.com/Robitx/gp.nvim
 - [ ] https://openrouter.ai/ + https://github.com/josh-le/openrouter.nvim
 - [ ] https://github.com/frankroeder/parrot.nvim
+
 ## Data Flow
 
 `plugin-set.nix` gets plugins from `nixpkgs` and `self-packaged-plugins.nix`.

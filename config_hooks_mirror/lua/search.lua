@@ -2,6 +2,7 @@ local selections = {
 	picker = "snacks",
 }
 local elements = {
+	["ido"] = true,
 	["regex-vars"] = false,
 	["inc_rename"] = false,
 	["muren"] = false,
@@ -9,7 +10,7 @@ local elements = {
 	["sad"] = false,
 	["fzf-lua"] = false,
 	["deck"] = false,
-	["snacks"] = selections.picker == "snacks",
+	["snacks"] = false, -- selections.picker == "snacks",
 	["hlslens"] = false,
 	["nvim-hlsearch"] = false,
 	["grug-far"] = false,
@@ -28,6 +29,35 @@ local elements = {
 	["nvim-monorepos"] = false,
 	["blink"] = false,
 }
+
+local function setup_ido()
+	local ido_config = {} -- TODO
+	setup_plugin("ido", function(ido)
+		ido.bind({
+			["jk"] = ido.exit,
+			["<c-j>"] = ido.next,
+			["<c-k>"] = ido.prev,
+			["<tab>"] = ido.accept_item,
+		})
+		-- map_explicit({
+		-- 	mode = "n",
+		-- 	sequence = "<leader>gp",
+		-- 	action = ido.projects("~/repos"),
+		-- })
+
+		local function test_ido()
+			ido.start({ "red", "green", "blue" }, function(v)
+				print(v)
+			end)
+		end
+
+		map_explicit({
+			mode = "n",
+			sequence = "<leader>id",
+			action = test_ido,
+		})
+	end)
+end
 
 local function setup_regex_vars()
 	-- https://github.com/jake-stewart/regex-vars.nvim
@@ -1363,6 +1393,7 @@ local function setup_blink()
 end
 
 local functions = {
+	["ido"] = setup_ido,
 	["regex-vars"] = setup_regex_vars,
 	["inc_rename"] = setup_inc_rename,
 	["muren"] = setup_muren,
@@ -1398,6 +1429,7 @@ local function maybe_call(element_name)
 	end
 end
 
+maybe_call("ido")
 maybe_call("regex-vars")
 maybe_call("inc_rename")
 maybe_call("muren")

@@ -965,6 +965,7 @@ local function setup_refactoring()
 	setup_plugin("refactoring", function(refactoring)
 		refactoring.setup()
 		local keymap = vim.keymap
+		local debug = require("refactoring.debug")
 
 		keymap.set({ "n", "x" }, "<leader>re", function()
 			return require("refactoring").extract_func()
@@ -1000,49 +1001,49 @@ local function setup_refactoring()
 
 		-- `iw` is the builtin textobject for "in word". You can use any other textobject or even create the keymap without any textobject if you prefer to provide one yourself each time that you use the keymap
 		keymap.set("n", "<leader>pv", function()
-			return require("refactoring.debug").print_var({ output_location = "below" }) .. "iw"
+			return debug.print_var({ output_location = "below" }) .. "iw"
 		end, { desc = "Debug print var below", expr = true })
 		keymap.set("x", "<leader>pv", function()
-			return require("refactoring.debug").print_var({ output_location = "below" })
+			return debug.print_var({ output_location = "below" })
 		end, { desc = "Debug print var below", expr = true })
 
 		-- `iw` is the builtin textobject for "in word". You can use any other textobject or even create the keymap without any textobject if you prefer to provide one yourself each time that you use the keymap
 		keymap.set("n", "<leader>pV", function()
-			return require("refactoring.debug").print_var({ output_location = "above" }) .. "iw"
+			return debug.print_var({ output_location = "above" }) .. "iw"
 		end, { desc = "Debug print var above", expr = true })
 		keymap.set("x", "<leader>pV", function()
-			return require("refactoring.debug").print_var({ output_location = "above" })
+			return debug.print_var({ output_location = "above" })
 		end, { desc = "Debug print var above", expr = true })
 
 		keymap.set({ "x", "n" }, "<leader>pe", function()
-			return require("refactoring.debug").print_exp({ output_location = "below" })
+			return debug.print_exp({ output_location = "below" })
 		end, { desc = "Debug print exp below", expr = true })
 		-- `_` is the default textobject for "current line"
 		keymap.set("n", "<leader>pee", function()
-			return require("refactoring.debug").print_exp({ output_location = "below" }) .. "_"
+			return debug.print_exp({ output_location = "below" }) .. "_"
 		end, { desc = "Debug print exp below", expr = true })
 
 		keymap.set({ "x", "n" }, "<leader>pE", function()
-			return require("refactoring.debug").print_exp({ output_location = "above" })
+			return debug.print_exp({ output_location = "above" })
 		end, { desc = "Debug print exp above", expr = true })
 		-- `_` is the default textobject for "current line"
 		keymap.set("n", "<leader>pEE", function()
-			return require("refactoring.debug").print_exp({ output_location = "above" }) .. "_"
+			return debug.print_exp({ output_location = "above" }) .. "_"
 		end, { desc = "Debug print exp above", expr = true })
 
 		keymap.set("n", "<leader>pP", function()
-			return require("refactoring.debug").print_loc({ output_location = "above" })
+			return debug.print_loc({ output_location = "above" })
 		end, { desc = "Debug print location", expr = true })
 		keymap.set("n", "<leader>pp", function()
-			return require("refactoring.debug").print_loc({ output_location = "below" })
+			return debug.print_loc({ output_location = "below" })
 		end, { desc = "Debug print location", expr = true })
 
 		keymap.set({ "x", "n" }, "<leader>pc", function()
 			-- `ag` is a custom textobject that selects the whole buffer. It's provided by plugins like `mini.ai` (requires manual configuration using `MiniExtra.gen_ai_spec.buffer()`).
-			-- return require("refactoring.debug").cleanup { restore_view = true } .. "ag"
+			-- return debug.cleanup { restore_view = true } .. "ag"
 
 			-- this keymap doesn't select any textobject by default, so you need to provide one each time you use it.
-			return require("refactoring.debug").cleanup({ restore_view = true })
+			return debug.cleanup({ restore_view = true })
 		end, { desc = "Debug print clean", expr = true, remap = true })
 	end)
 end

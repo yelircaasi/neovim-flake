@@ -37,6 +37,7 @@ config_modules = {
 	["navigation"] = true,
 	["langs.python"] = true,
 	["mappings"] = true,
+	["search"] = true,
 
 	["ai"] = false,
 	["clipboard"] = true,
@@ -66,7 +67,6 @@ config_modules = {
 	["miscellaneous"] = false,
 	["projects"] = false,
 	["replacer"] = false,
-	["search"] = false,
 	["task_runner"] = false,
 	["telescope_etc"] = false,
 	["terminal"] = false,
