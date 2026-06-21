@@ -24,11 +24,14 @@
     installPhase = ''
       mkdir -p $out/lua
 
-      so=$(find target -type f -name "libnvim_winpick.so" | head -n 1)
+      ext="${pkgs.stdenv.hostPlatform.extensions.sharedLibrary}"
+      
+      lib=$(find target -type f -name "libnvim_winpick$ext" | head -n 1)
 
-      echo "Found: $so"
+      echo "Found: $lib"
 
-      cp "$so" $out/lua/nvim_winpick.so
+      # rename to .so (Neovim requires .so for Lua modules on all platforms)
+      cp "$lib" $out/lua/nvim_winpick.so
     '';
   };
 in rec {
@@ -1525,6 +1528,21 @@ in rec {
         description = "";
       };
     };
+    # dotdot = pkgs.vimUtils.buildVimPlugin {
+    #   pname = "dotdot";
+    #   version = "2026-03-14"; # updated: 2026-06
+    #   src = pkgs.fetchFromGitHub {
+    #     owner = "yelircaasi";
+    #     repo = "dotdot.nvim__mirror";
+    #     rev = "92e268eb5ac89e48450076cab245e7a5947aeea2";
+    #     hash = "";
+    #   };
+    #   doCheck = false;
+    #   meta = {
+    #     homepage = "https://codeberg.org/hernandez/dotdot.nvim";
+    #     description = ".";
+    #   };
+    # };
     dotdot = pkgs.vimUtils.buildVimPlugin {
       pname = "dotdot";
       version = "2026-03-14"; # updated: 2026-06
@@ -1536,7 +1554,7 @@ in rec {
       doCheck = false;
       meta = {
         homepage = "https://codeberg.org/hernandez/dotdot.nvim";
-        description = "";
+        description = "dotdot.nvim lets you search for and execute commands with a press of .. (i.e. period period)";
       };
     };
     minimal-narrow-region = pkgs.vimUtils.buildVimPlugin {
