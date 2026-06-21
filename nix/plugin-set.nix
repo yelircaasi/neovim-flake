@@ -2151,7 +2151,7 @@ in rec {
         owner = "notomo";
         repo = "tracebundler.nvim";
         rev = "d5cf812d20ef4291c4f858cccc0d38cb4d0439fe";
-        hash = "sha256-1hHT4mmrTnvLyBL2TAzl7cCYqvRPF6PoQUbOez6JjoI=";
+        hash = "sha256-rdNHD/1DLNIiD1TQnwL5OiikAH+gdtSln72QtX+AS1s=";
       };
       doCheck = false;
       meta = {
