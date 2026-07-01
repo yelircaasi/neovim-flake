@@ -6,19 +6,17 @@
     nixpkgs,
     flake-utils,
     neovim-nightly-overlay,
-    nix-treesitter,
     ...
   } @ inputs:
     flake-utils.lib.eachDefaultSystem (
       system: let
         blink-lib = inputs.blink-lib.packages.${system}.default;
         neovim-nightly = inputs.neovim-nightly-overlay.packages.${system}.default;
-        nix-treesitter = inputs.nix-treesitter.packages.${system}.default;
         pkgs = import inputs.nixpkgs {
           inherit system;
           # overlays = [neovim-nightly];
         };
-        pdeDerivation = import ./nix/pde.nix {inherit pkgs nix-treesitter neovim-nightly blink-lib;}; # neovim-nightly ;};
+        pdeDerivation = import ./nix/pde.nix {inherit pkgs neovim-nightly blink-lib;}; # neovim-nightly ;};
       in {
         apps = rec {
           default = pde;
@@ -56,12 +54,6 @@
 
     neovim-nightly-overlay = {
       url = "github:nix-community/neovim-nightly-overlay/0cbdb3a8833e52d3e51207291b17e613e8e94c99";
-      inputs.nixpkgs.follows = "nixpkgs";
-    };
-
-    nix-treesitter = {
-      # TODO: use or delete
-      url = "github:ratson/nix-treesitter/d9d35e37a5b2aee2f3f4d14c66e2bf0604dae4ce";
       inputs.nixpkgs.follows = "nixpkgs";
     };
 

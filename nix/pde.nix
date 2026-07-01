@@ -1,7 +1,6 @@
 {
   pkgs,
   neovim-nightly,
-  nix-treesitter,
   blink-lib,
   ...
 }: let
