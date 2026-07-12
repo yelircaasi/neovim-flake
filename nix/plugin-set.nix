@@ -25,7 +25,7 @@
       mkdir -p $out/lua
 
       ext="${pkgs.stdenv.hostPlatform.extensions.sharedLibrary}"
-      
+
       lib=$(find target -type f -name "libnvim_winpick$ext" | head -n 1)
 
       echo "Found: $lib"

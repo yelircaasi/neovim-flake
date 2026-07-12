@@ -15,6 +15,7 @@
         pkgs = import inputs.nixpkgs {
           inherit system;
           # overlays = [neovim-nightly];
+          config.allowUnfree = true;
         };
         pdeDerivation = import ./nix/pde.nix {inherit pkgs neovim-nightly blink-lib;}; # neovim-nightly ;};
       in {
