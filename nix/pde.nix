@@ -29,12 +29,14 @@
   nodeEnvSnippet = ''--cmd 'let g:node_host_prog="${pkgs.neovim-node-client}/bin/neovim-node-host"' '';
 
   jsregexp = pkgs.luajitPackages.jsregexp;
+
+  tools = import ./tools.nix {inherit pkgs;};
 in
   pkgs.stdenv.mkDerivation rec {
     name = "pde";
     src = ./.;
 
-    propagatedBuildInputs = import ./tools.nix {inherit pkgs;};
+    propagatedBuildInputs = tools + [pkgs.neovim-remote];
 
     buildInputs = [
       neovim-nightly
