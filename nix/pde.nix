@@ -36,7 +36,7 @@ in
     name = "pde";
     src = ./.;
 
-    propagatedBuildInputs = tools + [pkgs.neovim-remote];
+    propagatedBuildInputs = tools ++ [pkgs.neovim-remote];
 
     buildInputs = [
       neovim-nightly
