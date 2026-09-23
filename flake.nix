@@ -46,7 +46,7 @@
 
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs/612012e504d5a5f1625362a9de4779a4d00bd644";
+      url = "github:nixos/nixpkgs/5bacb6c43c4f82f7265acab8e1437660cc752a97"; # updated 09-2026
     };
 
     flake-utils = {
@@ -54,12 +54,12 @@
     };
 
     neovim-nightly-overlay = {
-      url = "github:nix-community/neovim-nightly-overlay/0cbdb3a8833e52d3e51207291b17e613e8e94c99";
+      url = "github:nix-community/neovim-nightly-overlay/47394c8e8ad56c63181864924d781045f602e472";  # updated 09-2026
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     blink-lib = {
-      url = "github:saghen/blink.lib/5876dd95deeb70aadbe9f1c0b7117a135061cdac";
+      url = "github:saghen/blink.lib/fd9a48ebbe6ec30d5dfcc5b42c243941ccdca1aa"; # updated 09-2026
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

@@ -1258,21 +1258,22 @@ in rec {
         description = "";
       };
     };
-    NeoComposer = pkgs.vimUtils.buildVimPlugin {
-      pname = "NeoComposer";
-      version = "2025-05-17"; # updated: 2026-06
-      src = pkgs.fetchFromGitHub {
-        owner = "lvim-tech";
-        repo = "NeoComposer.nvim";
-        rev = "83f78b23c4f6826b0f484a91869415b85f74b24f";
-        hash = "sha256-tdM6kp0UfGN6Y4kWAPPOhboLZQWNBKGylqj5zBO1uSg=";
-      };
-      doCheck = false;
-      meta = {
-        homepage = "https://github.com/lvim-tech/NeoComposer.nvim";
-        description = "";
-      };
-    };
+    # TODO: investigate
+    # NeoComposer = pkgs.vimUtils.buildVimPlugin {
+    #   pname = "NeoComposer";
+    #   version = "2025-05-17"; # updated: 2026-06
+    #   src = pkgs.fetchFromGitHub {
+    #     owner = "lvim-tech";
+    #     repo = "NeoComposer.nvim";
+    #     rev = "83f78b23c4f6826b0f484a91869415b85f74b24f";
+    #     hash = "sha256-tdM6kp0UfGN6Y4kWAPPOhboLZQWNBKGylqj5zBO1uSg=";
+    #   };
+    #   doCheck = false;
+    #   meta = {
+    #     homepage = "https://github.com/lvim-tech/NeoComposer.nvim";
+    #     description = "";
+    #   };
+    # };
     nvim-macros = pkgs.vimUtils.buildVimPlugin {
       pname = "nvim-macros";
       version = "2024-02-16"; # updated: 2026-06
@@ -1543,6 +1544,7 @@ in rec {
     #     description = ".";
     #   };
     # };
+
     dotdot = pkgs.vimUtils.buildVimPlugin {
       pname = "dotdot";
       version = "2026-03-14"; # updated: 2026-06
@@ -2369,21 +2371,21 @@ in rec {
         description = "";
       };
     };
-    lvim-ui-config = pkgs.vimUtils.buildVimPlugin {
-      pname = "lvim-ui-config";
-      version = "2024-12-26"; # updated: 2026-06
-      src = pkgs.fetchFromGitHub {
-        owner = "lvim-tech";
-        repo = "lvim-ui-config";
-        rev = "56ec5a05408045b62f5fd59d94ca34223450cf57";
-        hash = "sha256-m8MTj4Wg+R1B5nJMtgAu9J6n6hXVxNKHgI92mEL68gA=";
-      };
-      doCheck = false;
-      meta = {
-        homepage = "https://github.com/lvim-tech/lvim-ui-config";
-        description = "";
-      };
-    };
+    # lvim-ui-config = pkgs.vimUtils.buildVimPlugin {
+    #   pname = "lvim-ui-config";
+    #   version = "2024-12-26"; # updated: 2026-06
+    #   src = pkgs.fetchFromGitHub {
+    #     owner = "lvim-tech";
+    #     repo = "lvim-ui-config";
+    #     rev = "56ec5a05408045b62f5fd59d94ca34223450cf57";
+    #     hash = "sha256-m8MTj4Wg+R1B5nJMtgAu9J6n6hXVxNKHgI92mEL68gA=";
+    #   };
+    #   doCheck = false;
+    #   meta = {
+    #     homepage = "https://github.com/lvim-tech/lvim-ui-config";
+    #     description = "";
+    #   };
+    # };
     bye-nerdfont = pkgs.vimUtils.buildVimPlugin {
       pname = "bye-nerdfont";
       version = "2023-07-24"; # updated: 2026-06
@@ -3393,10 +3395,10 @@ in rec {
       name = "nvim-navbuddy";
       path = nvim-navbuddy;
     }
-    # { UNFREE LICENSE (?) TODO: vendor
-    #   name = "barbar";
-    #   path = barbar-nvim;
-    # }
+    { #  UNFREE LICENSE (?) TODO: vendor
+      name = "barbar";
+      path = barbar-nvim;
+    }
     {
       name = "tabby";
       path = tabby-nvim;
@@ -3844,16 +3846,16 @@ in rec {
       path = nvim-dap-python;
     }
     {
+      name = "dap";
+      path = nvim-dap;
+    }
+    {
       name = "dapui";
       path = nvim-dap-ui;
     }
     {
       name = "nvim-dap-virtual-text";
       path = nvim-dap-virtual-text;
-    }
-    {
-      name = "dap";
-      path = nvim-dap;
     }
     {
       name = "trouble";
@@ -4010,10 +4012,6 @@ in rec {
       path = vim-pug;
     }
     {
-      name = "copilot";
-      path = copilot-lua;
-    }
-    {
       name = "opencode";
       path = opencode-nvim;
     }
@@ -4121,6 +4119,12 @@ in rec {
       name = "blink-cmp-avante";
       path = blink-cmp-avante;
     }
+    # TODO: make custom expression
+    {
+      name = "copilot";
+      path = copilot-lua;
+    }
+    # TODO: debug
     {
       name = "blink-cmp-copilot";
       path = blink-cmp-copilot;
