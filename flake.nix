@@ -46,20 +46,20 @@
 
   inputs = {
     nixpkgs = {
-      url = "github:nixos/nixpkgs/5bacb6c43c4f82f7265acab8e1437660cc752a97"; # updated 09-2026
+      url = "github:nixos/nixpkgs/c57a028c30068aa2a7e00fa87300804dab748ff5";  # updated 2026-10-27
     };
 
     flake-utils = {
-      url = "github:numtide/flake-utils/11707dc2f618dd54ca8739b309ec4fc024de578b";
+      url = "github:numtide/flake-utils/b7a79d3fea1e214f6d668d521cecec0c01e26544";  # updated 2026-10-27
     };
 
     neovim-nightly-overlay = {
-      url = "github:nix-community/neovim-nightly-overlay/47394c8e8ad56c63181864924d781045f602e472";  # updated 09-2026
+      url = "github:nix-community/neovim-nightly-overlay/ca14eed2583453aab3c37e5ba711ccea22f5299b";  # updated 2026-10-27
       inputs.nixpkgs.follows = "nixpkgs";
     };
 
     blink-lib = {
-      url = "github:saghen/blink.lib/fd9a48ebbe6ec30d5dfcc5b42c243941ccdca1aa"; # updated 09-2026
+      url = "github:saghen/blink.lib/fd9a48ebbe6ec30d5dfcc5b42c243941ccdca1aa";  # updated 2026-10-27
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };

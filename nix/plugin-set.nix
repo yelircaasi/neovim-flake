@@ -3749,7 +3749,7 @@ in rec {
       path = cmp-nvim-lsp-signature-help;
     }
     {
-      # TODO: vendor because "unfree" (?)
+      # TODO: fix
       name = "diagflow";
       path = diagflow-nvim;
     }
