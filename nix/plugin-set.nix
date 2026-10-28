@@ -3348,6 +3348,8 @@ in rec {
       path = otter-nvim;
     }
     {
+      # TODO: causes deprecation warning due to nvim-treesitter-legacy,
+      #       so fork, update, and package
       name = "FeMaco";
       path = nvim-FeMaco-lua;
     }
